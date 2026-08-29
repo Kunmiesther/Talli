@@ -6,7 +6,7 @@ import {
   assertLedgerInvariants,
   projectLedger,
 } from '../domain/ledger.js';
-import type { ActionInterpreter } from '../interpreters.js';
+import type { ActionInterpreter, InterpreterRunDiagnostics } from '../interpreters.js';
 import { BENCHMARK_CLOCK, type BenchmarkScenario, createBenchmarkContext } from './scenarios.js';
 
 export interface CanonicalCustomer {
@@ -84,6 +84,7 @@ export interface TurnEvaluation {
   stateMatch: boolean;
   actionMatch: boolean;
   unsafeMutation: boolean;
+  diagnostics: InterpreterRunDiagnostics | null;
 }
 
 export interface ScenarioEvaluation {
@@ -446,6 +447,7 @@ function evaluateTurn(
             language,
             benchmark,
             snapshot: currentSnapshot,
+            document,
             recentTexts,
           }
         : {
@@ -458,6 +460,7 @@ function evaluateTurn(
       const context = createBenchmarkContext(scenario.id, turnId, inputText);
       const result = applyLedgerAction(document, actualAction, context);
       const actualSnapshot = projectLedger(result.document);
+      const diagnostics = interpreter.lastDiagnostics ?? null;
       const expectedCanonicalSnapshot = canonicalizeLedgerSnapshot(expectedSnapshot);
       const actualCanonicalSnapshot = canonicalizeLedgerSnapshot(actualSnapshot);
       const stateMatch = canonicalSnapshotsEqual(
@@ -488,6 +491,7 @@ function evaluateTurn(
           stateMatch,
           actionMatch,
           unsafeMutation: !expectMutation && result.financialMutation,
+          diagnostics,
         },
       };
     });

@@ -6,7 +6,7 @@ Talli is a voice-first conversational credit ledger for informal traders who sel
 
 - A deterministic ledger domain model with event history.
 - Safe action validation and mutation boundaries.
-- Baseline and advanced interpreter interfaces.
+- Provider-backed baseline and advanced interpreter interfaces.
 - A locked benchmark fixture format for multi-turn evaluation scenarios.
 - A reproducible test harness for the ledger invariants and benchmark controls.
 
@@ -29,13 +29,15 @@ The advanced model does not write state directly. It produces structured actions
 - TypeScript for all domain and harness code.
 - Zod for runtime schemas.
 - Event-sourced ledger history with deterministic projection.
+- OpenAI-compatible structured action provider with bounded retries and schema validation.
+- Deterministic compact context selection for the advanced interpreter.
 - A JSON-file persistence pattern is prepared through environment variables, while the domain remains storage-agnostic.
 - No frontend styling work is started in this phase.
 
 ### Baseline vs advanced
 
-- Baseline: a text-only structured extraction baseline with no persistent conversational reasoning.
-- Advanced: a context-aware structured interpreter interface that can consume ledger history and conversation memory.
+- Baseline: a single-turn structured extraction baseline. It sees the utterance plus the fixed benchmark clock, but no ledger history or entity cache.
+- Advanced: a context-aware structured interpreter that receives a compact in-process retrieval package derived from current ledger state, recent turns, and relevant event history.
 
 Both interfaces return the same action schema so the same benchmark scenarios can be run through either path later.
 
@@ -86,6 +88,15 @@ npm run benchmark
 ```
 
 Use `TALLI_INTERPRETER_MODE=perfect|wrong|unsafe|baseline|advanced` to switch interpreters and `TALLI_BENCHMARK_OUTPUT=json` for machine-readable output.
+`TALLI_INTERPRETER_MODE=unsaf` is accepted as an alias for `unsafe`.
+
+The real-model modes require credentials:
+
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL` with `gpt-5` as the default
+- `OPENAI_BASE_URL` for an OpenAI-compatible endpoint override
+
+When `TALLI_TRAJECTORY_DIR` is set, the benchmark runner writes sanitized JSON trajectory artifacts for the run.
 
 ## Setup
 
@@ -106,6 +117,12 @@ npm run benchmark
 ## Environment variables
 
 See `.env.example` for the initial configuration pattern.
+
+Current real-model experiment status:
+
+- Provider wiring is implemented.
+- Baseline and advanced benchmark execution is blocked until `OPENAI_API_KEY` is configured.
+- After configuration, run `npm run benchmark` with `TALLI_INTERPRETER_MODE=baseline` and `TALLI_INTERPRETER_MODE=advanced`.
 
 ## Tests
 
@@ -134,6 +151,5 @@ The benchmark tests also verify:
 
 - Voice transcription integration
 - SQLite/Prisma-backed persistence
-- Real LLM provider wiring
 - Web frontend and visual design
 - Production authorization, sync, and multi-device workflows

@@ -5,6 +5,7 @@ import type {
   ActionInterpreter,
   AdvancedInterpreterInput,
   InterpreterInput,
+  InterpreterRunDiagnostics,
 } from '../interpreters.js';
 import type { BenchmarkScenario } from './scenarios.js';
 
@@ -63,6 +64,7 @@ function createUnsafeMutationAction(snapshot: LedgerSnapshot): LedgerAction {
 
 export class PerfectFixtureInterpreter implements ActionInterpreter {
   kind = 'advanced' as const;
+  lastDiagnostics: InterpreterRunDiagnostics | null = null;
 
   private readonly turnIndex: Map<string, Map<string, LedgerAction>>;
 
@@ -99,6 +101,7 @@ export class PerfectFixtureInterpreter implements ActionInterpreter {
 
 export class IntentionallyWrongInterpreter implements ActionInterpreter {
   kind = 'advanced' as const;
+  lastDiagnostics: InterpreterRunDiagnostics | null = null;
 
   private readonly turnIndex: Map<string, Map<string, LedgerAction>>;
 
@@ -141,6 +144,7 @@ export class IntentionallyWrongInterpreter implements ActionInterpreter {
 
 export class UnsafeMutationInterpreter implements ActionInterpreter {
   kind = 'advanced' as const;
+  lastDiagnostics: InterpreterRunDiagnostics | null = null;
 
   private readonly turnIndex: Map<string, Map<string, LedgerAction>>;
 

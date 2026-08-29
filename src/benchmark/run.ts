@@ -1,4 +1,7 @@
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { AdvancedInterpreter, BaselineInterpreter } from '../interpreters.js';
+import { createConfiguredStructuredActionModel } from '../llm/structured-action-model.js';
 import {
   IntentionallyWrongInterpreter,
   PerfectFixtureInterpreter,
@@ -22,9 +25,10 @@ function readInterpreterMode(): InterpreterMode {
     mode === 'advanced' ||
     mode === 'perfect' ||
     mode === 'wrong' ||
-    mode === 'unsafe'
+    mode === 'unsafe' ||
+    mode === 'unsaf'
   ) {
-    return mode;
+    return mode === 'unsaf' ? 'unsafe' : mode;
   }
 
   return 'baseline';
@@ -59,6 +63,7 @@ function renderScenarioFailures(scenario: {
     stateMatch: boolean;
     actionMatch: boolean;
     unsafeMutation: boolean;
+    diagnostics: unknown;
   }>;
 }): string[] {
   const lines: string[] = [];
@@ -78,6 +83,9 @@ function renderScenarioFailures(scenario: {
     lines.push(
       `    canonical state diff: ${diff.length > 0 ? `\n      - ${diff.join('\n      - ')}` : 'none'}`,
     );
+    if (turn.diagnostics) {
+      lines.push(`    diagnostics: ${JSON.stringify(turn.diagnostics, null, 2)}`);
+    }
   }
 
   if (failedTurns.length === 0) {
@@ -90,7 +98,9 @@ function renderScenarioFailures(scenario: {
 function buildInterpreter(mode: InterpreterMode, scenarios: readonly BenchmarkScenario[]) {
   switch (mode) {
     case 'advanced':
-      return new AdvancedInterpreter();
+      return new AdvancedInterpreter(requireConfiguredModel('advanced'));
+    case 'baseline':
+      return new BaselineInterpreter(requireConfiguredModel('baseline'));
     case 'perfect':
       return new PerfectFixtureInterpreter(scenarios);
     case 'wrong':
@@ -98,8 +108,79 @@ function buildInterpreter(mode: InterpreterMode, scenarios: readonly BenchmarkSc
     case 'unsafe':
       return new UnsafeMutationInterpreter(scenarios);
     default:
-      return new BaselineInterpreter();
+      throw new Error(`Unsupported interpreter mode: ${mode}`);
   }
+}
+
+function requireConfiguredModel(mode: 'baseline' | 'advanced') {
+  const model = createConfiguredStructuredActionModel();
+  if (!model) {
+    throw new Error(
+      `Missing OPENAI_API_KEY. Configure a real provider before running TALLI_INTERPRETER_MODE=${mode}.`,
+    );
+  }
+
+  return model;
+}
+
+function sanitizeFileName(value: string): string {
+  return value.replace(/[^a-zA-Z0-9._-]+/g, '_');
+}
+
+async function writeTrajectoryArtifact(
+  evaluation: Awaited<ReturnType<typeof evaluateBenchmark>>,
+  mode: string,
+) {
+  const directory = process.env.TALLI_TRAJECTORY_DIR?.trim();
+  if (!directory) {
+    return;
+  }
+
+  await mkdir(directory, { recursive: true });
+  const fileName = `trajectory-${sanitizeFileName(mode)}-${sanitizeFileName(new Date().toISOString())}.json`;
+  const filePath = join(directory, fileName);
+  const artifact = {
+    generatedAt: new Date().toISOString(),
+    mode,
+    referenceNow: evaluation.referenceNow,
+    timezone: evaluation.timezone,
+    scenarioCount: evaluation.scenarioCount,
+    turnCount: evaluation.turnCount,
+    lsa: evaluation.lsa,
+    actionAccuracy: evaluation.actionAccuracy,
+    abstentionRequiredTurnCount: evaluation.abstentionRequiredTurnCount,
+    unsafeMutationCount: evaluation.unsafeMutationCount,
+    umr: evaluation.umr,
+    scenarios: evaluation.scenarios.map((scenario) => ({
+      scenarioId: scenario.scenarioId,
+      title: scenario.title,
+      purpose: scenario.purpose,
+      lsa: scenario.lsa,
+      actionAccuracy: scenario.actionAccuracy,
+      abstentionRequiredTurnCount: scenario.abstentionRequiredTurnCount,
+      unsafeMutationCount: scenario.unsafeMutationCount,
+      turns: scenario.turns.map((turn) => ({
+        turnId: turn.turnId,
+        inputText: turn.inputText,
+        language: turn.language,
+        expectMutation: turn.expectMutation,
+        mutationOccurred: turn.mutationOccurred,
+        clarificationOccurred: turn.clarificationOccurred,
+        stateMatch: turn.stateMatch,
+        actionMatch: turn.actionMatch,
+        unsafeMutation: turn.unsafeMutation,
+        expectedAction: turn.expectedAction,
+        actualAction: turn.actualAction,
+        expectedCanonicalAction: turn.expectedCanonicalAction,
+        actualCanonicalAction: turn.actualCanonicalAction,
+        expectedSnapshot: turn.expectedCanonicalSnapshot,
+        actualSnapshot: turn.actualCanonicalSnapshot,
+        diagnostics: turn.diagnostics,
+      })),
+    })),
+  };
+
+  await writeFile(filePath, `${JSON.stringify(artifact, null, 2)}\n`, 'utf8');
 }
 
 async function main() {
@@ -107,6 +188,7 @@ async function main() {
   const outputFormat = readOutputFormat();
   const interpreter = buildInterpreter(mode, seedScenarios);
   const evaluation = await evaluateBenchmark(seedScenarios, interpreter, mode);
+  await writeTrajectoryArtifact(evaluation, mode);
 
   if (outputFormat === 'json') {
     console.log(JSON.stringify(evaluation, null, 2));

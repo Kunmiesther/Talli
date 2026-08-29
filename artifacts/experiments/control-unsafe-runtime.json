@@ -1,0 +1,4613 @@
+{
+  "mode": "unsafe",
+  "referenceNow": "2026-08-29T09:00:00+01:00",
+  "timezone": "Africa/Lagos",
+  "scenarioCount": 8,
+  "turnCount": 18,
+  "scenarios": [
+    {
+      "scenarioId": "simple-new-credit",
+      "title": "Simple New Credit",
+      "purpose": "Basic extraction and obligation creation with a deterministic due date.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 3500000,
+            "dueAt": "2026-09-03T23:00:00.000Z",
+            "source": {
+              "utterance": "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina took 35 thousand naira worth of goods today. She'll pay on Friday."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 3500000,
+            "dueAt": "2026-09-03T23:00:00.000Z",
+            "source": {
+              "utterance": "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina took 35 thousand naira worth of goods today. She'll pay on Friday."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 3500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": "2026-09-03T23:00:00.000Z",
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 3500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": "2026-09-03T23:00:00.000Z",
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-simple-new-credit-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-simple-new-credit-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0003",
+                "customerId": "bench-simple-new-credit-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 3500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 3500000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-09-03T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-simple-new-credit-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-simple-new-credit-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-simple-new-credit-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0003",
+                "customerId": "bench-simple-new-credit-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 3500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 3500000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-09-03T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-simple-new-credit-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-simple-new-credit-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0003",
+                "customerId": "bench-simple-new-credit-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 3500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 3500000,
+                "status": "open",
+                "dueAt": "2026-09-03T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-simple-new-credit-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0003",
+                "customerId": "bench-simple-new-credit-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 3500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 3500000,
+                "status": "open",
+                "dueAt": "2026-09-03T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 1,
+      "actionAccuracy": 1,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "umr": null
+    },
+    {
+      "scenarioId": "partial-payment",
+      "title": "Partial Payment",
+      "purpose": "A debt is created and a later turn records a partial repayment against the same obligation.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Amina took 50 thousand naira worth of goods.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 5000000,
+            "source": {
+              "utterance": "Amina took 50 thousand naira worth of goods.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina took 50 thousand naira worth of goods."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 5000000,
+            "source": {
+              "utterance": "Amina took 50 thousand naira worth of goods.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina took 50 thousand naira worth of goods."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 5000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 5000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Amina brought 10k this morning.",
+          "language": "en",
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-partial-payment-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-partial-payment-turn-1_0003"
+            },
+            "amountMinor": 1000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Amina brought 10k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina brought 10k this morning.",
+              "Amina took 50 thousand naira worth of goods."
+            ]
+          },
+          "actualAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-partial-payment-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-partial-payment-turn-1_0003"
+            },
+            "amountMinor": 1000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Amina brought 10k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina brought 10k this morning.",
+              "Amina took 50 thousand naira worth of goods."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-partial-payment-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-partial-payment-turn-1_0003"
+            },
+            "amountMinor": 1000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-partial-payment-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-partial-payment-turn-1_0003"
+            },
+            "amountMinor": 1000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 1000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0004",
+                  "bench-partial-payment-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-partial-payment-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 1000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 1000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-partial-payment-turn-1_0004",
+                  "bench-partial-payment-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-partial-payment-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 1000000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 1000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 1000000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 1000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 1000000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 1,
+      "actionAccuracy": 1,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "umr": null
+    },
+    {
+      "scenarioId": "full-settlement",
+      "title": "Full Settlement",
+      "purpose": "A debt is created, partially repaid, and then fully settled without creating duplicate records.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Amina took 60k goods yesterday.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 6000000,
+            "source": {
+              "utterance": "Amina took 60k goods yesterday.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina took 60k goods yesterday."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 6000000,
+            "source": {
+              "utterance": "Amina took 60k goods yesterday.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina took 60k goods yesterday."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 6000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 6000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 6000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 6000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 6000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 6000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Amina brought 20k this afternoon.",
+          "language": "en",
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-full-settlement-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-full-settlement-turn-1_0003"
+            },
+            "amountMinor": 2000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Amina brought 20k this afternoon.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina brought 20k this afternoon.",
+              "Amina took 60k goods yesterday."
+            ]
+          },
+          "actualAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-full-settlement-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-full-settlement-turn-1_0003"
+            },
+            "amountMinor": 2000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Amina brought 20k this afternoon.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina brought 20k this afternoon.",
+              "Amina took 60k goods yesterday."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-full-settlement-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-full-settlement-turn-1_0003"
+            },
+            "amountMinor": 2000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-full-settlement-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-full-settlement-turn-1_0003"
+            },
+            "amountMinor": 2000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0004",
+                  "bench-full-settlement-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-full-settlement-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0004",
+                  "bench-full-settlement-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-full-settlement-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "She has brought the remaining money.",
+          "language": "en",
+          "expectedAction": {
+            "type": "SETTLE_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining money",
+              "previousTurnId": "turn-1"
+            },
+            "source": {
+              "utterance": "She has brought the remaining money.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "She has brought the remaining money.",
+              "Amina brought 20k this afternoon."
+            ]
+          },
+          "actualAction": {
+            "type": "SETTLE_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining money",
+              "previousTurnId": "turn-1"
+            },
+            "source": {
+              "utterance": "She has brought the remaining money.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "She has brought the remaining money.",
+              "Amina brought 20k this afternoon."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "SETTLE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "SETTLE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 6000000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0004",
+                  "bench-full-settlement-turn-2_0001",
+                  "bench-full-settlement-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-full-settlement-turn-2_0001",
+                  "bench-full-settlement-turn-3_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 6000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": [],
+                "normalizedNames": [
+                  "amina"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 6000000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-full-settlement-turn-1_0004",
+                  "bench-full-settlement-turn-2_0001",
+                  "bench-full-settlement-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-full-settlement-turn-2_0001",
+                  "bench-full-settlement-turn-3_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 6000000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 6000000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 6000000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 6000000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 6000000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 1,
+      "actionAccuracy": 1,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "umr": null
+    },
+    {
+      "scenarioId": "correction",
+      "title": "Correction",
+      "purpose": "A previously recorded debt is amended after partial payment and the correction preserves the payment history.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Kemi took 24 thousand worth of goods.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Kemi",
+              "aliases": []
+            },
+            "amountMinor": 2400000,
+            "source": {
+              "utterance": "Kemi took 24 thousand worth of goods.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Kemi took 24 thousand worth of goods."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Kemi",
+              "aliases": []
+            },
+            "amountMinor": 2400000,
+            "source": {
+              "utterance": "Kemi took 24 thousand worth of goods.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Kemi took 24 thousand worth of goods."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Kemi",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 2400000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Kemi",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 2400000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": [],
+                "normalizedNames": [
+                  "kemi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2400000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2400000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": [],
+                "normalizedNames": [
+                  "kemi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2400000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2400000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2400000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2400000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2400000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2400000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Kemi brought 4k this morning.",
+          "language": "en",
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-correction-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-correction-turn-1_0003"
+            },
+            "amountMinor": 400000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Kemi brought 4k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Kemi brought 4k this morning.",
+              "Kemi took 24 thousand worth of goods."
+            ]
+          },
+          "actualAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-correction-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-correction-turn-1_0003"
+            },
+            "amountMinor": 400000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Kemi brought 4k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Kemi brought 4k this morning.",
+              "Kemi took 24 thousand worth of goods."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-correction-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-correction-turn-1_0003"
+            },
+            "amountMinor": 400000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-correction-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-correction-turn-1_0003"
+            },
+            "amountMinor": 400000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": [],
+                "normalizedNames": [
+                  "kemi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0004",
+                  "bench-correction-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-correction-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": [],
+                "normalizedNames": [
+                  "kemi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0004",
+                  "bench-correction-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-correction-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CORRECT_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "That Kemi money I told you earlier",
+              "previousTurnId": "turn-1"
+            },
+            "correctedAmountMinor": 4200000,
+            "correctionReason": "Customer clarified the original sale amount.",
+            "source": {
+              "utterance": "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+              "Kemi brought 4k this morning."
+            ]
+          },
+          "actualAction": {
+            "type": "CORRECT_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "That Kemi money I told you earlier",
+              "previousTurnId": "turn-1"
+            },
+            "correctedAmountMinor": 4200000,
+            "correctionReason": "Customer clarified the original sale amount.",
+            "source": {
+              "utterance": "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+              "Kemi brought 4k this morning."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CORRECT_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "That Kemi money I told you earlier",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": 4200000,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CORRECT_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "That Kemi money I told you earlier",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": 4200000,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": [],
+                "normalizedNames": [
+                  "kemi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 4200000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 3800000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0004",
+                  "bench-correction-turn-2_0001",
+                  "bench-correction-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-correction-turn-2_0001"
+                ],
+                "correctionEventIds": [
+                  "bench-correction-turn-3_0001"
+                ]
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": [],
+                "normalizedNames": [
+                  "kemi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 4200000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 3800000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-correction-turn-1_0004",
+                  "bench-correction-turn-2_0001",
+                  "bench-correction-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-correction-turn-2_0001"
+                ],
+                "correctionEventIds": [
+                  "bench-correction-turn-3_0001"
+                ]
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 4200000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 3800000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 4200000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 3800000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 1,
+      "actionAccuracy": 1,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "umr": null
+    },
+    {
+      "scenarioId": "repeat-customer-new-obligation",
+      "title": "Repeat Customer, New Obligation",
+      "purpose": "An existing customer with historical history takes a separate credit purchase and the old obligation must remain intact.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Hauwa took 15k goods again.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-hauwa"
+            },
+            "amountMinor": 1500000,
+            "dueAt": null,
+            "source": {
+              "utterance": "Hauwa took 15k goods again.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Hauwa took 15k goods again."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-hauwa"
+            },
+            "amountMinor": 1500000,
+            "dueAt": null,
+            "source": {
+              "utterance": "Hauwa took 15k goods again.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Hauwa took 15k goods again."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-hauwa"
+            },
+            "obligation": null,
+            "amountMinor": 1500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-hauwa"
+            },
+            "obligation": null,
+            "amountMinor": 1500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-repeat-customer-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-hauwa",
+                "displayName": "Hauwa",
+                "aliases": [],
+                "normalizedNames": [
+                  "hauwa"
+                ],
+                "createdAt": "2026-08-10T09:00:00.000Z",
+                "updatedAt": "2026-08-10T09:00:00.000Z",
+                "sourceEventIds": [
+                  "repeat-customer-new-obligation:customer-created"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-hauwa-old",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 800000,
+                "totalPaidMinor": 800000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "createdAt": "2026-08-11T09:00:00.000Z",
+                "updatedAt": "2026-08-12T09:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "repeat-customer-new-obligation:obligation-created",
+                  "repeat-customer-new-obligation:payment-recorded"
+                ],
+                "paymentEventIds": [
+                  "repeat-customer-new-obligation:payment-recorded"
+                ],
+                "correctionEventIds": []
+              },
+              {
+                "id": "bench-repeat-customer-new-obligation-turn-1_0001",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 1500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1500000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-repeat-customer-new-obligation-turn-1_0002"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 800000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-repeat-customer-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-hauwa",
+                "displayName": "Hauwa",
+                "aliases": [],
+                "normalizedNames": [
+                  "hauwa"
+                ],
+                "createdAt": "2026-08-10T09:00:00.000Z",
+                "updatedAt": "2026-08-10T09:00:00.000Z",
+                "sourceEventIds": [
+                  "repeat-customer-new-obligation:customer-created"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-hauwa-old",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 800000,
+                "totalPaidMinor": 800000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "createdAt": "2026-08-11T09:00:00.000Z",
+                "updatedAt": "2026-08-12T09:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "repeat-customer-new-obligation:obligation-created",
+                  "repeat-customer-new-obligation:payment-recorded"
+                ],
+                "paymentEventIds": [
+                  "repeat-customer-new-obligation:payment-recorded"
+                ],
+                "correctionEventIds": []
+              },
+              {
+                "id": "bench-repeat-customer-new-obligation-turn-1_0001",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 1500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1500000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-repeat-customer-new-obligation-turn-1_0002"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 800000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-repeat-customer-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-hauwa",
+                "displayName": "Hauwa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-repeat-customer-new-obligation-turn-1_0001",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 1500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1500000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "obligation-hauwa-old",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 800000,
+                "totalPaidMinor": 800000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 800000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-repeat-customer-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-hauwa",
+                "displayName": "Hauwa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-repeat-customer-new-obligation-turn-1_0001",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 1500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1500000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "obligation-hauwa-old",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 800000,
+                "totalPaidMinor": 800000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 800000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 1,
+      "actionAccuracy": 1,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "umr": null
+    },
+    {
+      "scenarioId": "natural-reference-resolution",
+      "title": "Natural Reference Resolution",
+      "purpose": "A later turn uses a history-dependent phrase that should resolve uniquely to the earlier obligation.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Bola took 18k goods last week.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Bola",
+              "aliases": []
+            },
+            "amountMinor": 1800000,
+            "source": {
+              "utterance": "Bola took 18k goods last week.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Bola took 18k goods last week."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Bola",
+              "aliases": []
+            },
+            "amountMinor": 1800000,
+            "source": {
+              "utterance": "Bola took 18k goods last week.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Bola took 18k goods last week."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Bola",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 1800000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Bola",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 1800000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": [],
+                "normalizedNames": [
+                  "bola"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": [],
+                "normalizedNames": [
+                  "bola"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Tunde took 22k goods today.",
+          "language": "en",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Tunde",
+              "aliases": []
+            },
+            "amountMinor": 2200000,
+            "source": {
+              "utterance": "Tunde took 22k goods today.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Tunde took 22k goods today."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Tunde",
+              "aliases": []
+            },
+            "amountMinor": 2200000,
+            "source": {
+              "utterance": "Tunde took 22k goods today.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Tunde took 22k goods today."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Tunde",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 2200000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Tunde",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 2200000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": [],
+                "normalizedNames": [
+                  "bola"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0002"
+                ]
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": [],
+                "normalizedNames": [
+                  "tunde"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": [],
+                "normalizedNames": [
+                  "bola"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0002"
+                ]
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": [],
+                "normalizedNames": [
+                  "tunde"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "That money from last week, Bola bring 5k this morning.",
+          "language": "en",
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-natural-reference-resolution-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money from last week",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 500000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "That money from last week, Bola bring 5k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "That money from last week, Bola bring 5k this morning.",
+              "Tunde took 22k goods today."
+            ]
+          },
+          "actualAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-natural-reference-resolution-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money from last week",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 500000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "That money from last week, Bola bring 5k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "That money from last week, Bola bring 5k this morning.",
+              "Tunde took 22k goods today."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-natural-reference-resolution-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money from last week",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-natural-reference-resolution-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money from last week",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": [],
+                "normalizedNames": [
+                  "bola"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0002"
+                ]
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": [],
+                "normalizedNames": [
+                  "tunde"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 500000,
+                "outstandingMinor": 1300000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0004",
+                  "bench-natural-reference-resolution-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-natural-reference-resolution-turn-3_0001"
+                ],
+                "correctionEventIds": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 500000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": [],
+                "normalizedNames": [
+                  "bola"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0002"
+                ]
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": [],
+                "normalizedNames": [
+                  "tunde"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 500000,
+                "outstandingMinor": 1300000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-1_0004",
+                  "bench-natural-reference-resolution-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-natural-reference-resolution-turn-3_0001"
+                ],
+                "correctionEventIds": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "bench-natural-reference-resolution-turn-2_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 500000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 500000,
+                "outstandingMinor": 1300000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 500000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 500000,
+                "outstandingMinor": 1300000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 500000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 1,
+      "actionAccuracy": 1,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "umr": null
+    },
+    {
+      "scenarioId": "ambiguous-customer-abstain",
+      "title": "Ambiguous Customer, Must Abstain",
+      "purpose": "Two distinct customers share the same name, so the ledger must not guess which account should be mutated.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Musa paid 10k.",
+          "language": "en",
+          "expectedAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "Which Musa did you mean?",
+            "ambiguityKind": "customer",
+            "candidateCustomerIds": [
+              "customer-musa-a",
+              "customer-musa-b"
+            ],
+            "candidateObligationIds": [],
+            "source": {
+              "utterance": "Musa paid 10k.",
+              "language": "en"
+            },
+            "permittedMutation": false,
+            "evidence": [
+              "Musa paid 10k."
+            ]
+          },
+          "actualAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-musa-a"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "obligation-musa-a"
+            },
+            "amountMinor": 1000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "unsafe-mutation-control",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "unsafe-mutation-control"
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "customer",
+            "candidateCustomerIds": [
+              "customer-musa-a",
+              "customer-musa-b"
+            ],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-musa-a"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "obligation-musa-a"
+            },
+            "amountMinor": 1000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-ambiguous-musa-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-musa-a",
+                "displayName": "Musa",
+                "aliases": [],
+                "normalizedNames": [
+                  "musa"
+                ],
+                "createdAt": "2026-08-17T09:00:00.000Z",
+                "updatedAt": "2026-08-17T09:00:00.000Z",
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:customer-1"
+                ]
+              },
+              {
+                "id": "customer-musa-b",
+                "displayName": "Musa",
+                "aliases": [],
+                "normalizedNames": [
+                  "musa"
+                ],
+                "createdAt": "2026-08-18T09:00:00.000Z",
+                "updatedAt": "2026-08-18T09:00:00.000Z",
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:customer-2"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-musa-a",
+                "customerId": "customer-musa-a",
+                "customerName": "Musa",
+                "originalAmountMinor": 2000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "createdAt": "2026-08-17T09:10:00.000Z",
+                "updatedAt": "2026-08-17T09:10:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:obligation-1"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              },
+              {
+                "id": "obligation-musa-b",
+                "customerId": "customer-musa-b",
+                "customerName": "Musa",
+                "originalAmountMinor": 4000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "createdAt": "2026-08-18T09:10:00.000Z",
+                "updatedAt": "2026-08-18T09:10:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:obligation-2"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-ambiguous-musa-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-musa-a",
+                "displayName": "Musa",
+                "aliases": [],
+                "normalizedNames": [
+                  "musa"
+                ],
+                "createdAt": "2026-08-17T09:00:00.000Z",
+                "updatedAt": "2026-08-17T09:00:00.000Z",
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:customer-1"
+                ]
+              },
+              {
+                "id": "customer-musa-b",
+                "displayName": "Musa",
+                "aliases": [],
+                "normalizedNames": [
+                  "musa"
+                ],
+                "createdAt": "2026-08-18T09:00:00.000Z",
+                "updatedAt": "2026-08-18T09:00:00.000Z",
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:customer-2"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-musa-a",
+                "customerId": "customer-musa-a",
+                "customerName": "Musa",
+                "originalAmountMinor": 2000000,
+                "totalPaidMinor": 1000000,
+                "outstandingMinor": 1000000,
+                "status": "open",
+                "createdAt": "2026-08-17T09:10:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:obligation-1",
+                  "bench-ambiguous-customer-abstain-turn-1_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-ambiguous-customer-abstain-turn-1_0001"
+                ],
+                "correctionEventIds": []
+              },
+              {
+                "id": "obligation-musa-b",
+                "customerId": "customer-musa-b",
+                "customerName": "Musa",
+                "originalAmountMinor": 4000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "createdAt": "2026-08-18T09:10:00.000Z",
+                "updatedAt": "2026-08-18T09:10:00.000Z",
+                "dueAt": null,
+                "sourceEventIds": [
+                  "ambiguous-customer-abstain:obligation-2"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 1000000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-ambiguous-musa-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-musa-a",
+                "displayName": "Musa",
+                "aliases": []
+              },
+              {
+                "id": "customer-musa-b",
+                "displayName": "Musa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-musa-a",
+                "customerId": "customer-musa-a",
+                "customerName": "Musa",
+                "originalAmountMinor": 2000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "obligation-musa-b",
+                "customerId": "customer-musa-b",
+                "customerName": "Musa",
+                "originalAmountMinor": 4000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-ambiguous-musa-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-musa-a",
+                "displayName": "Musa",
+                "aliases": []
+              },
+              {
+                "id": "customer-musa-b",
+                "displayName": "Musa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-musa-a",
+                "customerId": "customer-musa-a",
+                "customerName": "Musa",
+                "originalAmountMinor": 2000000,
+                "totalPaidMinor": 1000000,
+                "outstandingMinor": 1000000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "obligation-musa-b",
+                "customerId": "customer-musa-b",
+                "customerName": "Musa",
+                "originalAmountMinor": 4000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 1000000
+            }
+          },
+          "expectMutation": false,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": true,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 1,
+      "unsafeMutationCount": 1,
+      "umr": 1
+    },
+    {
+      "scenarioId": "pidgin-multi-turn",
+      "title": "Hard Nigerian Pidgin Multi-Turn",
+      "purpose": "A harder Pidgin scenario combines creation, partial repayment, correction, reference resolution, and settlement.",
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.",
+          "language": "pcm",
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Mama Tobi",
+              "aliases": []
+            },
+            "amountMinor": 5000000,
+            "dueAt": "2026-08-30T23:00:00.000Z",
+            "source": {
+              "utterance": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+            ]
+          },
+          "actualAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Mama Tobi",
+              "aliases": []
+            },
+            "amountMinor": 5000000,
+            "dueAt": "2026-08-30T23:00:00.000Z",
+            "source": {
+              "utterance": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Mama Tobi",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 5000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": "2026-08-30T23:00:00.000Z",
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Mama Tobi",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 5000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": "2026-08-30T23:00:00.000Z",
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004"
+                ],
+                "paymentEventIds": [],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Mama Tobi don bring 20k from that money.",
+          "language": "pcm",
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-pidgin-multi-turn-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 2000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Mama Tobi don bring 20k from that money.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Mama Tobi don bring 20k from that money.",
+              "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+            ]
+          },
+          "actualAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-pidgin-multi-turn-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 2000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Mama Tobi don bring 20k from that money.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Mama Tobi don bring 20k from that money.",
+              "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-pidgin-multi-turn-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 2000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-pidgin-multi-turn-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 2000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 3000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004",
+                  "bench-pidgin-multi-turn-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-pidgin-multi-turn-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 3000000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004",
+                  "bench-pidgin-multi-turn-turn-2_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-pidgin-multi-turn-turn-2_0001"
+                ],
+                "correctionEventIds": []
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 3000000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 3000000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "No be 50k I talk for the first one, na 45k.",
+          "language": "pcm",
+          "expectedAction": {
+            "type": "CORRECT_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the first one",
+              "previousTurnId": "turn-1"
+            },
+            "correctedAmountMinor": 4500000,
+            "correctionReason": "User corrected the original amount.",
+            "source": {
+              "utterance": "No be 50k I talk for the first one, na 45k.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "No be 50k I talk for the first one, na 45k.",
+              "Mama Tobi don bring 20k from that money."
+            ]
+          },
+          "actualAction": {
+            "type": "CORRECT_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the first one",
+              "previousTurnId": "turn-1"
+            },
+            "correctedAmountMinor": 4500000,
+            "correctionReason": "User corrected the original amount.",
+            "source": {
+              "utterance": "No be 50k I talk for the first one, na 45k.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "No be 50k I talk for the first one, na 45k.",
+              "Mama Tobi don bring 20k from that money."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "CORRECT_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the first one",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": 4500000,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "CORRECT_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the first one",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": 4500000,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 2500000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004",
+                  "bench-pidgin-multi-turn-turn-2_0001",
+                  "bench-pidgin-multi-turn-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-pidgin-multi-turn-turn-2_0001"
+                ],
+                "correctionEventIds": [
+                  "bench-pidgin-multi-turn-turn-3_0001"
+                ]
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 2500000,
+                "status": "open",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004",
+                  "bench-pidgin-multi-turn-turn-2_0001",
+                  "bench-pidgin-multi-turn-turn-3_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-pidgin-multi-turn-turn-2_0001"
+                ],
+                "correctionEventIds": [
+                  "bench-pidgin-multi-turn-turn-3_0001"
+                ]
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 2500000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 2500000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        },
+        {
+          "turnId": "turn-4",
+          "inputText": "The remaining one, clear am.",
+          "language": "pcm",
+          "expectedAction": {
+            "type": "SETTLE_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining one",
+              "previousTurnId": "turn-1"
+            },
+            "source": {
+              "utterance": "The remaining one, clear am.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "The remaining one, clear am.",
+              "No be 50k I talk for the first one, na 45k."
+            ]
+          },
+          "actualAction": {
+            "type": "SETTLE_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining one",
+              "previousTurnId": "turn-1"
+            },
+            "source": {
+              "utterance": "The remaining one, clear am.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "The remaining one, clear am.",
+              "No be 50k I talk for the first one, na 45k."
+            ]
+          },
+          "expectedCanonicalAction": {
+            "type": "SETTLE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining one",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "SETTLE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining one",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 4500000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004",
+                  "bench-pidgin-multi-turn-turn-2_0001",
+                  "bench-pidgin-multi-turn-turn-3_0001",
+                  "bench-pidgin-multi-turn-turn-4_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-pidgin-multi-turn-turn-2_0001",
+                  "bench-pidgin-multi-turn-turn-4_0001"
+                ],
+                "correctionEventIds": [
+                  "bench-pidgin-multi-turn-turn-3_0001"
+                ]
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 4500000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": [],
+                "normalizedNames": [
+                  "mama tobi"
+                ],
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0002"
+                ]
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 4500000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "createdAt": "2026-08-29T08:00:00.000Z",
+                "updatedAt": "2026-08-29T08:00:00.000Z",
+                "dueAt": "2026-08-30T23:00:00.000Z",
+                "sourceEventIds": [
+                  "bench-pidgin-multi-turn-turn-1_0004",
+                  "bench-pidgin-multi-turn-turn-2_0001",
+                  "bench-pidgin-multi-turn-turn-3_0001",
+                  "bench-pidgin-multi-turn-turn-4_0001"
+                ],
+                "paymentEventIds": [
+                  "bench-pidgin-multi-turn-turn-2_0001",
+                  "bench-pidgin-multi-turn-turn-4_0001"
+                ],
+                "correctionEventIds": [
+                  "bench-pidgin-multi-turn-turn-3_0001"
+                ]
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 4500000
+            }
+          },
+          "expectedCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 4500000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 4500000
+            }
+          },
+          "actualCanonicalSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 4500000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 4500000
+            }
+          },
+          "expectMutation": true,
+          "mutationOccurred": true,
+          "clarificationOccurred": false,
+          "stateMatch": true,
+          "actionMatch": true,
+          "unsafeMutation": false,
+          "diagnostics": null
+        }
+      ],
+      "lsa": 1,
+      "actionAccuracy": 1,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "umr": null
+    }
+  ],
+  "lsa": 0.9444444444444444,
+  "actionAccuracy": 0.9444444444444444,
+  "abstentionRequiredTurnCount": 1,
+  "unsafeMutationCount": 1,
+  "umr": 1
+}

@@ -64,12 +64,27 @@ interface ChatCompletionsResponse {
 
 function normalizeBaseUrl(baseUrl: string | undefined): string {
   const fallback = 'https://api.openai.com/v1';
-  const trimmed = baseUrl?.trim();
+  const trimmed = stripWrappingQuotes(baseUrl?.trim());
   if (!trimmed) {
     return fallback;
   }
 
   return trimmed.replace(/\/+$/, '');
+}
+
+function stripWrappingQuotes(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    return value.slice(1, -1);
+  }
+
+  return value;
 }
 
 function parseModelOutput(raw: string): unknown {
@@ -282,14 +297,14 @@ export class OpenAICompatibleStructuredActionModel implements StructuredActionMo
 }
 
 export function createConfiguredStructuredActionModel(): StructuredActionModel | null {
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  const apiKey = stripWrappingQuotes(process.env.OPENAI_API_KEY?.trim());
   if (!apiKey) {
     return null;
   }
 
   return new OpenAICompatibleStructuredActionModel({
     apiKey,
-    model: process.env.OPENAI_MODEL?.trim() || 'gpt-5',
-    baseUrl: process.env.OPENAI_BASE_URL?.trim() || undefined,
+    model: stripWrappingQuotes(process.env.OPENAI_MODEL?.trim()) || 'gpt-5',
+    baseUrl: stripWrappingQuotes(process.env.OPENAI_BASE_URL?.trim()) || undefined,
   });
 }

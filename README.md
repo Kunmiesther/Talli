@@ -96,6 +96,8 @@ The real-model modes require credentials:
 - `OPENAI_MODEL` with `gpt-5` as the default
 - `OPENAI_BASE_URL` for an OpenAI-compatible endpoint override
 
+If those values come from `.env`, the loader strips surrounding quotes before creating the provider.
+
 When `TALLI_TRAJECTORY_DIR` is set, the benchmark runner writes sanitized JSON trajectory artifacts for the run.
 
 ## Setup
@@ -120,9 +122,18 @@ See `.env.example` for the initial configuration pattern.
 
 Current real-model experiment status:
 
-- Provider wiring is implemented.
-- Baseline and advanced benchmark execution is blocked until `OPENAI_API_KEY` is configured.
-- After configuration, run `npm run benchmark` with `TALLI_INTERPRETER_MODE=baseline` and `TALLI_INTERPRETER_MODE=advanced`.
+- Groq worked with the OpenAI-compatible provider after quote-stripping the local `.env` values.
+- Provider/model/settings: `OPENAI_BASE_URL=https://api.groq.com/openai/v1`, `OPENAI_MODEL=openai/gpt-oss-120b`, `temperature=0`, `top_p=1`, `response_format=json_object` with bounded retries.
+- Baseline Experiment 1: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=17`, `schemaInvalidResponses=17`, `retries=2`, `latencyMs=4198`, `totalTokens=6910`.
+- Advanced v1 Experiment 1: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=16`, `schemaInvalidResponses=18`, `retries=2`, `latencyMs=2281`, `totalTokens=5185`.
+- Saved evidence:
+  - `artifacts/experiments/baseline-v1.json`
+  - `artifacts/experiments/advanced-v1.json`
+  - `artifacts/trajectories/`
+- Run commands:
+  - `TALLI_INTERPRETER_MODE=baseline`
+  - `TALLI_INTERPRETER_MODE=advanced`
+  - `npm run benchmark`
 
 ## Tests
 

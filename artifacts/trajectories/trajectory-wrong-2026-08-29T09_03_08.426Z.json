@@ -44,9 +44,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 35 thousand naira worth of goods today. She'll pay on Friday."
-            ]
+            "evidence": ["Amina took 35 thousand naira worth of goods today. She'll pay on Friday."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -56,9 +54,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Amina took 35 thousand naira worth of goods today. She'll pay on Friday."
-            ]
+            "evidence": ["Amina took 35 thousand naira worth of goods today. She'll pay on Friday."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -165,9 +161,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 50 thousand naira worth of goods."
-            ]
+            "evidence": ["Amina took 50 thousand naira worth of goods."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -177,9 +171,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Amina took 50 thousand naira worth of goods."
-            ]
+            "evidence": ["Amina took 50 thousand naira worth of goods."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -292,9 +284,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Amina brought 10k this morning."
-            ]
+            "evidence": ["Amina brought 10k this morning."]
           },
           "expectedCanonicalAction": {
             "type": "RECORD_PAYMENT",
@@ -403,9 +393,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 60k goods yesterday."
-            ]
+            "evidence": ["Amina took 60k goods yesterday."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -415,9 +403,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Amina took 60k goods yesterday."
-            ]
+            "evidence": ["Amina took 60k goods yesterday."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -517,10 +503,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina brought 20k this afternoon.",
-              "Amina took 60k goods yesterday."
-            ]
+            "evidence": ["Amina brought 20k this afternoon.", "Amina took 60k goods yesterday."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -530,9 +513,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Amina brought 20k this afternoon."
-            ]
+            "evidence": ["Amina brought 20k this afternoon."]
           },
           "expectedCanonicalAction": {
             "type": "RECORD_PAYMENT",
@@ -642,9 +623,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "She has brought the remaining money."
-            ]
+            "evidence": ["She has brought the remaining money."]
           },
           "expectedCanonicalAction": {
             "type": "SETTLE_OBLIGATION",
@@ -751,9 +730,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Kemi took 24 thousand worth of goods."
-            ]
+            "evidence": ["Kemi took 24 thousand worth of goods."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -763,9 +740,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Kemi took 24 thousand worth of goods."
-            ]
+            "evidence": ["Kemi took 24 thousand worth of goods."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -865,10 +840,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Kemi brought 4k this morning.",
-              "Kemi took 24 thousand worth of goods."
-            ]
+            "evidence": ["Kemi brought 4k this morning.", "Kemi took 24 thousand worth of goods."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -878,9 +850,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Kemi brought 4k this morning."
-            ]
+            "evidence": ["Kemi brought 4k this morning."]
           },
           "expectedCanonicalAction": {
             "type": "RECORD_PAYMENT",
@@ -992,9 +962,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand."
-            ]
+            "evidence": ["That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand."]
           },
           "expectedCanonicalAction": {
             "type": "CORRECT_OBLIGATION",
@@ -1101,9 +1069,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Hauwa took 15k goods again."
-            ]
+            "evidence": ["Hauwa took 15k goods again."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -1113,9 +1079,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Hauwa took 15k goods again."
-            ]
+            "evidence": ["Hauwa took 15k goods again."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -1248,9 +1212,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Bola took 18k goods last week."
-            ]
+            "evidence": ["Bola took 18k goods last week."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -1260,9 +1222,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Bola took 18k goods last week."
-            ]
+            "evidence": ["Bola took 18k goods last week."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -1358,9 +1318,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Tunde took 22k goods today."
-            ]
+            "evidence": ["Tunde took 22k goods today."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -1370,9 +1328,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Tunde took 22k goods today."
-            ]
+            "evidence": ["Tunde took 22k goods today."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -1501,9 +1457,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "That money from last week, Bola bring 5k this morning."
-            ]
+            "evidence": ["That money from last week, Bola bring 5k this morning."]
           },
           "expectedCanonicalAction": {
             "type": "RECORD_PAYMENT",
@@ -1619,19 +1573,14 @@
             "type": "REQUEST_CLARIFICATION",
             "question": "Which Musa did you mean?",
             "ambiguityKind": "customer",
-            "candidateCustomerIds": [
-              "customer-musa-a",
-              "customer-musa-b"
-            ],
+            "candidateCustomerIds": ["customer-musa-a", "customer-musa-b"],
             "candidateObligationIds": [],
             "source": {
               "utterance": "Musa paid 10k.",
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Musa paid 10k."
-            ]
+            "evidence": ["Musa paid 10k."]
           },
           "actualAction": {
             "type": "NO_ACTION",
@@ -1641,9 +1590,7 @@
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Musa paid 10k."
-            ]
+            "evidence": ["Musa paid 10k."]
           },
           "expectedCanonicalAction": {
             "type": "REQUEST_CLARIFICATION",
@@ -1655,10 +1602,7 @@
             "settleRemaining": null,
             "dueAt": null,
             "ambiguityKind": "customer",
-            "candidateCustomerIds": [
-              "customer-musa-a",
-              "customer-musa-b"
-            ],
+            "candidateCustomerIds": ["customer-musa-a", "customer-musa-b"],
             "candidateObligationIds": []
           },
           "actualCanonicalAction": {
@@ -1925,9 +1869,7 @@
               "language": "pcm"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Mama Tobi don bring 20k from that money."
-            ]
+            "evidence": ["Mama Tobi don bring 20k from that money."]
           },
           "expectedCanonicalAction": {
             "type": "RECORD_PAYMENT",
@@ -2040,9 +1982,7 @@
               "language": "pcm"
             },
             "permittedMutation": false,
-            "evidence": [
-              "No be 50k I talk for the first one, na 45k."
-            ]
+            "evidence": ["No be 50k I talk for the first one, na 45k."]
           },
           "expectedCanonicalAction": {
             "type": "CORRECT_OBLIGATION",
@@ -2150,9 +2090,7 @@
               "language": "pcm"
             },
             "permittedMutation": false,
-            "evidence": [
-              "The remaining one, clear am."
-            ]
+            "evidence": ["The remaining one, clear am."]
           },
           "expectedCanonicalAction": {
             "type": "SETTLE_OBLIGATION",

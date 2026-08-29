@@ -16,16 +16,30 @@
 
 ## Milestone 2 - Real-model baseline
 
-- OpenAI-compatible structured action provider wired behind the interpreter contract
-- Baseline prompt stays single-turn and receives only the utterance plus the fixed benchmark clock
-- Structured responses are validated with Zod and retried in a bounded way
+- Provider: Groq via OpenAI-compatible `OPENAI_BASE_URL=https://api.groq.com/openai/v1`
+- Model: `openai/gpt-oss-120b`
+- Compatibility change: strip surrounding quotes from `.env` values before constructing the provider
+- Baseline prompt stayed single-turn and received only the utterance plus the fixed benchmark clock
+- Structured responses were validated with Zod and retried in a bounded way
+- Actual metrics: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=17`, `schemaInvalidResponses=17`, `retries=2`, `latencyMs=4198`, `totalTokens=6910`
+- Main failures:
+  - simple extraction requests returned schema-invalid objects or clarification fallbacks instead of `CREATE_OBLIGATION`
+  - one full-settlement turn returned a `RECORD_PAYMENT` action but still missed the expected canonical state
+  - the ambiguous-customer abstention preserved state but did not match the expected clarification payload
 - Trajectory artifacts are emitted under `artifacts/trajectories/`
-- Real-model benchmark execution is blocked because `OPENAI_API_KEY` is unset
+- Evidence saved at `artifacts/experiments/baseline-v1.json`
 
 ## Milestone 3 - Advanced Talli v1
 
+- Provider: Groq via OpenAI-compatible `OPENAI_BASE_URL=https://api.groq.com/openai/v1`
+- Model: `openai/gpt-oss-120b`
 - Compact in-process retrieval package built from the current ledger snapshot, event history, and recent turns
-- Stable customer and obligation IDs are surfaced in the prompt context
-- Advanced prompt covers entity resolution, obligation/reference resolution, corrections, abstention, Pidgin, and temporal normalization
-- Safe clarification fallback is returned when provider output is invalid or unavailable
-- Real-model benchmark execution is blocked because `OPENAI_API_KEY` is unset
+- Stable customer and obligation IDs were surfaced in the prompt context
+- Advanced prompt covered entity resolution, obligation/reference resolution, corrections, abstention, Pidgin, and temporal normalization
+- Safe clarification fallback was returned when provider output was invalid or unavailable
+- Actual metrics: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=16`, `schemaInvalidResponses=18`, `retries=2`, `latencyMs=2281`, `totalTokens=5185`
+- Main failures:
+  - every non-abstention scenario returned clarification instead of the intended mutation
+  - the ambiguous-customer abstention again preserved state but missed the exact expected clarification payload
+  - rate limits surfaced in the provider diagnostics on later turns
+- Evidence saved at `artifacts/experiments/advanced-v1.json`

@@ -1,0 +1,3585 @@
+{
+  "generatedAt": "2026-08-29T09:43:01.680Z",
+  "mode": "advanced",
+  "referenceNow": "2026-08-29T09:00:00+01:00",
+  "timezone": "Africa/Lagos",
+  "scenarioCount": 8,
+  "turnCount": 18,
+  "lsa": 0.05555555555555555,
+  "actionAccuracy": 0,
+  "abstentionRequiredTurnCount": 1,
+  "unsafeMutationCount": 0,
+  "umr": 0,
+  "scenarios": [
+    {
+      "scenarioId": "simple-new-credit",
+      "title": "Simple New Credit",
+      "purpose": "Basic extraction and obligation creation with a deterministic due date.",
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 3500000,
+            "dueAt": "2026-09-03T23:00:00.000Z",
+            "source": {
+              "utterance": "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Amina took 35 thousand naira worth of goods today. She'll pay on Friday."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "Which customer does the 35,000 NGN purchase refer to?",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": true,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 3500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": "2026-09-03T23:00:00.000Z",
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-simple-new-credit-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-simple-new-credit-turn-1_0003",
+                "customerId": "bench-simple-new-credit-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 3500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 3500000,
+                "status": "open",
+                "dueAt": "2026-09-03T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-simple-new-credit-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 2281,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"type\":\"REQUEST_CLARIFICATION\"}",
+                "{\"type\":\"REQUEST_CLARIFICATION\",\"question\":\"Which customer does the 35,000 NGN purchase refer to?\"}"
+              ],
+              "parseErrors": [
+                "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]"
+              ],
+              "requestIds": [
+                "chatcmpl-ba2d77ee-0120-4b26-a9bd-852ec183af97",
+                "chatcmpl-91b4b8a4-ebf8-460b-a765-5c4207ed8546"
+              ],
+              "usage": {
+                "promptTokens": 806,
+                "completionTokens": 199,
+                "totalTokens": 1005
+              }
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "partial-payment",
+      "title": "Partial Payment",
+      "purpose": "A debt is created and a later turn records a partial repayment against the same obligation.",
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Amina took 50 thousand naira worth of goods.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 5000000,
+            "source": {
+              "utterance": "Amina took 50 thousand naira worth of goods.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Amina took 50 thousand naira worth of goods."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "Please specify the customer (customerId) for the 50,000 NGN goods taken.",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": true,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 5000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 1797,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"type\":\"REQUEST_CLARIFICATION\",\"message\":\"Please specify the customer (e.g., provide a customerId) for the 50,000 NGN goods taken.\"}",
+                "{\"type\":\"REQUEST_CLARIFICATION\",\"question\":\"Please specify the customer (customerId) for the 50,000 NGN goods taken.\"}"
+              ],
+              "parseErrors": [
+                "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]"
+              ],
+              "requestIds": [
+                "chatcmpl-3e059549-6dcb-4d69-bb08-7b47e31a1f79",
+                "chatcmpl-4c103067-fd9b-42a4-aade-fb075765e6ba"
+              ],
+              "usage": {
+                "promptTokens": 820,
+                "completionTokens": 183,
+                "totalTokens": 1003
+              }
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Amina took 50 thousand naira worth of goods.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Amina took 50 thousand naira worth of goods.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            }
+          }
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Amina brought 10k this morning.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-partial-payment-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-partial-payment-turn-1_0003"
+            },
+            "amountMinor": 1000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Amina brought 10k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Amina brought 10k this morning.",
+              "Amina took 50 thousand naira worth of goods."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-partial-payment-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-partial-payment-turn-1_0003"
+            },
+            "amountMinor": 1000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-partial-payment-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-partial-payment-turn-1_0003",
+                "customerId": "bench-partial-payment-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 1000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 1000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-partial-payment-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 1929,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"action\":\"REQUEST_CLARIFICATION\",\"message\":\"Please specify the customer (customerId) for Amina's payment of 10,000 NGN.\"}",
+                "{\"type\":\"REQUEST_CLARIFICATION\",\"message\":\"Please specify the customerId for Amina's payment of 10,000 NGN.\"}"
+              ],
+              "parseErrors": [
+                "[\n  {\n    \"code\": \"invalid_union_discriminator\",\n    \"options\": [\n      \"CREATE_OBLIGATION\",\n      \"RECORD_PAYMENT\",\n      \"CORRECT_OBLIGATION\",\n      \"SETTLE_OBLIGATION\",\n      \"REQUEST_CLARIFICATION\",\n      \"NO_ACTION\"\n    ],\n    \"path\": [\n      \"type\"\n    ],\n    \"message\": \"Invalid discriminator value. Expected 'CREATE_OBLIGATION' | 'RECORD_PAYMENT' | 'CORRECT_OBLIGATION' | 'SETTLE_OBLIGATION' | 'REQUEST_CLARIFICATION' | 'NO_ACTION'\"\n  }\n]",
+                "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]"
+              ],
+              "requestIds": [
+                "chatcmpl-d5bef948-21f8-4639-bf94-a9371abc1d48",
+                "chatcmpl-8ea059ca-6ba3-4594-8f89-8d0a03e1443a"
+              ],
+              "usage": {
+                "promptTokens": 1030,
+                "completionTokens": 281,
+                "totalTokens": 1311
+              },
+              "failureReason": "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Amina brought 10k this morning.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Amina brought 10k this morning.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Amina took 50 thousand naira worth of goods."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-partial-payment-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: Please specify the customer (customerId) for the 50,000 NGN goods taken."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "full-settlement",
+      "title": "Full Settlement",
+      "purpose": "A debt is created, partially repaid, and then fully settled without creating duplicate records.",
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Amina took 60k goods yesterday.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "amountMinor": 6000000,
+            "source": {
+              "utterance": "Amina took 60k goods yesterday.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Amina took 60k goods yesterday."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Amina",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 6000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 6000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 1620,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"action\":\"REQUEST_CLARIFICATION\",\"reason\":\"Customer 'Amina' not found in context\"}",
+                "{\"type\":\"REQUEST_CLARIFICATION\",\"reason\":\"Customer 'Amina' not found in context\"}"
+              ],
+              "parseErrors": [
+                "[\n  {\n    \"code\": \"invalid_union_discriminator\",\n    \"options\": [\n      \"CREATE_OBLIGATION\",\n      \"RECORD_PAYMENT\",\n      \"CORRECT_OBLIGATION\",\n      \"SETTLE_OBLIGATION\",\n      \"REQUEST_CLARIFICATION\",\n      \"NO_ACTION\"\n    ],\n    \"path\": [\n      \"type\"\n    ],\n    \"message\": \"Invalid discriminator value. Expected 'CREATE_OBLIGATION' | 'RECORD_PAYMENT' | 'CORRECT_OBLIGATION' | 'SETTLE_OBLIGATION' | 'REQUEST_CLARIFICATION' | 'NO_ACTION'\"\n  }\n]",
+                "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]"
+              ],
+              "requestIds": [
+                "chatcmpl-d2fa3911-fd5f-49ce-a1b0-59b3ba8f81b8",
+                "chatcmpl-66413d09-4d59-40ca-8d1a-31f64d8246fb"
+              ],
+              "usage": {
+                "promptTokens": 879,
+                "completionTokens": 116,
+                "totalTokens": 995
+              },
+              "failureReason": "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Amina took 60k goods yesterday.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Amina took 60k goods yesterday.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "[\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"string\",\n    \"received\": \"undefined\",\n    \"path\": [\n      \"question\"\n    ],\n    \"message\": \"Required\"\n  }\n]",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Amina brought 20k this afternoon.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-full-settlement-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-full-settlement-turn-1_0003"
+            },
+            "amountMinor": 2000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Amina brought 20k this afternoon.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Amina brought 20k this afternoon.", "Amina took 60k goods yesterday."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-full-settlement-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-full-settlement-turn-1_0003"
+            },
+            "amountMinor": 2000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 1921,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7108, Requested 1481. Please try again in 4.4175s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6880, Requested 1633. Please try again in 3.8475s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7108, Requested 1481. Please try again in 4.4175s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6880, Requested 1633. Please try again in 3.8475s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16ed5yseewvqv18b28fmrd8", "req_01m16ed7m9e6faaxam7cycdr7q"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6880, Requested 1633. Please try again in 3.8475s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Amina brought 20k this afternoon.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Amina brought 20k this afternoon.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Amina took 60k goods yesterday."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-full-settlement-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6880, Requested 1633. Please try again in 3.8475s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "She has brought the remaining money.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "SETTLE_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining money",
+              "previousTurnId": "turn-1"
+            },
+            "source": {
+              "utterance": "She has brought the remaining money.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "She has brought the remaining money.",
+              "Amina brought 20k this afternoon."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "SETTLE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-full-settlement-turn-1_0001",
+                "displayName": "Amina",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-full-settlement-turn-1_0003",
+                "customerId": "bench-full-settlement-turn-1_0001",
+                "customerName": "Amina",
+                "originalAmountMinor": 6000000,
+                "totalPaidMinor": 6000000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 6000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-full-settlement-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 433,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6843, Requested 1497. Please try again in 2.55s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6815, Requested 1682. Please try again in 3.7275s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6843, Requested 1497. Please try again in 2.55s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6815, Requested 1682. Please try again in 3.7275s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16ed7wxe8b9ja6sp7p3w42j", "req_01m16ed83genyts1849bjkwa1m"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6815, Requested 1682. Please try again in 3.7275s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "She has brought the remaining money.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "She has brought the remaining money.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Amina took 60k goods yesterday."
+                },
+                {
+                  "index": 2,
+                  "text": "Amina brought 20k this afternoon."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-full-settlement-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                },
+                {
+                  "id": "bench-full-settlement-turn-2_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-2",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6815, Requested 1682. Please try again in 3.7275s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "correction",
+      "title": "Correction",
+      "purpose": "A previously recorded debt is amended after partial payment and the correction preserves the payment history.",
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Kemi took 24 thousand worth of goods.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Kemi",
+              "aliases": []
+            },
+            "amountMinor": 2400000,
+            "source": {
+              "utterance": "Kemi took 24 thousand worth of goods.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Kemi took 24 thousand worth of goods."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Kemi",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 2400000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2400000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2400000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 421,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6774, Requested 1351. Please try again in 937.5ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6749, Requested 1501. Please try again in 1.875s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6774, Requested 1351. Please try again in 937.5ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6749, Requested 1501. Please try again in 1.875s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16ed8d3e5ybsmzwdph8mtdf", "req_01m16ed8jxefesgb0a84brzgnj"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6749, Requested 1501. Please try again in 1.875s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Kemi took 24 thousand worth of goods.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Kemi took 24 thousand worth of goods.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6749, Requested 1501. Please try again in 1.875s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Kemi brought 4k this morning.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-correction-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-correction-turn-1_0003"
+            },
+            "amountMinor": 400000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Kemi brought 4k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Kemi brought 4k this morning.", "Kemi took 24 thousand worth of goods."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-correction-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "id",
+              "obligationId": "bench-correction-turn-1_0003"
+            },
+            "amountMinor": 400000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 2400000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 381,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6724, Requested 1481. Please try again in 1.537499999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6698, Requested 1743. Please try again in 3.3075s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6724, Requested 1481. Please try again in 1.537499999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6698, Requested 1743. Please try again in 3.3075s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16ed8rwegsaf7s36cz7fxsc", "req_01m16ed8yze5er4r340x403aqc"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6698, Requested 1743. Please try again in 3.3075s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Kemi brought 4k this morning.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Kemi brought 4k this morning.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Kemi took 24 thousand worth of goods."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-correction-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6698, Requested 1743. Please try again in 3.3075s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CORRECT_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "That Kemi money I told you earlier",
+              "previousTurnId": "turn-1"
+            },
+            "correctedAmountMinor": 4200000,
+            "correctionReason": "Customer clarified the original sale amount.",
+            "source": {
+              "utterance": "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+              "Kemi brought 4k this morning."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CORRECT_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "That Kemi money I told you earlier",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": 4200000,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-correction-turn-1_0001",
+                "displayName": "Kemi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-correction-turn-1_0003",
+                "customerId": "bench-correction-turn-1_0001",
+                "customerName": "Kemi",
+                "originalAmountMinor": 4200000,
+                "totalPaidMinor": 400000,
+                "outstandingMinor": 3800000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 400000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-correction-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 363,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6671, Requested 1524. Please try again in 1.4625s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6647, Requested 1711. Please try again in 2.685s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6671, Requested 1524. Please try again in 1.4625s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6647, Requested 1711. Please try again in 2.685s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16ed95ae29tt2qjcfcngjde", "req_01m16ed9awe83sae38y9ceksv6"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6647, Requested 1711. Please try again in 2.685s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Kemi took 24 thousand worth of goods."
+                },
+                {
+                  "index": 2,
+                  "text": "Kemi brought 4k this morning."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-correction-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                },
+                {
+                  "id": "bench-correction-turn-2_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-2",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6647, Requested 1711. Please try again in 2.685s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "repeat-customer-new-obligation",
+      "title": "Repeat Customer, New Obligation",
+      "purpose": "An existing customer with historical history takes a separate credit purchase and the old obligation must remain intact.",
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Hauwa took 15k goods again.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-hauwa"
+            },
+            "amountMinor": 1500000,
+            "dueAt": null,
+            "source": {
+              "utterance": "Hauwa took 15k goods again.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Hauwa took 15k goods again."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "customer-hauwa"
+            },
+            "obligation": null,
+            "amountMinor": 1500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-repeat-customer-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-hauwa",
+                "displayName": "Hauwa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-repeat-customer-new-obligation-turn-1_0001",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 1500000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1500000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "obligation-hauwa-old",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 800000,
+                "totalPaidMinor": 800000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 800000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-repeat-customer-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-hauwa",
+                "displayName": "Hauwa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-hauwa-old",
+                "customerId": "customer-hauwa",
+                "customerName": "Hauwa",
+                "originalAmountMinor": 800000,
+                "totalPaidMinor": 800000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 800000
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 403,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6618, Requested 1782. Please try again in 3s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6592, Requested 2144. Please try again in 5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6618, Requested 1782. Please try again in 3s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6592, Requested 2144. Please try again in 5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16ed9hpe54vgghfjzw80sjy", "req_01m16ed9qqea0r22wk93yddhvh"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6592, Requested 2144. Please try again in 5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Hauwa took 15k goods again.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Hauwa took 15k goods again.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [
+                {
+                  "id": "customer-hauwa",
+                  "displayName": "Hauwa",
+                  "aliases": [],
+                  "normalizedNames": ["hauwa"],
+                  "openObligationIds": [],
+                  "settledObligationIds": ["obligation-hauwa-old"],
+                  "totalOutstandingMinor": 0,
+                  "latestActivityAt": "2026-08-12T09:00:00.000Z"
+                }
+              ],
+              "obligations": [
+                {
+                  "id": "obligation-hauwa-old",
+                  "customerId": "customer-hauwa",
+                  "customerName": "Hauwa",
+                  "status": "settled",
+                  "originalAmountMinor": 800000,
+                  "totalPaidMinor": 800000,
+                  "outstandingMinor": 0,
+                  "dueAt": null,
+                  "createdAt": "2026-08-11T09:00:00.000Z",
+                  "updatedAt": "2026-08-12T09:00:00.000Z",
+                  "lastPaymentEventId": "repeat-customer-new-obligation:payment-recorded",
+                  "correctionEventIds": []
+                }
+              ],
+              "recentEvents": [
+                {
+                  "id": "repeat-customer-new-obligation:customer-created",
+                  "kind": "customer.created",
+                  "timestamp": "2026-08-10T09:00:00.000Z",
+                  "customerId": "customer-hauwa",
+                  "obligationId": null,
+                  "summary": "customer Hauwa (customer-hauwa) created"
+                },
+                {
+                  "id": "repeat-customer-new-obligation:obligation-created",
+                  "kind": "obligation.created",
+                  "timestamp": "2026-08-11T09:00:00.000Z",
+                  "customerId": "customer-hauwa",
+                  "obligationId": "obligation-hauwa-old",
+                  "summary": "obligation obligation-hauwa-old for Hauwa created with ₦8,000"
+                },
+                {
+                  "id": "repeat-customer-new-obligation:payment-recorded",
+                  "kind": "payment.recorded",
+                  "timestamp": "2026-08-12T09:00:00.000Z",
+                  "customerId": "customer-hauwa",
+                  "obligationId": "obligation-hauwa-old",
+                  "summary": "payment 800000 recorded for obligation-hauwa-old (800000 -> 0)"
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6592, Requested 2144. Please try again in 5.52s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "natural-reference-resolution",
+      "title": "Natural Reference Resolution",
+      "purpose": "A later turn uses a history-dependent phrase that should resolve uniquely to the earlier obligation.",
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Bola took 18k goods last week.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Bola",
+              "aliases": []
+            },
+            "amountMinor": 1800000,
+            "source": {
+              "utterance": "Bola took 18k goods last week.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Bola took 18k goods last week."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Bola",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 1800000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 1800000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 808,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"action\":\"REQUEST_CLARIFICATION\",\"reason\":\"Customer 'Bola' not found in context\"}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7096, Requested 1348. Please try again in 3.33s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "[\n  {\n    \"code\": \"invalid_union_discriminator\",\n    \"options\": [\n      \"CREATE_OBLIGATION\",\n      \"RECORD_PAYMENT\",\n      \"CORRECT_OBLIGATION\",\n      \"SETTLE_OBLIGATION\",\n      \"REQUEST_CLARIFICATION\",\n      \"NO_ACTION\"\n    ],\n    \"path\": [\n      \"type\"\n    ],\n    \"message\": \"Invalid discriminator value. Expected 'CREATE_OBLIGATION' | 'RECORD_PAYMENT' | 'CORRECT_OBLIGATION' | 'SETTLE_OBLIGATION' | 'REQUEST_CLARIFICATION' | 'NO_ACTION'\"\n  }\n]",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7096, Requested 1348. Please try again in 3.33s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": [
+                "chatcmpl-cd98d53a-6e7a-4ed7-a688-09c856a7973f",
+                "req_01m16edaj2e5etz5w87kawt9mt"
+              ],
+              "usage": {
+                "promptTokens": 703,
+                "completionTokens": 168,
+                "totalTokens": 871
+              },
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7096, Requested 1348. Please try again in 3.33s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Bola took 18k goods last week.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Bola took 18k goods last week.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7096, Requested 1348. Please try again in 3.33s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Tunde took 22k goods today.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Tunde",
+              "aliases": []
+            },
+            "amountMinor": 2200000,
+            "source": {
+              "utterance": "Tunde took 22k goods today.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": ["Tunde took 22k goods today."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Tunde",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 2200000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 1800000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 4000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 396,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7070, Requested 1495. Please try again in 4.2375s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7043, Requested 1574. Please try again in 4.627499999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7070, Requested 1495. Please try again in 4.2375s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7043, Requested 1574. Please try again in 4.627499999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16edaqzedd9cdtj9rmhjjn9", "req_01m16edaycetx9pmfk9yp35s11"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7043, Requested 1574. Please try again in 4.627499999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Tunde took 22k goods today.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Tunde took 22k goods today.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Bola took 18k goods last week."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-natural-reference-resolution-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing.",
+                "The utterance or recent conversation contains historical reference language."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7043, Requested 1574. Please try again in 4.627499999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "That money from last week, Bola bring 5k this morning.",
+          "language": "en",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-natural-reference-resolution-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money from last week",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 500000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "That money from last week, Bola bring 5k this morning.",
+              "language": "en"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "That money from last week, Bola bring 5k this morning.",
+              "Tunde took 22k goods today."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-natural-reference-resolution-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money from last week",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 500000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0001",
+                "displayName": "Bola",
+                "aliases": []
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0001",
+                "displayName": "Tunde",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-natural-reference-resolution-turn-1_0003",
+                "customerId": "bench-natural-reference-resolution-turn-1_0001",
+                "customerName": "Bola",
+                "originalAmountMinor": 1800000,
+                "totalPaidMinor": 500000,
+                "outstandingMinor": 1300000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "bench-natural-reference-resolution-turn-2_0003",
+                "customerId": "bench-natural-reference-resolution-turn-2_0001",
+                "customerName": "Tunde",
+                "originalAmountMinor": 2200000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2200000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 500000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-natural-reference-resolution-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 381,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7016, Requested 1633. Please try again in 4.8675s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6990, Requested 1785. Please try again in 5.8125s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7016, Requested 1633. Please try again in 4.8675s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6990, Requested 1785. Please try again in 5.8125s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16edb4qef2rc9ascv155mjs", "req_01m16edbareqrtcpj785eee052"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6990, Requested 1785. Please try again in 5.8125s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "That money from last week, Bola bring 5k this morning.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "That money from last week, Bola bring 5k this morning.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Bola took 18k goods last week."
+                },
+                {
+                  "index": 2,
+                  "text": "Tunde took 22k goods today."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-natural-reference-resolution-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                },
+                {
+                  "id": "bench-natural-reference-resolution-turn-2_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-2",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing.",
+                "The utterance or recent conversation contains historical reference language."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6990, Requested 1785. Please try again in 5.8125s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "ambiguous-customer-abstain",
+      "title": "Ambiguous Customer, Must Abstain",
+      "purpose": "Two distinct customers share the same name, so the ledger must not guess which account should be mutated.",
+      "lsa": 1,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 1,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Musa paid 10k.",
+          "language": "en",
+          "expectMutation": false,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": true,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "Which Musa did you mean?",
+            "ambiguityKind": "customer",
+            "candidateCustomerIds": ["customer-musa-a", "customer-musa-b"],
+            "candidateObligationIds": [],
+            "source": {
+              "utterance": "Musa paid 10k.",
+              "language": "en"
+            },
+            "permittedMutation": false,
+            "evidence": ["Musa paid 10k."]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "customer",
+            "candidateCustomerIds": ["customer-musa-a", "customer-musa-b"],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-ambiguous-musa-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-musa-a",
+                "displayName": "Musa",
+                "aliases": []
+              },
+              {
+                "id": "customer-musa-b",
+                "displayName": "Musa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-musa-a",
+                "customerId": "customer-musa-a",
+                "customerName": "Musa",
+                "originalAmountMinor": 2000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "obligation-musa-b",
+                "customerId": "customer-musa-b",
+                "customerName": "Musa",
+                "originalAmountMinor": 4000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-ambiguous-musa-start",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "customer-musa-a",
+                "displayName": "Musa",
+                "aliases": []
+              },
+              {
+                "id": "customer-musa-b",
+                "displayName": "Musa",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "obligation-musa-a",
+                "customerId": "customer-musa-a",
+                "customerName": "Musa",
+                "originalAmountMinor": 2000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 2000000,
+                "status": "open",
+                "dueAt": null
+              },
+              {
+                "id": "obligation-musa-b",
+                "customerId": "customer-musa-b",
+                "customerName": "Musa",
+                "originalAmountMinor": 4000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 4000000,
+                "status": "open",
+                "dueAt": null
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 6000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 683,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6923, Requested 2091. Please try again in 7.605s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6899, Requested 2457. Please try again in 10.17s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6923, Requested 2091. Please try again in 7.605s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6899, Requested 2457. Please try again in 10.17s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16edbtme5qrf1rtbf62ah3n", "req_01m16edc03ebktymtpm2jjt5vz"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6899, Requested 2457. Please try again in 10.17s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Musa paid 10k.",
+            "language": "en",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Musa paid 10k.",
+              "language": "en",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [
+                {
+                  "id": "customer-musa-b",
+                  "displayName": "Musa",
+                  "aliases": [],
+                  "normalizedNames": ["musa"],
+                  "openObligationIds": ["obligation-musa-b"],
+                  "settledObligationIds": [],
+                  "totalOutstandingMinor": 4000000,
+                  "latestActivityAt": "2026-08-18T09:10:00.000Z"
+                },
+                {
+                  "id": "customer-musa-a",
+                  "displayName": "Musa",
+                  "aliases": [],
+                  "normalizedNames": ["musa"],
+                  "openObligationIds": ["obligation-musa-a"],
+                  "settledObligationIds": [],
+                  "totalOutstandingMinor": 2000000,
+                  "latestActivityAt": "2026-08-17T09:10:00.000Z"
+                }
+              ],
+              "obligations": [
+                {
+                  "id": "obligation-musa-b",
+                  "customerId": "customer-musa-b",
+                  "customerName": "Musa",
+                  "status": "open",
+                  "originalAmountMinor": 4000000,
+                  "totalPaidMinor": 0,
+                  "outstandingMinor": 4000000,
+                  "dueAt": null,
+                  "createdAt": "2026-08-18T09:10:00.000Z",
+                  "updatedAt": "2026-08-18T09:10:00.000Z",
+                  "lastPaymentEventId": null,
+                  "correctionEventIds": []
+                },
+                {
+                  "id": "obligation-musa-a",
+                  "customerId": "customer-musa-a",
+                  "customerName": "Musa",
+                  "status": "open",
+                  "originalAmountMinor": 2000000,
+                  "totalPaidMinor": 0,
+                  "outstandingMinor": 2000000,
+                  "dueAt": null,
+                  "createdAt": "2026-08-17T09:10:00.000Z",
+                  "updatedAt": "2026-08-17T09:10:00.000Z",
+                  "lastPaymentEventId": null,
+                  "correctionEventIds": []
+                }
+              ],
+              "recentEvents": [
+                {
+                  "id": "ambiguous-customer-abstain:customer-1",
+                  "kind": "customer.created",
+                  "timestamp": "2026-08-17T09:00:00.000Z",
+                  "customerId": "customer-musa-a",
+                  "obligationId": null,
+                  "summary": "customer Musa (customer-musa-a) created"
+                },
+                {
+                  "id": "ambiguous-customer-abstain:obligation-1",
+                  "kind": "obligation.created",
+                  "timestamp": "2026-08-17T09:10:00.000Z",
+                  "customerId": "customer-musa-a",
+                  "obligationId": "obligation-musa-a",
+                  "summary": "obligation obligation-musa-a for Musa created with ₦20,000"
+                },
+                {
+                  "id": "ambiguous-customer-abstain:customer-2",
+                  "kind": "customer.created",
+                  "timestamp": "2026-08-18T09:00:00.000Z",
+                  "customerId": "customer-musa-b",
+                  "obligationId": null,
+                  "summary": "customer Musa (customer-musa-b) created"
+                },
+                {
+                  "id": "ambiguous-customer-abstain:obligation-2",
+                  "kind": "obligation.created",
+                  "timestamp": "2026-08-18T09:10:00.000Z",
+                  "customerId": "customer-musa-b",
+                  "obligationId": "obligation-musa-b",
+                  "summary": "obligation obligation-musa-b for Musa created with ₦40,000"
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6899, Requested 2457. Please try again in 10.17s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "scenarioId": "pidgin-multi-turn",
+      "title": "Hard Nigerian Pidgin Multi-Turn",
+      "purpose": "A harder Pidgin scenario combines creation, partial repayment, correction, reference resolution, and settlement.",
+      "lsa": 0,
+      "actionAccuracy": 0,
+      "abstentionRequiredTurnCount": 0,
+      "unsafeMutationCount": 0,
+      "turns": [
+        {
+          "turnId": "turn-1",
+          "inputText": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.",
+          "language": "pcm",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CREATE_OBLIGATION",
+            "customer": {
+              "kind": "new",
+              "name": "Mama Tobi",
+              "aliases": []
+            },
+            "amountMinor": 5000000,
+            "dueAt": "2026-08-30T23:00:00.000Z",
+            "source": {
+              "utterance": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CREATE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "new",
+              "name": "Mama Tobi",
+              "aliases": []
+            },
+            "obligation": null,
+            "amountMinor": 5000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": "2026-08-30T23:00:00.000Z",
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 0,
+                "outstandingMinor": 5000000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 5000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 648,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6838, Requested 1371. Please try again in 1.5675s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6811, Requested 1523. Please try again in 2.505s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6838, Requested 1371. Please try again in 1.5675s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6811, Requested 1523. Please try again in 2.505s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16edceeew99s9hak99mjk45", "req_01m16edcmpeyr8fjq4f4qn2d0j"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6811, Requested 1523. Please try again in 2.505s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.",
+            "language": "pcm",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.",
+              "language": "pcm",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6811, Requested 1523. Please try again in 2.505s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-2",
+          "inputText": "Mama Tobi don bring 20k from that money.",
+          "language": "pcm",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "RECORD_PAYMENT",
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-pidgin-multi-turn-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 2000000,
+            "settleRemaining": false,
+            "source": {
+              "utterance": "Mama Tobi don bring 20k from that money.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "Mama Tobi don bring 20k from that money.",
+              "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "RECORD_PAYMENT",
+            "permittedMutation": true,
+            "customer": {
+              "kind": "id",
+              "customerId": "bench-pidgin-multi-turn-turn-1_0001"
+            },
+            "obligation": {
+              "kind": "reference",
+              "phrase": "that money",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": 2000000,
+            "correctedAmountMinor": null,
+            "settleRemaining": false,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 5000000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 3000000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 3000000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 395,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6783, Requested 1501. Please try again in 2.13s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6757, Requested 1759. Please try again in 3.87s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6783, Requested 1501. Please try again in 2.13s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6757, Requested 1759. Please try again in 3.87s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16edcv7e4kbqkdhwffkpt8h", "req_01m16edd1deg39dj7vd7n6am7j"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6757, Requested 1759. Please try again in 3.87s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "Mama Tobi don bring 20k from that money.",
+            "language": "pcm",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "Mama Tobi don bring 20k from that money.",
+              "language": "pcm",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-pidgin-multi-turn-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6757, Requested 1759. Please try again in 3.87s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-3",
+          "inputText": "No be 50k I talk for the first one, na 45k.",
+          "language": "pcm",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "CORRECT_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the first one",
+              "previousTurnId": "turn-1"
+            },
+            "correctedAmountMinor": 4500000,
+            "correctionReason": "User corrected the original amount.",
+            "source": {
+              "utterance": "No be 50k I talk for the first one, na 45k.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "No be 50k I talk for the first one, na 45k.",
+              "Mama Tobi don bring 20k from that money."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "CORRECT_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the first one",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": 4500000,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 2000000,
+                "outstandingMinor": 2500000,
+                "status": "open",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 2500000,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 2000000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 424,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6729, Requested 1658. Please try again in 2.9025s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6702, Requested 1918. Please try again in 4.65s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6729, Requested 1658. Please try again in 2.9025s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6702, Requested 1918. Please try again in 4.65s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16edd7zevkrp0azm2pj0mn2", "req_01m16edde6er58e1dgmjh5na8t"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6702, Requested 1918. Please try again in 4.65s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "No be 50k I talk for the first one, na 45k.",
+            "language": "pcm",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "No be 50k I talk for the first one, na 45k.",
+              "language": "pcm",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+                },
+                {
+                  "index": 2,
+                  "text": "Mama Tobi don bring 20k from that money."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-pidgin-multi-turn-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                },
+                {
+                  "id": "bench-pidgin-multi-turn-turn-2_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-2",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing.",
+                "The utterance or recent conversation contains historical reference language."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6702, Requested 1918. Please try again in 4.65s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        },
+        {
+          "turnId": "turn-4",
+          "inputText": "The remaining one, clear am.",
+          "language": "pcm",
+          "expectMutation": true,
+          "mutationOccurred": false,
+          "clarificationOccurred": true,
+          "stateMatch": false,
+          "actionMatch": false,
+          "unsafeMutation": false,
+          "expectedAction": {
+            "type": "SETTLE_OBLIGATION",
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining one",
+              "previousTurnId": "turn-1"
+            },
+            "source": {
+              "utterance": "The remaining one, clear am.",
+              "language": "pcm"
+            },
+            "permittedMutation": true,
+            "evidence": [
+              "The remaining one, clear am.",
+              "No be 50k I talk for the first one, na 45k."
+            ]
+          },
+          "actualAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": [],
+            "permittedMutation": false,
+            "evidence": []
+          },
+          "expectedCanonicalAction": {
+            "type": "SETTLE_OBLIGATION",
+            "permittedMutation": true,
+            "customer": null,
+            "obligation": {
+              "kind": "reference",
+              "phrase": "the remaining one",
+              "previousTurnId": "turn-1"
+            },
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": null,
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "actualCanonicalAction": {
+            "type": "REQUEST_CLARIFICATION",
+            "permittedMutation": false,
+            "customer": null,
+            "obligation": null,
+            "amountMinor": null,
+            "correctedAmountMinor": null,
+            "settleRemaining": null,
+            "dueAt": null,
+            "ambiguityKind": "other",
+            "candidateCustomerIds": [],
+            "candidateObligationIds": []
+          },
+          "expectedSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0001",
+                "displayName": "Mama Tobi",
+                "aliases": []
+              }
+            ],
+            "obligations": [
+              {
+                "id": "bench-pidgin-multi-turn-turn-1_0003",
+                "customerId": "bench-pidgin-multi-turn-turn-1_0001",
+                "customerName": "Mama Tobi",
+                "originalAmountMinor": 4500000,
+                "totalPaidMinor": 4500000,
+                "outstandingMinor": 0,
+                "status": "settled",
+                "dueAt": "2026-08-30T23:00:00.000Z"
+              }
+            ],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 4500000
+            }
+          },
+          "actualSnapshot": {
+            "id": "scenario-pidgin-multi-turn-starting",
+            "currency": "NGN",
+            "customers": [],
+            "obligations": [],
+            "totals": {
+              "openOutstandingMinor": 0,
+              "settledOutstandingMinor": 0,
+              "totalPaidMinor": 0
+            }
+          },
+          "diagnostics": {
+            "mode": "advanced",
+            "promptKind": "advanced",
+            "provider": {
+              "provider": "openai-compatible",
+              "model": "openai/gpt-oss-120b",
+              "baseUrl": "https://api.groq.com/openai/v1",
+              "configured": true,
+              "attempts": 2,
+              "latencyMs": 415,
+              "responseFormatUsed": true,
+              "rawOutputs": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6669, Requested 1777. Please try again in 3.345s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6640, Requested 2035. Please try again in 5.0625s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "parseErrors": [
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6669, Requested 1777. Please try again in 3.345s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+                "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6640, Requested 2035. Please try again in 5.0625s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+              ],
+              "requestIds": ["req_01m16eddnyezs9j6dskx4xc51y", "req_01m16eddwte0y90t92scn0g8ve"],
+              "failureReason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6640, Requested 2035. Please try again in 5.0625s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+            },
+            "clock": {
+              "referenceNow": "2026-08-29T09:00:00+01:00",
+              "timezone": "Africa/Lagos"
+            },
+            "inputText": "The remaining one, clear am.",
+            "language": "pcm",
+            "advancedContext": {
+              "clock": {
+                "referenceNow": "2026-08-29T09:00:00+01:00",
+                "timezone": "Africa/Lagos"
+              },
+              "currentUtterance": "The remaining one, clear am.",
+              "language": "pcm",
+              "referenceDate": "2026-08-29",
+              "referenceWeekday": "Saturday",
+              "temporalHints": {
+                "today": "2026-08-29",
+                "yesterday": "2026-08-28",
+                "tomorrow": "2026-08-30",
+                "nextFriday": "2026-09-04",
+                "nextMonday": "2026-08-31"
+              },
+              "recentTurns": [
+                {
+                  "index": 1,
+                  "text": "Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday."
+                },
+                {
+                  "index": 2,
+                  "text": "Mama Tobi don bring 20k from that money."
+                },
+                {
+                  "index": 3,
+                  "text": "No be 50k I talk for the first one, na 45k."
+                }
+              ],
+              "customers": [],
+              "obligations": [],
+              "recentEvents": [
+                {
+                  "id": "bench-pidgin-multi-turn-turn-1_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-1",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                },
+                {
+                  "id": "bench-pidgin-multi-turn-turn-2_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-2",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                },
+                {
+                  "id": "bench-pidgin-multi-turn-turn-3_0001",
+                  "kind": "decision.clarification_requested",
+                  "timestamp": "2026-08-29T08:00:00.000Z",
+                  "turnId": "turn-3",
+                  "customerId": null,
+                  "obligationId": null,
+                  "summary": "clarification requested: I could not produce a safe ledger action from this state-aware turn. Please clarify."
+                }
+              ],
+              "selectionNotes": [
+                "Compact context only includes relevant customers, obligations, recent events, and recent turns.",
+                "Use stable IDs from this context when the intended target is uniquely resolved.",
+                "If a target is still materially ambiguous, request clarification rather than guessing.",
+                "The utterance or recent conversation contains historical reference language."
+              ]
+            },
+            "providerFailure": {
+              "reason": "{\"error\":{\"message\":\"Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01krknmbqrfghbkf5srayttwcd` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6640, Requested 2035. Please try again in 5.0625s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}",
+              "safeActionType": "REQUEST_CLARIFICATION"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

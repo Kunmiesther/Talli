@@ -44,9 +44,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 35 thousand naira worth of goods today. She'll pay on Friday."
-            ]
+            "evidence": ["Amina took 35 thousand naira worth of goods today. She'll pay on Friday."]
           },
           "actualAction": {
             "type": "CREATE_OBLIGATION",
@@ -62,9 +60,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 35 thousand naira worth of goods today. She'll pay on Friday."
-            ]
+            "evidence": ["Amina took 35 thousand naira worth of goods today. She'll pay on Friday."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -192,9 +188,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 50 thousand naira worth of goods."
-            ]
+            "evidence": ["Amina took 50 thousand naira worth of goods."]
           },
           "actualAction": {
             "type": "CREATE_OBLIGATION",
@@ -209,9 +203,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 50 thousand naira worth of goods."
-            ]
+            "evidence": ["Amina took 50 thousand naira worth of goods."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -489,9 +481,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 60k goods yesterday."
-            ]
+            "evidence": ["Amina took 60k goods yesterday."]
           },
           "actualAction": {
             "type": "CREATE_OBLIGATION",
@@ -506,9 +496,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina took 60k goods yesterday."
-            ]
+            "evidence": ["Amina took 60k goods yesterday."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -629,10 +617,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina brought 20k this afternoon.",
-              "Amina took 60k goods yesterday."
-            ]
+            "evidence": ["Amina brought 20k this afternoon.", "Amina took 60k goods yesterday."]
           },
           "actualAction": {
             "type": "RECORD_PAYMENT",
@@ -651,10 +636,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Amina brought 20k this afternoon.",
-              "Amina took 60k goods yesterday."
-            ]
+            "evidence": ["Amina brought 20k this afternoon.", "Amina took 60k goods yesterday."]
           },
           "expectedCanonicalAction": {
             "type": "RECORD_PAYMENT",
@@ -922,9 +904,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Kemi took 24 thousand worth of goods."
-            ]
+            "evidence": ["Kemi took 24 thousand worth of goods."]
           },
           "actualAction": {
             "type": "CREATE_OBLIGATION",
@@ -939,9 +919,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Kemi took 24 thousand worth of goods."
-            ]
+            "evidence": ["Kemi took 24 thousand worth of goods."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -1062,10 +1040,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Kemi brought 4k this morning.",
-              "Kemi took 24 thousand worth of goods."
-            ]
+            "evidence": ["Kemi brought 4k this morning.", "Kemi took 24 thousand worth of goods."]
           },
           "actualAction": {
             "type": "RECORD_PAYMENT",
@@ -1084,10 +1059,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Kemi brought 4k this morning.",
-              "Kemi took 24 thousand worth of goods."
-            ]
+            "evidence": ["Kemi brought 4k this morning.", "Kemi took 24 thousand worth of goods."]
           },
           "expectedCanonicalAction": {
             "type": "RECORD_PAYMENT",
@@ -1359,9 +1331,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Hauwa took 15k goods again."
-            ]
+            "evidence": ["Hauwa took 15k goods again."]
           },
           "actualAction": {
             "type": "CREATE_OBLIGATION",
@@ -1376,9 +1346,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Hauwa took 15k goods again."
-            ]
+            "evidence": ["Hauwa took 15k goods again."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -1524,9 +1492,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Bola took 18k goods last week."
-            ]
+            "evidence": ["Bola took 18k goods last week."]
           },
           "actualAction": {
             "type": "CREATE_OBLIGATION",
@@ -1541,9 +1507,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Bola took 18k goods last week."
-            ]
+            "evidence": ["Bola took 18k goods last week."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -1660,9 +1624,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Tunde took 22k goods today."
-            ]
+            "evidence": ["Tunde took 22k goods today."]
           },
           "actualAction": {
             "type": "CREATE_OBLIGATION",
@@ -1677,9 +1639,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "Tunde took 22k goods today."
-            ]
+            "evidence": ["Tunde took 22k goods today."]
           },
           "expectedCanonicalAction": {
             "type": "CREATE_OBLIGATION",
@@ -2012,19 +1972,14 @@
             "type": "REQUEST_CLARIFICATION",
             "question": "Which Musa did you mean?",
             "ambiguityKind": "customer",
-            "candidateCustomerIds": [
-              "customer-musa-a",
-              "customer-musa-b"
-            ],
+            "candidateCustomerIds": ["customer-musa-a", "customer-musa-b"],
             "candidateObligationIds": [],
             "source": {
               "utterance": "Musa paid 10k.",
               "language": "en"
             },
             "permittedMutation": false,
-            "evidence": [
-              "Musa paid 10k."
-            ]
+            "evidence": ["Musa paid 10k."]
           },
           "actualAction": {
             "type": "RECORD_PAYMENT",
@@ -2043,9 +1998,7 @@
               "language": "en"
             },
             "permittedMutation": true,
-            "evidence": [
-              "unsafe-mutation-control"
-            ]
+            "evidence": ["unsafe-mutation-control"]
           },
           "expectedCanonicalAction": {
             "type": "REQUEST_CLARIFICATION",
@@ -2057,10 +2010,7 @@
             "settleRemaining": null,
             "dueAt": null,
             "ambiguityKind": "customer",
-            "candidateCustomerIds": [
-              "customer-musa-a",
-              "customer-musa-b"
-            ],
+            "candidateCustomerIds": ["customer-musa-a", "customer-musa-b"],
             "candidateObligationIds": []
           },
           "actualCanonicalAction": {

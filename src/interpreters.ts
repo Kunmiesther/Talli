@@ -44,6 +44,7 @@ export interface AdvancedInterpreterInput extends InterpreterInput {
     text: string;
   }>;
   recentTexts?: string[];
+  pendingClarification?: AdvancedContextPackage['pendingClarification'];
 }
 
 export interface InterpreterRunDiagnostics {
@@ -200,6 +201,7 @@ export class AdvancedInterpreter implements ActionInterpreter {
       utterance: input.text,
       language: input.language ?? 'en',
       clock,
+      pendingClarification: input.pendingClarification ?? null,
     });
     const request = buildAdvancedRequestEnvelope({
       utterance: input.text,

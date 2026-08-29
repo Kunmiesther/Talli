@@ -121,6 +121,27 @@ npm run benchmark
 
 See `.env.example` for the initial configuration pattern.
 
+## Running Talli locally
+
+```bash
+npm install
+npm run demo:seed
+npm run dev:api
+npm run demo
+npm run demo:reset
+npm run typecheck
+npm run lint
+npm test
+```
+
+Useful environment variables:
+
+- `TALLI_DATA_DIR` or `TALLI_LEDGER_FILE` to control where the local event store lives.
+- `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_BASE_URL` for live provider-backed interpretation.
+- `TALLI_PORT` or `PORT` for the local HTTP API.
+
+The demo and API both use the same text-first runtime path, so typed input and the future voice transcript flow will hit the same message endpoint.
+
 Current real-model experiment status:
 
 - Groq worked with the OpenAI-compatible provider after quote-stripping the local `.env` values.

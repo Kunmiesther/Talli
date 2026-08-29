@@ -65,3 +65,15 @@
 - OpenRouter smoke: a direct JSON-mode connectivity check reached the provider but returned HTTP `429` with upstream rate-limit messaging; the five-case advanced smoke suite still surfaced provider failures and did not pass the success gate.
 - Control benchmarks after the change stayed healthy: perfect `LSA=1.0`, wrong `LSA=0.0556`, unsafe `LSA=0.9444`, with the locked abstention turn count unchanged at `1`.
 - Evidence saved at `artifacts/experiments/resolution-smoke-*.json` and `artifacts/trajectories/trajectory-resolution-smoke-*.json`.
+
+## Milestone 6 - Product Runtime
+
+- Implemented a persistent `TalliService` orchestration layer that loads and saves the event-sourced ledger, keeps bounded conversation state, and composes existing domain operations instead of duplicating business rules.
+- Added a stable application-facing response contract for applied actions, clarification requests, safe no-ops, and sanitized provider failures.
+- Added deterministic user confirmations for create, payment, settlement, correction, and ambiguity flows so the runtime can return natural text without another LLM call.
+- Added a lightweight HTTP API, a text-first CLI/demo harness, demo seed/reset commands, and a clarification round-trip that preserves candidate context across turns.
+- Persistence uses local event and session files with deterministic reload and corruption-safe handling; no Prisma/Postgres layer was added in this milestone.
+- Runtime tests cover persistence, clarification, provider failure safety, demo reset, and API error shaping.
+- Quality gate passed: `npm run typecheck`, `npm run lint`, `npm test` all green; benchmark controls stayed healthy after the runtime layer was added.
+- Control runtime evidence recorded: perfect `LSA=1.0`, wrong `LSA=0.0556`, unsafe `LSA=0.9444`, with the locked abstention turn count unchanged at `1`.
+- Evidence saved at `artifacts/experiments/control-perfect-runtime.json`, `artifacts/experiments/control-wrong-runtime.json`, `artifacts/experiments/control-unsafe-runtime.json`, and `artifacts/trajectories/trajectory-*-17_17_*.json`.

@@ -10,7 +10,11 @@
     "lint": "biome check .",
     "benchmark": "tsx src/benchmark/run.ts",
     "smoke:contract": "tsx src/benchmark/contract-smoke.ts",
-    "smoke:resolution": "tsx src/benchmark/resolution-smoke.ts"
+    "smoke:resolution": "tsx src/benchmark/resolution-smoke.ts",
+    "demo": "tsx src/app/demo.ts",
+    "demo:seed": "tsx src/app/demo.ts seed",
+    "demo:reset": "tsx src/app/demo.ts reset",
+    "dev:api": "tsx src/app/server.ts"
   },
   "dependencies": {
     "zod": "^3.25.76"

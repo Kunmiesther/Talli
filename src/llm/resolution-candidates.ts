@@ -7,7 +7,7 @@ import {
   normalizeLedgerName,
 } from '../domain/ledger.js';
 import { nairaToMinorUnits } from '../domain/money.js';
-import type { ReferenceClock } from './context.js';
+import type { PendingClarificationContext, ReferenceClock } from './context.js';
 
 export interface ResolutionRelevantEvent {
   id: string;
@@ -179,6 +179,7 @@ function scoredCustomers(
   snapshot: LedgerSnapshot,
   utterance: string,
   recentTurns: Array<{ turnId: string; text: string }>,
+  pendingClarification: PendingClarificationContext | null,
 ): CustomerScore[] {
   const normalizedUtterance = normalizeLedgerName(utterance);
   const normalizedRecentTurns = normalizeTexts(recentTurns.slice(-4).map((turn) => turn.text));
@@ -249,6 +250,10 @@ function scoredCustomers(
         score += 4;
         reasonCodes.add('latest_customer');
       }
+      if (pendingClarification?.candidateCustomerIds.includes(customer.id)) {
+        score += 40;
+        reasonCodes.add('pending_clarification_customer');
+      }
       if (customerActivityTimestamp(snapshot, customer.id)) {
         score += 2;
         reasonCodes.add('has_activity');
@@ -272,8 +277,9 @@ function selectCustomerCandidates(
   snapshot: LedgerSnapshot,
   utterance: string,
   recentTurns: Array<{ turnId: string; text: string }>,
+  pendingClarification: PendingClarificationContext | null,
 ): CustomerScore[] {
-  const scored = scoredCustomers(snapshot, utterance, recentTurns);
+  const scored = scoredCustomers(snapshot, utterance, recentTurns, pendingClarification);
   if (scored.length === 0) {
     return [];
   }
@@ -306,6 +312,7 @@ function scoreObligations(
   utterance: string,
   recentTurns: Array<{ turnId: string; text: string }>,
   clock: ReferenceClock,
+  pendingClarification: PendingClarificationContext | null,
 ): ObligationScore[] {
   const normalizedUtterance = normalizeLedgerName(utterance);
   const referenceCue = hasReferenceCue(utterance);
@@ -415,6 +422,10 @@ function scoreObligations(
       if (customer && clock.referenceNow >= obligation.createdAt) {
         score += 1;
       }
+      if (pendingClarification?.candidateObligationIds.includes(obligation.id)) {
+        score += 40;
+        reasonCodes.add('pending_clarification_obligation');
+      }
 
       return {
         obligation,
@@ -445,6 +456,7 @@ function selectObligationCandidates(
   utterance: string,
   recentTurns: Array<{ turnId: string; text: string }>,
   clock: ReferenceClock,
+  pendingClarification: PendingClarificationContext | null,
 ): ObligationScore[] {
   const scored = scoreObligations(
     snapshot,
@@ -453,6 +465,7 @@ function selectObligationCandidates(
     utterance,
     recentTurns,
     clock,
+    pendingClarification,
   );
   if (scored.length === 0) {
     return [];
@@ -496,16 +509,19 @@ export function buildResolutionCandidates(input: {
   utterance: string;
   language: string;
   clock: ReferenceClock;
+  pendingClarification?: PendingClarificationContext | null;
 }): ResolutionCandidatePackage {
   const recentTurns = input.recentTurns.slice(-4).map((turn, index, array) => ({
     turnId: turn.turnId,
     index: input.recentTurns.length - array.length + index + 1,
     text: turn.text,
   }));
+  const pendingClarification = input.pendingClarification ?? null;
   const customerScores = selectCustomerCandidates(
     input.snapshot,
     input.utterance,
     input.recentTurns,
+    pendingClarification,
   );
   const customerCandidates = customerScores.map((entry) => {
     const customerObligations = input.snapshot.obligations.filter(
@@ -542,6 +558,7 @@ export function buildResolutionCandidates(input: {
     input.utterance,
     input.recentTurns,
     input.clock,
+    pendingClarification,
   );
 
   const obligationCandidates = obligationScores.map((entry) => ({
@@ -569,6 +586,12 @@ export function buildResolutionCandidates(input: {
     'If the target is still materially ambiguous, return request_clarification.',
     `Customer candidates: ${customerCandidates.length}; obligation candidates: ${obligationCandidates.length}.`,
   ];
+
+  if (pendingClarification) {
+    selectionNotes.push(
+      `Pending clarification: ${pendingClarification.question} (customers=${pendingClarification.candidateCustomerIds.length}, obligations=${pendingClarification.candidateObligationIds.length}).`,
+    );
+  }
 
   return {
     currentUtterance: input.utterance,

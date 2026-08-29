@@ -17,6 +17,14 @@ export interface ReferenceClock {
   timezone: string;
 }
 
+export interface PendingClarificationContext {
+  question: string;
+  ambiguityKind?: 'customer' | 'obligation' | 'amount' | 'correction' | 'other';
+  candidateCustomerIds: string[];
+  candidateObligationIds: string[];
+  sourceTurnId?: string | null;
+}
+
 export interface CompactCustomerContext {
   id: string;
   displayName: string;
@@ -55,6 +63,7 @@ export interface AdvancedContextPackage extends ResolutionCandidatePackage {
   clock: ReferenceClock;
   currentUtterance: string;
   language: string;
+  pendingClarification: PendingClarificationContext | null;
   referenceDate: string;
   referenceWeekday: string;
   temporalHints: {
@@ -360,6 +369,7 @@ export function buildAdvancedContextPackage(input: {
   utterance: string;
   language: string;
   clock: ReferenceClock;
+  pendingClarification?: PendingClarificationContext | null;
 }): AdvancedContextPackage {
   const resolutionCandidates = buildResolutionCandidates(input);
 
@@ -368,6 +378,7 @@ export function buildAdvancedContextPackage(input: {
     referenceDate: formatDay(new Date(input.clock.referenceNow), input.clock.timezone),
     referenceWeekday: formatWeekday(new Date(input.clock.referenceNow), input.clock.timezone),
     temporalHints: buildTemporalHints(input.clock),
+    pendingClarification: input.pendingClarification ?? null,
     ...resolutionCandidates,
   };
 }

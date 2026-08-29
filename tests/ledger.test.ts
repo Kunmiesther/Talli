@@ -33,6 +33,18 @@ function apply(document: LedgerDocument, action: ReturnType<typeof parseAction>)
   });
 }
 
+function applyWithTurnId(
+  document: LedgerDocument,
+  action: ReturnType<typeof parseAction>,
+  turnId: string,
+) {
+  return applyLedgerAction(document, action, {
+    ...makeContext(),
+    turnId,
+    sourceText: action.source?.utterance,
+  });
+}
+
 function createCustomerEvent(
   id: string,
   displayName: string,
@@ -375,5 +387,47 @@ describe('ledger domain', () => {
       'obligation.corrected',
     ]);
     assertLedgerInvariants(corrected.snapshot);
+  });
+
+  it('resolves a reference target by previous turn id', () => {
+    let document = createLedgerDocument('ledger-reference');
+    document = applyWithTurnId(
+      document,
+      parseAction({
+        type: 'CREATE_OBLIGATION',
+        customer: { kind: 'new', name: 'Bola', aliases: [] },
+        amountMinor: nairaToMinorUnits(18_000),
+        permittedMutation: true,
+        evidence: ['Bola took 18k goods last week.'],
+        source: { utterance: 'Bola took 18k goods last week.', language: 'en' },
+      }),
+      'turn-1',
+    ).document;
+
+    const result = apply(
+      document,
+      parseAction({
+        type: 'RECORD_PAYMENT',
+        customer: { kind: 'name', name: 'Bola', allowCreate: false },
+        obligation: {
+          kind: 'reference',
+          phrase: 'that money from last week',
+          previousTurnId: 'turn-1',
+        },
+        amountMinor: nairaToMinorUnits(5_000),
+        settleRemaining: false,
+        permittedMutation: true,
+        evidence: ['That money from last week, Bola bring 5k this morning.'],
+        source: {
+          utterance: 'That money from last week, Bola bring 5k this morning.',
+          language: 'en',
+        },
+      }),
+    );
+
+    expect(result.financialMutation).toBe(true);
+    expect(result.snapshot.obligations[0]?.totalPaidMinor).toBe(nairaToMinorUnits(5_000));
+    expect(result.snapshot.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(13_000));
+    assertLedgerInvariants(result.snapshot);
   });
 });

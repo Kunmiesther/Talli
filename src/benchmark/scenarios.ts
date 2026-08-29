@@ -1,719 +1,854 @@
 import { type LedgerAction, ledgerActionSchema } from '../domain/actions.js';
 import {
   type LedgerDocument,
+  type LedgerEvent,
   type LedgerSnapshot,
+  type ResolveContext,
+  applyLedgerAction,
+  createIdFactory,
   createLedgerDocument,
+  projectLedger,
 } from '../domain/ledger.js';
+import { nairaToMinorUnits } from '../domain/money.js';
+
+export const BENCHMARK_REFERENCE_NOW = '2026-08-29T09:00:00+01:00';
+export const BENCHMARK_TIMEZONE = 'Africa/Lagos';
+
+export const BENCHMARK_CLOCK = {
+  referenceNow: BENCHMARK_REFERENCE_NOW,
+  timezone: BENCHMARK_TIMEZONE,
+} as const;
 
 export interface BenchmarkTurn {
   id: string;
   inputText: string;
-  language?: 'en' | 'pcm' | 'mixed';
+  language: 'en' | 'pcm' | 'mixed';
   expectedAction: LedgerAction;
-  expectedSnapshot: LedgerSnapshot;
   expectMutation: boolean;
-  notes?: string;
+  expectedSnapshot: LedgerSnapshot;
+  evaluatorNotes: string;
 }
 
 export interface BenchmarkScenario {
   id: string;
+  status: 'locked';
   title: string;
   purpose: string;
-  reviewStatus: 'draft-review';
+  clock: typeof BENCHMARK_CLOCK;
   startingDocument: LedgerDocument;
   startingSnapshot: LedgerSnapshot;
   turns: BenchmarkTurn[];
 }
 
-function emptySnapshot(document: LedgerDocument): LedgerSnapshot {
+function eventId(scenarioId: string, label: string): string {
+  return `${scenarioId}:${label}`;
+}
+
+function seedDocument(documentId: string, events: LedgerEvent[]): LedgerDocument {
+  const document = createLedgerDocument(documentId);
+  document.events = [...events];
+  return document;
+}
+
+export function createBenchmarkContext(
+  scenarioId: string,
+  turnId: string,
+  sourceText: string,
+): ResolveContext {
   return {
-    id: document.id,
-    currency: document.currency,
-    customers: [],
-    obligations: [],
-    totals: {
-      openOutstandingMinor: 0,
-      settledOutstandingMinor: 0,
-      totalPaidMinor: 0,
-    },
+    now: new Date(BENCHMARK_REFERENCE_NOW),
+    turnId,
+    sourceText,
+    actor: 'system',
+    idFactory: createIdFactory(`bench-${scenarioId}-${turnId}`),
   };
 }
 
-function newLedgerState(): { document: LedgerDocument; snapshot: LedgerSnapshot } {
-  const document = createLedgerDocument();
-  return { document, snapshot: emptySnapshot(document) };
-}
-
-function createCustomer(
+function applyExpectedTurn(
   document: LedgerDocument,
-  snapshot: LedgerSnapshot,
-  id: string,
-  displayName: string,
-): LedgerSnapshot {
-  const next: LedgerSnapshot = {
-    ...snapshot,
-    customers: [
-      ...snapshot.customers,
-      {
-        id,
-        displayName,
-        aliases: [],
-        normalizedNames: [displayName.toLowerCase()],
-        createdAt: '2026-08-28T00:00:00.000Z',
-        updatedAt: '2026-08-28T00:00:00.000Z',
-        sourceEventIds: ['seed'],
-      },
-    ],
-  };
-  void document;
-  return next;
-}
-
-function createObligation(
-  snapshot: LedgerSnapshot,
-  customerId: string,
-  customerName: string,
-  obligationId: string,
-  originalAmountMinor: number,
-  totalPaidMinor = 0,
-  status: 'open' | 'settled' = originalAmountMinor - totalPaidMinor === 0 ? 'settled' : 'open',
-): LedgerSnapshot {
-  const obligation = {
-    id: obligationId,
-    customerId,
-    customerName,
-    originalAmountMinor,
-    totalPaidMinor,
-    outstandingMinor: originalAmountMinor - totalPaidMinor,
-    status,
-    createdAt: '2026-08-28T00:00:00.000Z',
-    updatedAt: '2026-08-28T00:00:00.000Z',
-    dueAt: null,
-    sourceEventIds: ['seed'],
-    paymentEventIds: [],
-    correctionEventIds: [],
-  } satisfies LedgerSnapshot['obligations'][number];
-
+  action: LedgerAction,
+  scenarioId: string,
+  turnId: string,
+  sourceText: string,
+): { document: LedgerDocument; snapshot: LedgerSnapshot } {
+  const result = applyLedgerAction(
+    document,
+    action,
+    createBenchmarkContext(scenarioId, turnId, sourceText),
+  );
   return {
-    ...snapshot,
-    obligations: [...snapshot.obligations, obligation],
+    document: result.document,
+    snapshot: result.snapshot,
   };
 }
 
-function seedScenario(
-  scenario: Omit<BenchmarkScenario, 'startingDocument' | 'startingSnapshot'>,
+function makeTurn(input: {
+  scenarioId: string;
+  turnId: string;
+  inputText: string;
+  language: 'en' | 'pcm' | 'mixed';
+  action: LedgerAction;
+  expectedSnapshot: LedgerSnapshot;
+  evaluatorNotes: string;
+}): BenchmarkTurn {
+  void input.scenarioId;
+  return {
+    id: input.turnId,
+    inputText: input.inputText,
+    language: input.language,
+    expectedAction: ledgerActionSchema.parse(input.action),
+    expectMutation:
+      input.action.type !== 'REQUEST_CLARIFICATION' && input.action.type !== 'NO_ACTION',
+    expectedSnapshot: input.expectedSnapshot,
+    evaluatorNotes: input.evaluatorNotes,
+  };
+}
+
+function emptyScenario(id: string, title: string, purpose: string): BenchmarkScenario {
+  const startingDocument = createLedgerDocument(`scenario-${id}-starting`);
+  return {
+    id,
+    status: 'locked',
+    title,
+    purpose,
+    clock: BENCHMARK_CLOCK,
+    startingDocument,
+    startingSnapshot: projectLedger(startingDocument),
+    turns: [],
+  };
+}
+
+function withTurns(
+  scenario: BenchmarkScenario,
+  turns: BenchmarkTurn[],
+  startingDocument = scenario.startingDocument,
 ): BenchmarkScenario {
-  const { document, snapshot } = newLedgerState();
   return {
     ...scenario,
-    startingDocument: document,
-    startingSnapshot: snapshot,
+    turns,
+    startingDocument,
+    startingSnapshot: projectLedger(startingDocument),
   };
 }
 
-const baseDocument = createLedgerDocument('seed-ledger');
-const baseSnapshot = emptySnapshot(baseDocument);
+const scenario1 = (() => {
+  const base = emptyScenario(
+    'simple-new-credit',
+    'Simple New Credit',
+    'Basic extraction and obligation creation with a deterministic due date.',
+  );
 
-const mamaTobiId = 'customer-mama-tobi';
-const kemiId = 'customer-kemi';
-const musaOneId = 'customer-musa-1';
-const musaTwoId = 'customer-musa-2';
+  const turn1Text = "Amina took 35 thousand naira worth of goods today. She'll pay on Friday.";
+  const turn1Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'new', name: 'Amina', aliases: [] },
+    amountMinor: nairaToMinorUnits(35_000),
+    dueAt: '2026-09-03T23:00:00.000Z',
+    permittedMutation: true,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'en' },
+  };
 
-const scenarios: BenchmarkScenario[] = [
-  seedScenario({
-    id: 'simple-new-debt',
-    title: 'Simple new debt',
-    purpose: 'Create a new customer and open a single obligation.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'Mama Tobi took 50k goods yesterday.',
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+
+  return withTurns(base, [
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-1',
+      inputText: turn1Text,
+      language: 'en',
+      action: turn1Action,
+      expectedSnapshot: turn1Result.snapshot,
+      evaluatorNotes:
+        'Creates the first customer and a single open obligation. The Friday date is resolved against the fixed benchmark clock.',
+    }),
+  ]);
+})();
+
+const scenario2 = (() => {
+  const base = emptyScenario(
+    'partial-payment',
+    'Partial Payment',
+    'A debt is created and a later turn records a partial repayment against the same obligation.',
+  );
+
+  const turn1Text = 'Amina took 50 thousand naira worth of goods.';
+  const turn1Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'new', name: 'Amina', aliases: [] },
+    amountMinor: nairaToMinorUnits(50_000),
+    permittedMutation: true,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'en' },
+  };
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+  const customerId = turn1Result.snapshot.customers[0]?.id ?? '';
+  const obligationId = turn1Result.snapshot.obligations[0]?.id ?? '';
+
+  const turn2Text = 'Amina brought 10k this morning.';
+  const turn2Action: LedgerAction = {
+    type: 'RECORD_PAYMENT',
+    customer: { kind: 'id', customerId },
+    obligation: { kind: 'id', obligationId },
+    amountMinor: nairaToMinorUnits(10_000),
+    settleRemaining: false,
+    permittedMutation: true,
+    evidence: [turn2Text, turn1Text],
+    source: { utterance: turn2Text, language: 'en' },
+  };
+  const turn2Result = applyExpectedTurn(
+    turn1Result.document,
+    turn2Action,
+    base.id,
+    'turn-2',
+    turn2Text,
+  );
+
+  return withTurns(base, [
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-1',
+      inputText: turn1Text,
+      language: 'en',
+      action: turn1Action,
+      expectedSnapshot: turn1Result.snapshot,
+      evaluatorNotes: 'Creates the debt that the partial payment will target.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-2',
+      inputText: turn2Text,
+      language: 'en',
+      action: turn2Action,
+      expectedSnapshot: turn2Result.snapshot,
+      evaluatorNotes:
+        'Records a partial payment on the existing obligation; the debt stays open with a reduced balance.',
+    }),
+  ]);
+})();
+
+const scenario3 = (() => {
+  const base = emptyScenario(
+    'full-settlement',
+    'Full Settlement',
+    'A debt is created, partially repaid, and then fully settled without creating duplicate records.',
+  );
+
+  const turn1Text = 'Amina took 60k goods yesterday.';
+  const turn1Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'new', name: 'Amina', aliases: [] },
+    amountMinor: nairaToMinorUnits(60_000),
+    permittedMutation: true,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'en' },
+  };
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+  const customerId = turn1Result.snapshot.customers[0]?.id ?? '';
+  const obligationId = turn1Result.snapshot.obligations[0]?.id ?? '';
+
+  const turn2Text = 'Amina brought 20k this afternoon.';
+  const turn2Action: LedgerAction = {
+    type: 'RECORD_PAYMENT',
+    customer: { kind: 'id', customerId },
+    obligation: { kind: 'id', obligationId },
+    amountMinor: nairaToMinorUnits(20_000),
+    settleRemaining: false,
+    permittedMutation: true,
+    evidence: [turn2Text, turn1Text],
+    source: { utterance: turn2Text, language: 'en' },
+  };
+  const turn2Result = applyExpectedTurn(
+    turn1Result.document,
+    turn2Action,
+    base.id,
+    'turn-2',
+    turn2Text,
+  );
+
+  const turn3Text = 'She has brought the remaining money.';
+  const turn3Action: LedgerAction = {
+    type: 'SETTLE_OBLIGATION',
+    obligation: {
+      kind: 'reference',
+      phrase: 'the remaining money',
+      previousTurnId: 'turn-1',
+    },
+    permittedMutation: true,
+    evidence: [turn3Text, turn2Text],
+    source: { utterance: turn3Text, language: 'en' },
+  };
+  const turn3Result = applyExpectedTurn(
+    turn2Result.document,
+    turn3Action,
+    base.id,
+    'turn-3',
+    turn3Text,
+  );
+
+  return withTurns(base, [
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-1',
+      inputText: turn1Text,
+      language: 'en',
+      action: turn1Action,
+      expectedSnapshot: turn1Result.snapshot,
+      evaluatorNotes: 'Creates the initial balance to be paid in stages.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-2',
+      inputText: turn2Text,
+      language: 'en',
+      action: turn2Action,
+      expectedSnapshot: turn2Result.snapshot,
+      evaluatorNotes: 'Records a partial repayment and leaves the obligation open.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-3',
+      inputText: turn3Text,
+      language: 'en',
+      action: turn3Action,
+      expectedSnapshot: turn3Result.snapshot,
+      evaluatorNotes:
+        'Settles the remaining balance from the same obligation without creating a duplicate payment record.',
+    }),
+  ]);
+})();
+
+const scenario4 = (() => {
+  const base = emptyScenario(
+    'correction',
+    'Correction',
+    'A previously recorded debt is amended after partial payment and the correction preserves the payment history.',
+  );
+
+  const turn1Text = 'Kemi took 24 thousand worth of goods.';
+  const turn1Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'new', name: 'Kemi', aliases: [] },
+    amountMinor: nairaToMinorUnits(24_000),
+    permittedMutation: true,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'en' },
+  };
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+  const customerId = turn1Result.snapshot.customers[0]?.id ?? '';
+  const obligationId = turn1Result.snapshot.obligations[0]?.id ?? '';
+
+  const turn2Text = 'Kemi brought 4k this morning.';
+  const turn2Action: LedgerAction = {
+    type: 'RECORD_PAYMENT',
+    customer: { kind: 'id', customerId },
+    obligation: { kind: 'id', obligationId },
+    amountMinor: nairaToMinorUnits(4_000),
+    settleRemaining: false,
+    permittedMutation: true,
+    evidence: [turn2Text, turn1Text],
+    source: { utterance: turn2Text, language: 'en' },
+  };
+  const turn2Result = applyExpectedTurn(
+    turn1Result.document,
+    turn2Action,
+    base.id,
+    'turn-2',
+    turn2Text,
+  );
+
+  const turn3Text = 'That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.';
+  const turn3Action: LedgerAction = {
+    type: 'CORRECT_OBLIGATION',
+    obligation: {
+      kind: 'reference',
+      phrase: 'That Kemi money I told you earlier',
+      previousTurnId: 'turn-1',
+    },
+    correctedAmountMinor: nairaToMinorUnits(42_000),
+    correctionReason: 'Customer clarified the original sale amount.',
+    permittedMutation: true,
+    evidence: [turn3Text, turn2Text],
+    source: { utterance: turn3Text, language: 'en' },
+  };
+  const turn3Result = applyExpectedTurn(
+    turn2Result.document,
+    turn3Action,
+    base.id,
+    'turn-3',
+    turn3Text,
+  );
+
+  return withTurns(base, [
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-1',
+      inputText: turn1Text,
+      language: 'en',
+      action: turn1Action,
+      expectedSnapshot: turn1Result.snapshot,
+      evaluatorNotes: 'Creates the original debt that will later be amended.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-2',
+      inputText: turn2Text,
+      language: 'en',
+      action: turn2Action,
+      expectedSnapshot: turn2Result.snapshot,
+      evaluatorNotes: 'Records a real partial payment before the correction arrives.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-3',
+      inputText: turn3Text,
+      language: 'en',
+      action: turn3Action,
+      expectedSnapshot: turn3Result.snapshot,
+      evaluatorNotes:
+        'Amends the original obligation in place. The earlier payment remains attached, and outstanding balance is recomputed to 38k.',
+    }),
+  ]);
+})();
+
+const scenario5 = (() => {
+  const settledCustomerId = 'customer-hauwa';
+  const settledObligationId = 'obligation-hauwa-old';
+  const startingDocument = seedDocument('scenario-repeat-customer-start', [
+    {
+      id: eventId('repeat-customer-new-obligation', 'customer-created'),
+      kind: 'customer.created',
+      timestamp: '2026-08-10T09:00:00.000Z',
+      actor: 'system',
+      customerId: settledCustomerId,
+      displayName: 'Hauwa',
+      aliases: [],
+    },
+    {
+      id: eventId('repeat-customer-new-obligation', 'obligation-created'),
+      kind: 'obligation.created',
+      timestamp: '2026-08-11T09:00:00.000Z',
+      actor: 'system',
+      customerId: settledCustomerId,
+      obligationId: settledObligationId,
+      originalAmountMinor: nairaToMinorUnits(8_000),
+      dueAt: null,
+    },
+    {
+      id: eventId('repeat-customer-new-obligation', 'payment-recorded'),
+      kind: 'payment.recorded',
+      timestamp: '2026-08-12T09:00:00.000Z',
+      actor: 'system',
+      customerId: settledCustomerId,
+      obligationId: settledObligationId,
+      amountMinor: nairaToMinorUnits(8_000),
+      outstandingBeforeMinor: nairaToMinorUnits(8_000),
+      outstandingAfterMinor: 0,
+    },
+  ]);
+  const base: BenchmarkScenario = {
+    id: 'repeat-customer-new-obligation',
+    status: 'locked',
+    title: 'Repeat Customer, New Obligation',
+    purpose:
+      'An existing customer with historical history takes a separate credit purchase and the old obligation must remain intact.',
+    clock: BENCHMARK_CLOCK,
+    startingDocument,
+    startingSnapshot: projectLedger(startingDocument),
+    turns: [],
+  };
+
+  const turn1Text = 'Hauwa took 15k goods again.';
+  const turn1Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'id', customerId: settledCustomerId },
+    amountMinor: nairaToMinorUnits(15_000),
+    dueAt: null,
+    permittedMutation: true,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'en' },
+  };
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+
+  return withTurns(
+    base,
+    [
+      makeTurn({
+        scenarioId: base.id,
+        turnId: 'turn-1',
+        inputText: turn1Text,
         language: 'en',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'CREATE_OBLIGATION',
-          customer: { kind: 'new', name: 'Mama Tobi', aliases: [] },
-          amountMinor: 5_000_000,
-          permittedMutation: true,
-          evidence: ['Mama Tobi took 50k goods yesterday.'],
-          source: { utterance: 'Mama Tobi took 50k goods yesterday.', language: 'en' },
-        }),
-        expectedSnapshot: {
-          ...baseSnapshot,
-          customers: [
-            {
-              id: mamaTobiId,
-              displayName: 'Mama Tobi',
-              aliases: [],
-              normalizedNames: ['mama tobi'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-          ],
-          obligations: [
-            {
-              id: 'obligation-mama-tobi-1',
-              customerId: mamaTobiId,
-              customerName: 'Mama Tobi',
-              originalAmountMinor: 5_000_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 5_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: true,
-        notes:
-          'Draft ground truth only. Review identifiers and amount normalization before locking the benchmark.',
-      },
+        action: turn1Action,
+        expectedSnapshot: turn1Result.snapshot,
+        evaluatorNotes:
+          'Uses the existing customer record and creates a fresh obligation alongside the older settled one.',
+      }),
     ],
-  }),
-  seedScenario({
-    id: 'partial-payment',
-    title: 'Partial payment',
-    purpose: 'Apply a partial payment against an existing open debt.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'Mama Tobi brought 20.',
+    startingDocument,
+  );
+})();
+
+const scenario6 = (() => {
+  const base = emptyScenario(
+    'natural-reference-resolution',
+    'Natural Reference Resolution',
+    'A later turn uses a history-dependent phrase that should resolve uniquely to the earlier obligation.',
+  );
+
+  const turn1Text = 'Bola took 18k goods last week.';
+  const turn1Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'new', name: 'Bola', aliases: [] },
+    amountMinor: nairaToMinorUnits(18_000),
+    permittedMutation: true,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'en' },
+  };
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+  const bolaCustomerId = turn1Result.snapshot.customers[0]?.id ?? '';
+
+  const turn2Text = 'Tunde took 22k goods today.';
+  const turn2Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'new', name: 'Tunde', aliases: [] },
+    amountMinor: nairaToMinorUnits(22_000),
+    permittedMutation: true,
+    evidence: [turn2Text],
+    source: { utterance: turn2Text, language: 'en' },
+  };
+  const turn2Result = applyExpectedTurn(
+    turn1Result.document,
+    turn2Action,
+    base.id,
+    'turn-2',
+    turn2Text,
+  );
+
+  const turn3Text = 'That money from last week, Bola bring 5k this morning.';
+  const turn3Action: LedgerAction = {
+    type: 'RECORD_PAYMENT',
+    customer: { kind: 'id', customerId: bolaCustomerId },
+    obligation: {
+      kind: 'reference',
+      phrase: 'that money from last week',
+      previousTurnId: 'turn-1',
+    },
+    amountMinor: nairaToMinorUnits(5_000),
+    settleRemaining: false,
+    permittedMutation: true,
+    evidence: [turn3Text, turn2Text],
+    source: { utterance: turn3Text, language: 'en' },
+  };
+  const turn3Result = applyExpectedTurn(
+    turn2Result.document,
+    turn3Action,
+    base.id,
+    'turn-3',
+    turn3Text,
+  );
+
+  return withTurns(base, [
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-1',
+      inputText: turn1Text,
+      language: 'en',
+      action: turn1Action,
+      expectedSnapshot: turn1Result.snapshot,
+      evaluatorNotes: 'Introduces the historical debt that later reference language should target.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-2',
+      inputText: turn2Text,
+      language: 'en',
+      action: turn2Action,
+      expectedSnapshot: turn2Result.snapshot,
+      evaluatorNotes:
+        'Creates a second debt so the later reference must be resolved by the phrase, not by simple recency.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-3',
+      inputText: turn3Text,
+      language: 'en',
+      action: turn3Action,
+      expectedSnapshot: turn3Result.snapshot,
+      evaluatorNotes:
+        'Resolves the reference to the earlier Bola debt and records a payment against the correct obligation.',
+    }),
+  ]);
+})();
+
+const scenario7 = (() => {
+  const startingDocument = seedDocument('scenario-ambiguous-musa-start', [
+    {
+      id: eventId('ambiguous-customer-abstain', 'customer-1'),
+      kind: 'customer.created',
+      timestamp: '2026-08-17T09:00:00.000Z',
+      actor: 'system',
+      customerId: 'customer-musa-a',
+      displayName: 'Musa',
+      aliases: [],
+    },
+    {
+      id: eventId('ambiguous-customer-abstain', 'obligation-1'),
+      kind: 'obligation.created',
+      timestamp: '2026-08-17T09:10:00.000Z',
+      actor: 'system',
+      customerId: 'customer-musa-a',
+      obligationId: 'obligation-musa-a',
+      originalAmountMinor: nairaToMinorUnits(20_000),
+      dueAt: null,
+    },
+    {
+      id: eventId('ambiguous-customer-abstain', 'customer-2'),
+      kind: 'customer.created',
+      timestamp: '2026-08-18T09:00:00.000Z',
+      actor: 'system',
+      customerId: 'customer-musa-b',
+      displayName: 'Musa',
+      aliases: [],
+    },
+    {
+      id: eventId('ambiguous-customer-abstain', 'obligation-2'),
+      kind: 'obligation.created',
+      timestamp: '2026-08-18T09:10:00.000Z',
+      actor: 'system',
+      customerId: 'customer-musa-b',
+      obligationId: 'obligation-musa-b',
+      originalAmountMinor: nairaToMinorUnits(40_000),
+      dueAt: null,
+    },
+  ]);
+  const base: BenchmarkScenario = {
+    id: 'ambiguous-customer-abstain',
+    status: 'locked',
+    title: 'Ambiguous Customer, Must Abstain',
+    purpose:
+      'Two distinct customers share the same name, so the ledger must not guess which account should be mutated.',
+    clock: BENCHMARK_CLOCK,
+    startingDocument,
+    startingSnapshot: projectLedger(startingDocument),
+    turns: [],
+  };
+
+  const turn1Text = 'Musa paid 10k.';
+  const turn1Action: LedgerAction = {
+    type: 'REQUEST_CLARIFICATION',
+    question: 'Which Musa did you mean?',
+    ambiguityKind: 'customer',
+    candidateCustomerIds: ['customer-musa-a', 'customer-musa-b'],
+    candidateObligationIds: [],
+    permittedMutation: false,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'en' },
+  };
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+
+  return withTurns(
+    base,
+    [
+      makeTurn({
+        scenarioId: base.id,
+        turnId: 'turn-1',
+        inputText: turn1Text,
         language: 'en',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'RECORD_PAYMENT',
-          customer: { kind: 'id', customerId: mamaTobiId },
-          obligation: { kind: 'id', obligationId: 'obligation-mama-tobi-1' },
-          amountMinor: 2_000_000,
-          settleRemaining: false,
-          permittedMutation: true,
-          evidence: ['Mama Tobi brought 20.'],
-          source: { utterance: 'Mama Tobi brought 20.', language: 'en' },
-        }),
-        expectedSnapshot: {
-          ...createCustomer(baseDocument, baseSnapshot, mamaTobiId, 'Mama Tobi'),
-          obligations: [
-            {
-              id: 'obligation-mama-tobi-1',
-              customerId: mamaTobiId,
-              customerName: 'Mama Tobi',
-              originalAmountMinor: 5_000_000,
-              totalPaidMinor: 2_000_000,
-              outstandingMinor: 3_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: ['seed'],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: true,
-        notes:
-          'Review whether bare "20" should always normalize to 20,000 NGN in this product context.',
-      },
+        action: turn1Action,
+        expectedSnapshot: turn1Result.snapshot,
+        evaluatorNotes:
+          'This is the key safety case: the correct response is clarification and the financial state must remain unchanged.',
+      }),
     ],
-  }),
-  seedScenario({
-    id: 'full-settlement',
-    title: 'Full settlement',
-    purpose: 'Settle a remaining balance completely.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'Mama Tobi paid the balance.',
-        language: 'en',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'SETTLE_OBLIGATION',
-          obligation: { kind: 'id', obligationId: 'obligation-mama-tobi-1' },
-          amountMinor: 3_000_000,
-          permittedMutation: true,
-          evidence: ['Mama Tobi paid the balance.'],
-          source: { utterance: 'Mama Tobi paid the balance.', language: 'en' },
-        }),
-        expectedSnapshot: {
-          ...createCustomer(baseDocument, baseSnapshot, mamaTobiId, 'Mama Tobi'),
-          obligations: [
-            {
-              id: 'obligation-mama-tobi-1',
-              customerId: mamaTobiId,
-              customerName: 'Mama Tobi',
-              originalAmountMinor: 5_000_000,
-              totalPaidMinor: 5_000_000,
-              outstandingMinor: 0,
-              status: 'settled',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: ['seed'],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: true,
-      },
-    ],
-  }),
-  seedScenario({
-    id: 'amount-correction',
-    title: 'Amount correction',
-    purpose: 'Correct a previously recorded debt amount without creating a duplicate debt.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.',
-        language: 'en',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'CORRECT_OBLIGATION',
-          obligation: { kind: 'id', obligationId: 'obligation-kemi-1' },
-          correctedAmountMinor: 4_200_000,
-          correctionReason: 'Replaced previous amount',
-          permittedMutation: true,
-          evidence: ['That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.'],
-          source: {
-            utterance: 'That Kemi money I told you earlier, it wasn’t 24. It was 42 thousand.',
-            language: 'en',
-          },
-        }),
-        expectedSnapshot: {
-          ...createCustomer(baseDocument, baseSnapshot, kemiId, 'Kemi'),
-          obligations: [
-            {
-              id: 'obligation-kemi-1',
-              customerId: kemiId,
-              customerName: 'Kemi',
-              originalAmountMinor: 4_200_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 4_200_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: ['seed'],
-            },
-          ],
-        },
-        expectMutation: true,
-        notes:
-          'The correction target is assumed to be the earlier Kemi debt. Review this reference before finalizing benchmark truth.',
-      },
-    ],
-  }),
-  seedScenario({
-    id: 'repeat-debtor-new-obligation',
-    title: 'Repeat debtor, new obligation',
-    purpose: 'Create a second obligation for the same debtor without overwriting the first.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'Mama Tobi took 15k again.',
-        language: 'en',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'CREATE_OBLIGATION',
-          customer: { kind: 'id', customerId: mamaTobiId },
-          amountMinor: 1_500_000,
-          permittedMutation: true,
-          evidence: ['Mama Tobi took 15k again.'],
-          source: { utterance: 'Mama Tobi took 15k again.', language: 'en' },
-        }),
-        expectedSnapshot: {
-          ...createCustomer(baseDocument, baseSnapshot, mamaTobiId, 'Mama Tobi'),
-          obligations: [
-            {
-              id: 'obligation-mama-tobi-1',
-              customerId: mamaTobiId,
-              customerName: 'Mama Tobi',
-              originalAmountMinor: 5_000_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 5_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-            {
-              id: 'obligation-mama-tobi-2',
-              customerId: mamaTobiId,
-              customerName: 'Mama Tobi',
-              originalAmountMinor: 1_500_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 1_500_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: true,
-        notes: 'This scenario should preserve both obligations independently.',
-      },
-    ],
-  }),
-  seedScenario({
-    id: 'reference-previous-debt',
-    title: 'Reference to a previous debt',
-    purpose: 'Resolve a natural-language reference to an earlier obligation in context.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'She paid the remaining one from last week.',
-        language: 'en',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'RECORD_PAYMENT',
-          customer: { kind: 'id', customerId: mamaTobiId },
-          obligation: { kind: 'id', obligationId: 'obligation-mama-tobi-1' },
-          amountMinor: 3_000_000,
-          settleRemaining: true,
-          permittedMutation: true,
-          evidence: ['She paid the remaining one from last week.'],
-          source: { utterance: 'She paid the remaining one from last week.', language: 'en' },
-        }),
-        expectedSnapshot: {
-          ...createCustomer(baseDocument, baseSnapshot, mamaTobiId, 'Mama Tobi'),
-          obligations: [
-            {
-              id: 'obligation-mama-tobi-1',
-              customerId: mamaTobiId,
-              customerName: 'Mama Tobi',
-              originalAmountMinor: 5_000_000,
-              totalPaidMinor: 5_000_000,
-              outstandingMinor: 0,
-              status: 'settled',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: ['seed'],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: true,
-        notes:
-          'The pronoun and temporal reference require context-aware resolution. Review whether the seed should include earlier turns explicitly.',
-      },
-    ],
-  }),
-  seedScenario({
-    id: 'ambiguous-identity-abstain',
-    title: 'Ambiguous same-name debtor',
-    purpose: 'Abstain when multiple customers share the same name and mutation would be unsafe.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'Musa paid 10k.',
-        language: 'en',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'REQUEST_CLARIFICATION',
-          question: 'Which Musa did you mean?',
-          ambiguityKind: 'customer',
-          candidateCustomerIds: [musaOneId, musaTwoId],
-          candidateObligationIds: [],
-          permittedMutation: false,
-          evidence: ['Musa paid 10k.'],
-          source: { utterance: 'Musa paid 10k.', language: 'en' },
-        }),
-        expectedSnapshot: {
-          ...createCustomer(baseDocument, baseSnapshot, musaOneId, 'Musa'),
-          customers: [
-            {
-              id: musaOneId,
-              displayName: 'Musa',
-              aliases: [],
-              normalizedNames: ['musa'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-            {
-              id: musaTwoId,
-              displayName: 'Musa',
-              aliases: [],
-              normalizedNames: ['musa'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-          ],
-          obligations: [
-            {
-              id: 'obligation-musa-1',
-              customerId: musaOneId,
-              customerName: 'Musa',
-              originalAmountMinor: 2_000_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 2_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-            {
-              id: 'obligation-musa-2',
-              customerId: musaTwoId,
-              customerName: 'Musa',
-              originalAmountMinor: 4_000_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 4_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: false,
-        notes: 'This is a hard abstention case and must not change financial state.',
-      },
-    ],
-  }),
-  seedScenario({
-    id: 'pidgin-multi-turn',
-    title: 'Nigerian Pidgin multi-turn scenario',
-    purpose: 'Combine creation, partial payment, correction, and clarification behavior in Pidgin.',
-    reviewStatus: 'draft-review',
-    turns: [
-      {
-        id: 'turn-1',
-        inputText: 'Aunty Sade take 30k goods yesterday.',
-        language: 'pcm',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'CREATE_OBLIGATION',
-          customer: { kind: 'new', name: 'Aunty Sade', aliases: [] },
-          amountMinor: 3_000_000,
-          permittedMutation: true,
-          evidence: ['Aunty Sade take 30k goods yesterday.'],
-          source: { utterance: 'Aunty Sade take 30k goods yesterday.', language: 'pcm' },
-        }),
-        expectedSnapshot: {
-          ...baseSnapshot,
-          customers: [
-            {
-              id: 'customer-aunty-sade',
-              displayName: 'Aunty Sade',
-              aliases: [],
-              normalizedNames: ['aunty sade'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-          ],
-          obligations: [
-            {
-              id: 'obligation-aunty-sade-1',
-              customerId: 'customer-aunty-sade',
-              customerName: 'Aunty Sade',
-              originalAmountMinor: 3_000_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 3_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: true,
-      },
-      {
-        id: 'turn-2',
-        inputText: 'She bring 10 today.',
-        language: 'pcm',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'RECORD_PAYMENT',
-          customer: { kind: 'id', customerId: 'customer-aunty-sade' },
-          obligation: { kind: 'id', obligationId: 'obligation-aunty-sade-1' },
-          amountMinor: 1_000_000,
-          settleRemaining: false,
-          permittedMutation: true,
-          evidence: ['She bring 10 today.'],
-          source: { utterance: 'She bring 10 today.', language: 'pcm' },
-        }),
-        expectedSnapshot: {
-          ...baseSnapshot,
-          customers: [
-            {
-              id: 'customer-aunty-sade',
-              displayName: 'Aunty Sade',
-              aliases: [],
-              normalizedNames: ['aunty sade'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-          ],
-          obligations: [
-            {
-              id: 'obligation-aunty-sade-1',
-              customerId: 'customer-aunty-sade',
-              customerName: 'Aunty Sade',
-              originalAmountMinor: 3_000_000,
-              totalPaidMinor: 1_000_000,
-              outstandingMinor: 2_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: ['seed'],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: true,
-        notes:
-          'The parser should treat bare 10 as 10,000 NGN in this scenario, but this detail still needs review.',
-      },
-      {
-        id: 'turn-3',
-        inputText: 'No, e no be 30. Na 45k.',
-        language: 'pcm',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'CORRECT_OBLIGATION',
-          obligation: { kind: 'id', obligationId: 'obligation-aunty-sade-1' },
-          correctedAmountMinor: 4_500_000,
-          correctionReason: 'Corrected previous debt amount',
-          permittedMutation: true,
-          evidence: ['No, e no be 30. Na 45k.'],
-          source: { utterance: 'No, e no be 30. Na 45k.', language: 'pcm' },
-        }),
-        expectedSnapshot: {
-          ...baseSnapshot,
-          customers: [
-            {
-              id: 'customer-aunty-sade',
-              displayName: 'Aunty Sade',
-              aliases: [],
-              normalizedNames: ['aunty sade'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-          ],
-          obligations: [
-            {
-              id: 'obligation-aunty-sade-1',
-              customerId: 'customer-aunty-sade',
-              customerName: 'Aunty Sade',
-              originalAmountMinor: 4_500_000,
-              totalPaidMinor: 1_000_000,
-              outstandingMinor: 3_500_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: ['seed'],
-              correctionEventIds: ['seed'],
-            },
-          ],
-        },
-        expectMutation: true,
-      },
-      {
-        id: 'turn-4',
-        inputText: 'Musa pay 10k.',
-        language: 'pcm',
-        expectedAction: ledgerActionSchema.parse({
-          type: 'REQUEST_CLARIFICATION',
-          question: 'Which Musa did you mean?',
-          ambiguityKind: 'customer',
-          candidateCustomerIds: [musaOneId, musaTwoId],
-          candidateObligationIds: [],
-          permittedMutation: false,
-          evidence: ['Musa pay 10k.'],
-          source: { utterance: 'Musa pay 10k.', language: 'pcm' },
-        }),
-        expectedSnapshot: {
-          ...baseSnapshot,
-          customers: [
-            {
-              id: musaOneId,
-              displayName: 'Musa',
-              aliases: [],
-              normalizedNames: ['musa'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-            {
-              id: musaTwoId,
-              displayName: 'Musa',
-              aliases: [],
-              normalizedNames: ['musa'],
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              sourceEventIds: ['seed'],
-            },
-          ],
-          obligations: [
-            {
-              id: 'obligation-musa-1',
-              customerId: musaOneId,
-              customerName: 'Musa',
-              originalAmountMinor: 2_000_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 2_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-            {
-              id: 'obligation-musa-2',
-              customerId: musaTwoId,
-              customerName: 'Musa',
-              originalAmountMinor: 4_000_000,
-              totalPaidMinor: 0,
-              outstandingMinor: 4_000_000,
-              status: 'open',
-              createdAt: '2026-08-28T00:00:00.000Z',
-              updatedAt: '2026-08-28T00:00:00.000Z',
-              dueAt: null,
-              sourceEventIds: ['seed'],
-              paymentEventIds: [],
-              correctionEventIds: [],
-            },
-          ],
-        },
-        expectMutation: false,
-      },
-    ],
-  }),
+    startingDocument,
+  );
+})();
+
+const scenario8 = (() => {
+  const base = emptyScenario(
+    'pidgin-multi-turn',
+    'Hard Nigerian Pidgin Multi-Turn',
+    'A harder Pidgin scenario combines creation, partial repayment, correction, reference resolution, and settlement.',
+  );
+
+  const turn1Text =
+    'Mama Tobi carry goods of 50k yesterday. She talk say she go pay before Monday.';
+  const turn1Action: LedgerAction = {
+    type: 'CREATE_OBLIGATION',
+    customer: { kind: 'new', name: 'Mama Tobi', aliases: [] },
+    amountMinor: nairaToMinorUnits(50_000),
+    dueAt: '2026-08-30T23:00:00.000Z',
+    permittedMutation: true,
+    evidence: [turn1Text],
+    source: { utterance: turn1Text, language: 'pcm' },
+  };
+  const turn1Result = applyExpectedTurn(
+    base.startingDocument,
+    turn1Action,
+    base.id,
+    'turn-1',
+    turn1Text,
+  );
+  const mamaTobiCustomerId = turn1Result.snapshot.customers[0]?.id ?? '';
+
+  const turn2Text = 'Mama Tobi don bring 20k from that money.';
+  const turn2Action: LedgerAction = {
+    type: 'RECORD_PAYMENT',
+    customer: { kind: 'id', customerId: mamaTobiCustomerId },
+    obligation: {
+      kind: 'reference',
+      phrase: 'that money',
+      previousTurnId: 'turn-1',
+    },
+    amountMinor: nairaToMinorUnits(20_000),
+    settleRemaining: false,
+    permittedMutation: true,
+    evidence: [turn2Text, turn1Text],
+    source: { utterance: turn2Text, language: 'pcm' },
+  };
+  const turn2Result = applyExpectedTurn(
+    turn1Result.document,
+    turn2Action,
+    base.id,
+    'turn-2',
+    turn2Text,
+  );
+
+  const turn3Text = 'No be 50k I talk for the first one, na 45k.';
+  const turn3Action: LedgerAction = {
+    type: 'CORRECT_OBLIGATION',
+    obligation: {
+      kind: 'reference',
+      phrase: 'the first one',
+      previousTurnId: 'turn-1',
+    },
+    correctedAmountMinor: nairaToMinorUnits(45_000),
+    correctionReason: 'User corrected the original amount.',
+    permittedMutation: true,
+    evidence: [turn3Text, turn2Text],
+    source: { utterance: turn3Text, language: 'pcm' },
+  };
+  const turn3Result = applyExpectedTurn(
+    turn2Result.document,
+    turn3Action,
+    base.id,
+    'turn-3',
+    turn3Text,
+  );
+
+  const turn4Text = 'The remaining one, clear am.';
+  const turn4Action: LedgerAction = {
+    type: 'SETTLE_OBLIGATION',
+    obligation: {
+      kind: 'reference',
+      phrase: 'the remaining one',
+      previousTurnId: 'turn-1',
+    },
+    permittedMutation: true,
+    evidence: [turn4Text, turn3Text],
+    source: { utterance: turn4Text, language: 'pcm' },
+  };
+  const turn4Result = applyExpectedTurn(
+    turn3Result.document,
+    turn4Action,
+    base.id,
+    'turn-4',
+    turn4Text,
+  );
+
+  return withTurns(base, [
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-1',
+      inputText: turn1Text,
+      language: 'pcm',
+      action: turn1Action,
+      expectedSnapshot: turn1Result.snapshot,
+      evaluatorNotes:
+        'Creates the Pidgin debt and anchors a deterministic due date relative to the fixed benchmark clock.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-2',
+      inputText: turn2Text,
+      language: 'pcm',
+      action: turn2Action,
+      expectedSnapshot: turn2Result.snapshot,
+      evaluatorNotes:
+        'Records a partial repayment against the original debt via historical reference language.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-3',
+      inputText: turn3Text,
+      language: 'pcm',
+      action: turn3Action,
+      expectedSnapshot: turn3Result.snapshot,
+      evaluatorNotes:
+        'Corrects the original amount after some of the balance has already been paid.',
+    }),
+    makeTurn({
+      scenarioId: base.id,
+      turnId: 'turn-4',
+      inputText: turn4Text,
+      language: 'pcm',
+      action: turn4Action,
+      expectedSnapshot: turn4Result.snapshot,
+      evaluatorNotes:
+        'Uses Pidgin shorthand to settle the corrected remaining balance and close the obligation.',
+    }),
+  ]);
+})();
+
+export const seedScenarios: BenchmarkScenario[] = [
+  scenario1,
+  scenario2,
+  scenario3,
+  scenario4,
+  scenario5,
+  scenario6,
+  scenario7,
+  scenario8,
 ];
-
-export { scenarios as seedScenarios };

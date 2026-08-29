@@ -7,8 +7,8 @@ Talli is a voice-first conversational credit ledger for informal traders who sel
 - A deterministic ledger domain model with event history.
 - Safe action validation and mutation boundaries.
 - Baseline and advanced interpreter interfaces.
-- A benchmark fixture format for multi-turn evaluation scenarios.
-- A reproducible test harness for the ledger invariants.
+- A locked benchmark fixture format for multi-turn evaluation scenarios.
+- A reproducible test harness for the ledger invariants and benchmark controls.
 
 ## Architecture
 
@@ -56,26 +56,36 @@ Money is stored only as integer minor units.
 
 Unsafe or ambiguous commands must not mutate financial state. The ledger application layer must return a clarification result instead of guessing when identity or target obligation resolution is not deterministic.
 
-## Benchmark
+## Benchmark & Metrics
 
-The benchmark fixture format supports:
+The benchmark is frozen before model testing so the evaluator measures the product instead of moving ground truth. Each scenario is deterministic, uses a fixed reference clock, and carries a fully specified expected action plus expected ledger state after every turn.
 
-- scenario metadata
-- starting ledger state
-- ordered turns
-- input text
-- language marker
-- expected action
-- expected ledger snapshot after each turn
-- mutation vs abstention
-- evaluator notes
+The eight locked failure modes are:
 
-The current seed benchmark is drafted for review and should not be treated as final ground truth yet.
+1. Simple new credit.
+2. Partial payment.
+3. Full settlement.
+4. Correction.
+5. Repeat customer, new obligation.
+6. Natural reference resolution.
+7. Ambiguous same-name customer requiring abstention.
+8. Hard Nigerian Pidgin multi-turn flow.
 
-## Metrics
+Metrics:
 
-- `LSA` - Ledger State Accuracy
-- `UMR` - Unsafe Mutation Rate
+- `LSA` is the percentage of turns whose canonical ledger state exactly matches the expected canonical state.
+- `UMR` is the percentage of abstention-required turns that caused a prohibited financial mutation. If there are no abstention-required turns, the benchmark reports `N/A`.
+- `Action Accuracy` is a diagnostic metric that compares the canonical expected action against the canonical actual action.
+
+The benchmark uses a fixed reference datetime of `2026-08-29T09:00:00+01:00` in `Africa/Lagos` so temporal phrases such as `Friday`, `tomorrow`, and `before Monday` are reproducible.
+
+Run the benchmark with:
+
+```bash
+npm run benchmark
+```
+
+Use `TALLI_INTERPRETER_MODE=perfect|wrong|unsafe|baseline|advanced` to switch interpreters and `TALLI_BENCHMARK_OUTPUT=json` for machine-readable output.
 
 ## Setup
 
@@ -110,6 +120,15 @@ Current tests focus on the ledger domain:
 - invalid overpayment behavior
 - balance consistency
 - audit history preservation
+
+The benchmark tests also verify:
+
+- the eight locked scenarios are complete and deterministic
+- perfect controls score 100% LSA and 0% UMR
+- wrong controls reduce accuracy
+- unsafe controls produce a non-zero UMR
+- canonical state comparison ignores audit-only metadata
+- abstention turns preserve financial state
 
 ## Deferred, not removed
 

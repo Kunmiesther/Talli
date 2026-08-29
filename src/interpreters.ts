@@ -12,6 +12,12 @@ import { nairaToMinorUnits } from './domain/money.js';
 export interface InterpreterInput {
   text: string;
   language?: 'en' | 'pcm' | 'mixed';
+  benchmark?: {
+    scenarioId: string;
+    turnId: string;
+    referenceNow: string;
+    timezone: string;
+  };
 }
 
 export interface AdvancedInterpreterInput extends InterpreterInput {
@@ -58,13 +64,19 @@ function parseMoneyExpression(text: string): number | undefined {
 
   for (const pattern of matches) {
     const match = normalized.match(pattern);
-    if (!match) continue;
+    if (!match) {
+      continue;
+    }
 
     const rawValue = match[1];
-    if (!rawValue) continue;
+    if (!rawValue) {
+      continue;
+    }
 
     const value = Number(rawValue.replace(/\s+/g, ''));
-    if (!Number.isFinite(value)) continue;
+    if (!Number.isFinite(value)) {
+      continue;
+    }
 
     const unit = match[2];
     if (unit === 'k' || unit === 'thousand' || unit === 'grand') {

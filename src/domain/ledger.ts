@@ -257,7 +257,7 @@ export function projectLedger(document: LedgerDocument): LedgerSnapshot {
       case 'decision.no_action':
         break;
       default: {
-        const never: never = event;
+        const never: never = event as never;
         void never;
       }
     }
@@ -377,6 +377,7 @@ export function selectObligationFromRef(
   snapshot: LedgerSnapshot,
   obligation: ObligationRef | undefined,
   customer?: CustomerRecord,
+  document?: LedgerDocument,
 ):
   | { kind: 'resolved'; obligation: ObligationRecord }
   | { kind: 'ambiguous'; candidateObligationIds: string[] }
@@ -398,6 +399,34 @@ export function selectObligationFromRef(
   }
 
   if (obligation.kind === 'reference') {
+    if (!document || !obligation.previousTurnId) {
+      return { kind: 'missing' };
+    }
+
+    const referencedObligationIds = document.events
+      .filter(
+        (event): event is ObligationCreatedEvent =>
+          event.kind === 'obligation.created' && event.turnId === obligation.previousTurnId,
+      )
+      .map((event) => event.obligationId);
+
+    if (referencedObligationIds.length === 1) {
+      const referenced = snapshot.obligations.find(
+        (entry) => entry.id === referencedObligationIds[0],
+      );
+      if (referenced) {
+        return { kind: 'resolved', obligation: referenced };
+      }
+      return { kind: 'missing' };
+    }
+
+    if (referencedObligationIds.length > 1) {
+      return {
+        kind: 'ambiguous',
+        candidateObligationIds: referencedObligationIds,
+      };
+    }
+
     return { kind: 'missing' };
   }
 
@@ -753,7 +782,7 @@ function applyRecordPayment(
   }
 
   let obligationResolution = action.obligation
-    ? selectObligationFromRef(snapshot, action.obligation, customer)
+    ? selectObligationFromRef(snapshot, action.obligation, customer, document)
     : { kind: 'missing' as const };
 
   if (obligationResolution.kind === 'ambiguous') {
@@ -1010,7 +1039,12 @@ function applyCorrectObligation(
   action: CorrectObligationAction,
   context: ResolveContext,
 ): ApplyResult {
-  const obligationResolution = selectObligationFromRef(snapshot, action.obligation);
+  const obligationResolution = selectObligationFromRef(
+    snapshot,
+    action.obligation,
+    undefined,
+    document,
+  );
   if (obligationResolution.kind === 'ambiguous') {
     return clarificationResult(
       document,
@@ -1126,7 +1160,12 @@ function applySettleObligation(
   action: SettleObligationAction,
   context: ResolveContext,
 ): ApplyResult {
-  const obligationResolution = selectObligationFromRef(snapshot, action.obligation);
+  const obligationResolution = selectObligationFromRef(
+    snapshot,
+    action.obligation,
+    undefined,
+    document,
+  );
   if (obligationResolution.kind !== 'resolved') {
     return clarificationResult(
       document,

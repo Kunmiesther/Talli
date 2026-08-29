@@ -17,7 +17,6 @@ export interface CompactCustomerContext {
   id: string;
   displayName: string;
   aliases: string[];
-  normalizedNames: string[];
   openObligationIds: string[];
   settledObligationIds: string[];
   totalOutstandingMinor: number;
@@ -36,7 +35,6 @@ export interface CompactObligationContext {
   createdAt: string;
   updatedAt: string;
   lastPaymentEventId: string | null;
-  correctionEventIds: string[];
 }
 
 export interface CompactEventContext {
@@ -63,6 +61,7 @@ export interface AdvancedContextPackage {
     nextMonday: string;
   };
   recentTurns: Array<{
+    turnId: string;
     index: number;
     text: string;
   }>;
@@ -119,7 +118,7 @@ function summarizeEvent(event: LedgerEvent, snapshot: LedgerSnapshot): string {
     case 'customer.created':
       return `customer ${event.displayName} (${event.customerId}) created`;
     case 'obligation.created':
-      return `obligation ${event.obligationId} for ${snapshot.obligations.find((obligation) => obligation.id === event.obligationId)?.customerName ?? event.customerId} created with ${formatNgn(event.originalAmountMinor)}${event.dueAt ? ` due ${event.dueAt}` : ''}`;
+      return `obligation ${event.obligationId} for ${snapshot.obligations.find((obligation) => obligation.id === event.obligationId)?.customerName ?? event.customerId} created ${formatNgn(event.originalAmountMinor)}${event.dueAt ? ` due ${event.dueAt}` : ''}`;
     case 'payment.recorded':
       return `payment ${event.amountMinor} recorded for ${event.obligationId} (${event.outstandingBeforeMinor} -> ${event.outstandingAfterMinor})`;
     case 'obligation.corrected':
@@ -271,7 +270,6 @@ function buildCustomerContexts(
       id: customer.id,
       displayName: customer.displayName,
       aliases: [...customer.aliases],
-      normalizedNames: [...customer.normalizedNames],
       openObligationIds,
       settledObligationIds,
       totalOutstandingMinor,
@@ -293,7 +291,6 @@ function buildObligationContexts(obligations: ObligationRecord[]): CompactObliga
     createdAt: obligation.createdAt,
     updatedAt: obligation.updatedAt,
     lastPaymentEventId: obligation.paymentEventIds.at(-1) ?? null,
-    correctionEventIds: [...obligation.correctionEventIds],
   }));
 }
 
@@ -356,12 +353,16 @@ export function buildTemporalHints(clock: ReferenceClock): AdvancedContextPackag
 export function buildAdvancedContextPackage(input: {
   snapshot: LedgerSnapshot;
   document: LedgerDocument;
-  recentTexts: string[];
+  recentTurns: Array<{
+    turnId: string;
+    text: string;
+  }>;
   utterance: string;
   language: string;
   clock: ReferenceClock;
 }): AdvancedContextPackage {
-  const scoredCustomers = selectCustomers(input.snapshot, input.utterance, input.recentTexts);
+  const recentTexts = input.recentTurns.map((turn) => turn.text);
+  const scoredCustomers = selectCustomers(input.snapshot, input.utterance, recentTexts);
   const selectedCustomers = scoredCustomers.slice(0, 5).map((entry) => entry.customer);
   const relevantObligations = selectRelevantObligations(
     input.snapshot,
@@ -373,12 +374,11 @@ export function buildAdvancedContextPackage(input: {
   const recentEvents = buildRecentEvents(input.snapshot, input.document);
 
   const selectionNotes = [
-    'Compact context only includes relevant customers, obligations, recent events, and recent turns.',
-    'Use stable IDs from this context when the intended target is uniquely resolved.',
-    'If a target is still materially ambiguous, request clarification rather than guessing.',
+    'Use the stable IDs in this context when a target is uniquely resolved.',
+    'If target selection is materially ambiguous, request clarification instead of guessing.',
   ];
 
-  if (recentTextsHasReference(input.recentTexts)) {
+  if (recentTextsHasReference(recentTexts)) {
     selectionNotes.push(
       'The utterance or recent conversation contains historical reference language.',
     );
@@ -391,9 +391,10 @@ export function buildAdvancedContextPackage(input: {
     referenceDate: formatDay(new Date(input.clock.referenceNow), input.clock.timezone),
     referenceWeekday: formatWeekday(new Date(input.clock.referenceNow), input.clock.timezone),
     temporalHints: buildTemporalHints(input.clock),
-    recentTurns: input.recentTexts.slice(-4).map((text, index, array) => ({
-      index: input.recentTexts.length - array.length + index + 1,
-      text,
+    recentTurns: input.recentTurns.slice(-4).map((turn, index, array) => ({
+      turnId: turn.turnId,
+      index: input.recentTurns.length - array.length + index + 1,
+      text: turn.text,
     })),
     customers,
     obligations,

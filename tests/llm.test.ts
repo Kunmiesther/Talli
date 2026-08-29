@@ -13,6 +13,11 @@ import {
   type InterpreterInput,
 } from '../src/interpreters.js';
 import {
+  LEDGER_INTENT_CONTRACT_NAME,
+  LEDGER_INTENT_CONTRACT_VERSION,
+  ledgerIntentSchema,
+} from '../src/llm/intent.js';
+import {
   OpenAICompatibleStructuredActionModel,
   type StructuredActionModel,
   type StructuredActionModelRequest,
@@ -37,14 +42,14 @@ class CapturingModel implements StructuredActionModel {
 
   constructor(private readonly result: StructuredActionModelResult) {}
 
-  async generateLedgerAction(request: StructuredActionModelRequest) {
+  async generateStructuredResponse(request: StructuredActionModelRequest) {
     this.lastRequest = request;
     return this.result;
   }
 }
 
 describe('structured action provider', () => {
-  it('validates a structured model response against the action schema', async () => {
+  it('validates a structured model response against the intent schema', async () => {
     const provider = new OpenAICompatibleStructuredActionModel({
       apiKey: 'test-key',
       model: 'test-model',
@@ -56,11 +61,9 @@ describe('structured action provider', () => {
               {
                 message: {
                   content: JSON.stringify({
-                    type: 'NO_ACTION',
+                    intent: 'no_action',
                     reason: 'Nothing to do.',
-                    permittedMutation: false,
                     evidence: [],
-                    source: { utterance: 'nothing', language: 'en' },
                   }),
                 },
               },
@@ -75,24 +78,25 @@ describe('structured action provider', () => {
       ) as typeof fetch,
     });
 
-    const result = await provider.generateLedgerAction({
+    const result = await provider.generateStructuredResponse({
       systemInstructions: 'system',
       userInput: 'user',
       context: { clock: { referenceNow: '2026-08-29T09:00:00+01:00', timezone: 'Africa/Lagos' } },
-      schemaName: 'LedgerAction',
+      schemaName: LEDGER_INTENT_CONTRACT_NAME,
+      contractName: LEDGER_INTENT_CONTRACT_NAME,
+      contractVersion: LEDGER_INTENT_CONTRACT_VERSION,
+      schema: ledgerIntentSchema,
     });
 
     expect(result.ok).toBe(true);
     if (!result.ok) {
       throw new Error('Expected a successful provider result.');
     }
-    expect(result.action).toEqual(
-      ledgerActionSchema.parse({
-        type: 'NO_ACTION',
+    expect(result.output).toEqual(
+      ledgerIntentSchema.parse({
+        intent: 'no_action',
         reason: 'Nothing to do.',
-        permittedMutation: false,
         evidence: [],
-        source: { utterance: 'nothing', language: 'en' },
       }),
     );
     expect(result.diagnostics.attempts).toBe(1);
@@ -126,11 +130,14 @@ describe('structured action provider', () => {
       fetchImpl: fetchImpl as typeof fetch,
     });
 
-    const result = await provider.generateLedgerAction({
+    const result = await provider.generateStructuredResponse({
       systemInstructions: 'system',
       userInput: 'user',
       context: { clock: { referenceNow: '2026-08-29T09:00:00+01:00', timezone: 'Africa/Lagos' } },
-      schemaName: 'LedgerAction',
+      schemaName: LEDGER_INTENT_CONTRACT_NAME,
+      contractName: LEDGER_INTENT_CONTRACT_NAME,
+      contractVersion: LEDGER_INTENT_CONTRACT_VERSION,
+      schema: ledgerIntentSchema,
     });
 
     expect(result.ok).toBe(false);
@@ -147,24 +154,28 @@ describe('llm-backed interpreters', () => {
   it('keeps baseline requests free of ledger history and entity context', async () => {
     const model = new CapturingModel({
       ok: true,
-      action: ledgerActionSchema.parse({
-        type: 'NO_ACTION',
+      output: ledgerIntentSchema.parse({
+        intent: 'no_action',
         reason: 'baseline',
-        permittedMutation: false,
         evidence: [],
-        source: { utterance: 'test', language: 'en' },
       }),
       diagnostics: {
         provider: 'mock',
         model: 'mock',
         baseUrl: 'mock',
         configured: true,
+        contractName: LEDGER_INTENT_CONTRACT_NAME,
+        contractVersion: LEDGER_INTENT_CONTRACT_VERSION,
         attempts: 1,
         latencyMs: 1,
         responseFormatUsed: true,
         rawOutputs: ['{}'],
         parseErrors: [],
         requestIds: [],
+        attemptLogs: [],
+        rateLimitFailures: 0,
+        schemaInvalidResponses: 0,
+        providerFailures: 0,
       },
     });
     const interpreter = new BaselineInterpreter(model);
@@ -213,24 +224,28 @@ describe('llm-backed interpreters', () => {
     const snapshot = projectLedger(document);
     const model = new CapturingModel({
       ok: true,
-      action: ledgerActionSchema.parse({
-        type: 'NO_ACTION',
+      output: ledgerIntentSchema.parse({
+        intent: 'no_action',
         reason: 'advanced',
-        permittedMutation: false,
         evidence: [],
-        source: { utterance: 'test', language: 'en' },
       }),
       diagnostics: {
         provider: 'mock',
         model: 'mock',
         baseUrl: 'mock',
         configured: true,
+        contractName: LEDGER_INTENT_CONTRACT_NAME,
+        contractVersion: LEDGER_INTENT_CONTRACT_VERSION,
         attempts: 1,
         latencyMs: 1,
         responseFormatUsed: true,
         rawOutputs: ['{}'],
         parseErrors: [],
         requestIds: [],
+        attemptLogs: [],
+        rateLimitFailures: 0,
+        schemaInvalidResponses: 0,
+        providerFailures: 0,
       },
     });
     const interpreter = new AdvancedInterpreter(model);
@@ -246,7 +261,7 @@ describe('llm-backed interpreters', () => {
       },
       snapshot,
       document,
-      recentTexts: ['Mama Tobi carry goods of 50k yesterday.'],
+      recentTurns: [{ turnId: 'turn-1', text: 'Mama Tobi carry goods of 50k yesterday.' }],
     });
 
     expect(model.lastRequest).toBeDefined();
@@ -265,6 +280,12 @@ describe('llm-backed interpreters', () => {
         expect.objectContaining({
           customerName: 'Mama Tobi',
           outstandingMinor: nairaToMinorUnits(50_000),
+        }),
+      ],
+      recentTurns: [
+        expect.objectContaining({
+          turnId: 'turn-1',
+          text: 'Mama Tobi carry goods of 50k yesterday.',
         }),
       ],
     });

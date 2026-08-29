@@ -12,6 +12,13 @@ import {
   buildAdvancedContextPackage,
   buildBaselineContextPackage,
 } from './llm/context.js';
+import { type IntentCompilationDiagnostics, compileLedgerIntent } from './llm/intent-compiler.js';
+import {
+  LEDGER_INTENT_CONTRACT_NAME,
+  LEDGER_INTENT_CONTRACT_VERSION,
+  type LedgerIntent,
+  ledgerIntentSchema,
+} from './llm/intent.js';
 import { buildAdvancedRequestEnvelope, buildBaselineRequestEnvelope } from './llm/prompts.js';
 import type {
   StructuredActionModel,
@@ -32,7 +39,11 @@ export interface InterpreterInput {
 export interface AdvancedInterpreterInput extends InterpreterInput {
   snapshot: LedgerSnapshot;
   document: LedgerDocument;
-  recentTexts: string[];
+  recentTurns?: Array<{
+    turnId: string;
+    text: string;
+  }>;
+  recentTexts?: string[];
 }
 
 export interface InterpreterRunDiagnostics {
@@ -44,6 +55,8 @@ export interface InterpreterRunDiagnostics {
   language: string;
   baselineContext?: BaselineContextPackage;
   advancedContext?: AdvancedContextPackage;
+  modelIntent?: LedgerIntent | null;
+  compiler?: IntentCompilationDiagnostics | null;
   providerFailure?: {
     reason: string;
     safeActionType: LedgerAction['type'];
@@ -111,10 +124,13 @@ export class BaselineInterpreter implements ActionInterpreter {
       language: input.language,
     });
 
-    const result = await this.model.generateLedgerAction({
+    const result = await this.model.generateStructuredResponse({
       ...request,
       context: baselineContext,
-      schemaName: 'LedgerAction',
+      schemaName: LEDGER_INTENT_CONTRACT_NAME,
+      contractName: LEDGER_INTENT_CONTRACT_NAME,
+      contractVersion: LEDGER_INTENT_CONTRACT_VERSION,
+      schema: ledgerIntentSchema,
     });
 
     if (!result.ok) {
@@ -126,6 +142,8 @@ export class BaselineInterpreter implements ActionInterpreter {
         inputText: input.text,
         language: input.language ?? 'en',
         baselineContext,
+        modelIntent: null,
+        compiler: null,
         providerFailure: {
           reason: result.diagnostics.failureReason ?? 'Provider failed to return a valid action.',
           safeActionType: 'REQUEST_CLARIFICATION',
@@ -136,6 +154,15 @@ export class BaselineInterpreter implements ActionInterpreter {
       );
     }
 
+    const compiled = compileLedgerIntent({
+      intent: result.output,
+      utterance: input.text,
+      language: input.language ?? 'en',
+      clock,
+      snapshot: projectLedger(createLedgerDocument()),
+      document: createLedgerDocument(),
+    });
+
     this.lastDiagnostics = {
       mode: 'baseline',
       promptKind: 'baseline',
@@ -144,8 +171,10 @@ export class BaselineInterpreter implements ActionInterpreter {
       inputText: input.text,
       language: input.language ?? 'en',
       baselineContext,
+      modelIntent: result.output,
+      compiler: compiled.diagnostics,
     };
-    return result.action;
+    return compiled.action;
   }
 }
 
@@ -158,10 +187,16 @@ export class AdvancedInterpreter implements ActionInterpreter {
   async interpret(input: InterpreterInput | AdvancedInterpreterInput): Promise<LedgerAction> {
     assertAdvancedInput(input);
     const clock = clockFromInput(input);
+    const recentTurns =
+      input.recentTurns ??
+      (input.recentTexts ?? []).map((text, index) => ({
+        turnId: `recent-${index + 1}`,
+        text,
+      }));
     const advancedContext = buildAdvancedContextPackage({
       snapshot: input.snapshot,
       document: input.document,
-      recentTexts: input.recentTexts,
+      recentTurns,
       utterance: input.text,
       language: input.language ?? 'en',
       clock,
@@ -172,10 +207,13 @@ export class AdvancedInterpreter implements ActionInterpreter {
       language: input.language,
     });
 
-    const result = await this.model.generateLedgerAction({
+    const result = await this.model.generateStructuredResponse({
       ...request,
       context: advancedContext,
-      schemaName: 'LedgerAction',
+      schemaName: LEDGER_INTENT_CONTRACT_NAME,
+      contractName: LEDGER_INTENT_CONTRACT_NAME,
+      contractVersion: LEDGER_INTENT_CONTRACT_VERSION,
+      schema: ledgerIntentSchema,
     });
 
     if (!result.ok) {
@@ -187,6 +225,8 @@ export class AdvancedInterpreter implements ActionInterpreter {
         inputText: input.text,
         language: input.language ?? 'en',
         advancedContext,
+        modelIntent: null,
+        compiler: null,
         providerFailure: {
           reason: result.diagnostics.failureReason ?? 'Provider failed to return a valid action.',
           safeActionType: 'REQUEST_CLARIFICATION',
@@ -197,6 +237,15 @@ export class AdvancedInterpreter implements ActionInterpreter {
       );
     }
 
+    const compiled = compileLedgerIntent({
+      intent: result.output,
+      utterance: input.text,
+      language: input.language ?? 'en',
+      clock,
+      snapshot: input.snapshot,
+      document: input.document,
+    });
+
     this.lastDiagnostics = {
       mode: 'advanced',
       promptKind: 'advanced',
@@ -205,8 +254,10 @@ export class AdvancedInterpreter implements ActionInterpreter {
       inputText: input.text,
       language: input.language ?? 'en',
       advancedContext,
+      modelIntent: result.output,
+      compiler: compiled.diagnostics,
     };
-    return result.action;
+    return compiled.action;
   }
 }
 

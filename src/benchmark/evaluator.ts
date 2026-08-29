@@ -426,7 +426,10 @@ function evaluateTurn(
   inputText: string,
   language: 'en' | 'pcm' | 'mixed',
   interpreter: ActionInterpreter,
-  recentTexts: string[],
+  recentTurns: Array<{
+    turnId: string;
+    text: string;
+  }>,
   expectedAction: LedgerAction,
   expectedSnapshot: LedgerSnapshot,
   expectMutation: boolean,
@@ -448,7 +451,7 @@ function evaluateTurn(
             benchmark,
             snapshot: currentSnapshot,
             document,
-            recentTexts,
+            recentTurns,
           }
         : {
             text: inputText,
@@ -510,7 +513,10 @@ export async function evaluateScenario(
   assertLedgerInvariants(startingSnapshot);
 
   const evaluations: TurnEvaluation[] = [];
-  const recentTexts: string[] = [];
+  const recentTurns: Array<{
+    turnId: string;
+    text: string;
+  }> = [];
 
   for (const turn of scenario.turns) {
     const outcome = await evaluateTurn(
@@ -520,7 +526,7 @@ export async function evaluateScenario(
       turn.inputText,
       turn.language,
       interpreter,
-      recentTexts,
+      recentTurns,
       turn.expectedAction,
       turn.expectedSnapshot,
       turn.expectMutation,
@@ -528,7 +534,10 @@ export async function evaluateScenario(
 
     document = outcome.document;
     evaluations.push(outcome.evaluation);
-    recentTexts.push(turn.inputText);
+    recentTurns.push({
+      turnId: turn.id,
+      text: turn.inputText,
+    });
   }
 
   const stateMatches = evaluations.filter((evaluation) => evaluation.stateMatch).length;

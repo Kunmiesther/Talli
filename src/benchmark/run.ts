@@ -186,12 +186,18 @@ async function writeTrajectoryArtifact(
 async function main() {
   const mode = readInterpreterMode();
   const outputFormat = readOutputFormat();
+  const benchmarkOutputPath = process.env.TALLI_BENCHMARK_OUTPUT_PATH?.trim();
   const interpreter = buildInterpreter(mode, seedScenarios);
   const evaluation = await evaluateBenchmark(seedScenarios, interpreter, mode);
   await writeTrajectoryArtifact(evaluation, mode);
+  if (benchmarkOutputPath) {
+    await writeFile(benchmarkOutputPath, `${JSON.stringify(evaluation, null, 2)}\n`, 'utf8');
+  }
 
   if (outputFormat === 'json') {
-    console.log(JSON.stringify(evaluation, null, 2));
+    if (!benchmarkOutputPath) {
+      console.log(JSON.stringify(evaluation, null, 2));
+    }
     return;
   }
 

@@ -43,3 +43,14 @@
   - the ambiguous-customer abstention again preserved state but missed the exact expected clarification payload
   - rate limits surfaced in the provider diagnostics on later turns
 - Evidence saved at `artifacts/experiments/advanced-v1.json`
+
+## Milestone 4 - Compact intent contract
+
+- Observed failure: Experiment 1 was dominated by schema-invalid provider outputs and token pressure at the model/provider contract boundary.
+- Hypothesis: the model should emit semantic intent while deterministic application code constructs the rich internal ledger action.
+- Implementation: compact `LedgerIntent` model-facing schema, deterministic intent-to-action compiler, compressed prompt/context packages, richer provider diagnostics, and explicit 429 / `Retry-After` handling.
+- Smoke suite: 4/4 live calls passed after date normalization was moved into deterministic code.
+- Baseline v2 metrics: `LSA=11.1%`, `Action Accuracy=5.6%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=4`, `schemaInvalidResponses=1`, `rateLimitFailures=3`.
+- Advanced v2 metrics: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=13`, `schemaInvalidResponses=6`, `rateLimitFailures=13`.
+- Main takeaway: the compact contract improved provider reliability enough for smoke testing, but the advanced path still underperformed the baseline on the locked benchmark.
+- Evidence saved at `artifacts/experiments/baseline-v2.json`, `artifacts/experiments/advanced-v2.json`, and `artifacts/experiments/contract-smoke.json`.

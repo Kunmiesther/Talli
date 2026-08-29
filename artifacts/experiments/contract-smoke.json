@@ -1,0 +1,222 @@
+{
+  "generatedAt": "2026-08-29T10:47:31.510Z",
+  "provider": "groq",
+  "model": "openai/gpt-oss-120b",
+  "baseUrl": "https://api.groq.com/openai/v1",
+  "results": [
+    {
+      "name": "english-create",
+      "ok": true,
+      "compiledActionType": "CREATE_OBLIGATION",
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 1,
+        "latencyMs": 4045,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "{\"intent\":\"create_obligation\",\"customer\":{\"name\":\"Amina\"},\"amountMinor\":3500000,\"dueAt\":\"2026-09-01T09:00:00+01:00\"}"
+        ],
+        "parseErrors": [],
+        "requestIds": [
+          "chatcmpl-948223b5-8320-44b7-8759-08cadd70e637"
+        ],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "chatcmpl-948223b5-8320-44b7-8759-08cadd70e637",
+            "httpStatus": 200,
+            "responseFormatUsed": true,
+            "rawOutput": "{\"intent\":\"create_obligation\",\"customer\":{\"name\":\"Amina\"},\"amountMinor\":3500000,\"dueAt\":\"2026-09-01T09:00:00+01:00\"}",
+            "parseSucceeded": true,
+            "schemaIssuePaths": [],
+            "failureKind": "success"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 0,
+        "usage": {
+          "promptTokens": 455,
+          "completionTokens": 449,
+          "totalTokens": 904
+        }
+      },
+      "modelIntent": {
+        "intent": "create_obligation",
+        "customer": {
+          "name": "Amina",
+          "candidateIds": []
+        },
+        "amountMinor": 3500000,
+        "dueAt": "2026-09-01T09:00:00+01:00",
+        "settleRemaining": false,
+        "evidence": []
+      }
+    },
+    {
+      "name": "simple-payment",
+      "ok": true,
+      "compiledActionType": "RECORD_PAYMENT",
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 1,
+        "latencyMs": 1374,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "{\"intent\":\"record_payment\",\"customer\":{\"id\":\"smoke-turn-1_0001\"},\"obligation\":{\"id\":\"smoke-turn-1_0003\"},\"amountMinor\":1000000}"
+        ],
+        "parseErrors": [],
+        "requestIds": [
+          "chatcmpl-7b54953c-79b4-4869-b1d1-7cca0c9f23f4"
+        ],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "chatcmpl-7b54953c-79b4-4869-b1d1-7cca0c9f23f4",
+            "httpStatus": 200,
+            "responseFormatUsed": true,
+            "rawOutput": "{\"intent\":\"record_payment\",\"customer\":{\"id\":\"smoke-turn-1_0001\"},\"obligation\":{\"id\":\"smoke-turn-1_0003\"},\"amountMinor\":1000000}",
+            "parseSucceeded": true,
+            "schemaIssuePaths": [],
+            "failureKind": "success"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 0,
+        "usage": {
+          "promptTokens": 1054,
+          "completionTokens": 478,
+          "totalTokens": 1532
+        }
+      },
+      "modelIntent": {
+        "intent": "record_payment",
+        "customer": {
+          "id": "smoke-turn-1_0001",
+          "candidateIds": []
+        },
+        "obligation": {
+          "id": "smoke-turn-1_0003",
+          "candidateIds": []
+        },
+        "amountMinor": 1000000,
+        "settleRemaining": false,
+        "evidence": []
+      }
+    },
+    {
+      "name": "correction",
+      "ok": true,
+      "compiledActionType": "CORRECT_OBLIGATION",
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 1,
+        "latencyMs": 1613,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "{\"intent\":\"correct_obligation\",\"obligation\":{\"id\":\"smoke-turn-1_0003\"},\"correctedAmountMinor\":4200000,\"correctionReason\":\"Amount corrected from 24k to 42k as per user clarification\"}"
+        ],
+        "parseErrors": [],
+        "requestIds": [
+          "chatcmpl-19e1e804-192d-420f-b9a4-5195d857aaf0"
+        ],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "chatcmpl-19e1e804-192d-420f-b9a4-5195d857aaf0",
+            "httpStatus": 200,
+            "responseFormatUsed": true,
+            "rawOutput": "{\"intent\":\"correct_obligation\",\"obligation\":{\"id\":\"smoke-turn-1_0003\"},\"correctedAmountMinor\":4200000,\"correctionReason\":\"Amount corrected from 24k to 42k as per user clarification\"}",
+            "parseSucceeded": true,
+            "schemaIssuePaths": [],
+            "failureKind": "success"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 0,
+        "usage": {
+          "promptTokens": 1200,
+          "completionTokens": 512,
+          "totalTokens": 1712
+        }
+      },
+      "modelIntent": {
+        "intent": "correct_obligation",
+        "obligation": {
+          "id": "smoke-turn-1_0003",
+          "candidateIds": []
+        },
+        "correctedAmountMinor": 4200000,
+        "settleRemaining": false,
+        "correctionReason": "Amount corrected from 24k to 42k as per user clarification",
+        "evidence": []
+      }
+    },
+    {
+      "name": "pidgin-payment",
+      "ok": true,
+      "compiledActionType": "REQUEST_CLARIFICATION",
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 1,
+        "latencyMs": 1317,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "{\"intent\":\"record_payment\",\"customerId\":\"smoke-turn-1_0001\",\"obligationId\":\"smoke-turn-1_0003\",\"amountMinor\":2000000}"
+        ],
+        "parseErrors": [],
+        "requestIds": [
+          "chatcmpl-a08617a9-acd5-4a8a-a796-e5cb7050efd6"
+        ],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "chatcmpl-a08617a9-acd5-4a8a-a796-e5cb7050efd6",
+            "httpStatus": 200,
+            "responseFormatUsed": true,
+            "rawOutput": "{\"intent\":\"record_payment\",\"customerId\":\"smoke-turn-1_0001\",\"obligationId\":\"smoke-turn-1_0003\",\"amountMinor\":2000000}",
+            "parseSucceeded": true,
+            "schemaIssuePaths": [],
+            "failureKind": "success"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 0,
+        "usage": {
+          "promptTokens": 1098,
+          "completionTokens": 487,
+          "totalTokens": 1585
+        }
+      },
+      "modelIntent": {
+        "intent": "record_payment",
+        "amountMinor": 2000000,
+        "settleRemaining": false,
+        "evidence": []
+      }
+    }
+  ]
+}

@@ -29,15 +29,16 @@ The advanced model does not write state directly. It produces structured actions
 - TypeScript for all domain and harness code.
 - Zod for runtime schemas.
 - Event-sourced ledger history with deterministic projection.
-- OpenAI-compatible structured action provider with bounded retries and schema validation.
+- OpenAI-compatible structured intent provider with bounded retries, JSON-mode requests, and Zod validation.
 - Deterministic compact context selection for the advanced interpreter.
+- A compact model-facing `LedgerIntent` contract compiled into the internal ledger action schema by deterministic application code.
 - A JSON-file persistence pattern is prepared through environment variables, while the domain remains storage-agnostic.
 - No frontend styling work is started in this phase.
 
 ### Baseline vs advanced
 
-- Baseline: a single-turn structured extraction baseline. It sees the utterance plus the fixed benchmark clock, but no ledger history or entity cache.
-- Advanced: a context-aware structured interpreter that receives a compact in-process retrieval package derived from current ledger state, recent turns, and relevant event history.
+- Baseline: a single-turn structured extraction baseline. It sees the utterance plus the fixed benchmark clock and produces a compact `LedgerIntent`, but no ledger history or entity cache.
+- Advanced: a context-aware structured interpreter that receives a compact in-process retrieval package derived from current ledger state, recent turns, and relevant event history before the same intent compiler maps it into the internal action schema.
 
 Both interfaces return the same action schema so the same benchmark scenarios can be run through either path later.
 
@@ -126,14 +127,21 @@ Current real-model experiment status:
 - Provider/model/settings: `OPENAI_BASE_URL=https://api.groq.com/openai/v1`, `OPENAI_MODEL=openai/gpt-oss-120b`, `temperature=0`, `top_p=1`, `response_format=json_object` with bounded retries.
 - Baseline Experiment 1: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=17`, `schemaInvalidResponses=17`, `retries=2`, `latencyMs=4198`, `totalTokens=6910`.
 - Advanced v1 Experiment 1: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=16`, `schemaInvalidResponses=18`, `retries=2`, `latencyMs=2281`, `totalTokens=5185`.
+- Contract smoke suite: 4/4 live calls passed after the compact contract and deterministic date normalization were in place.
+- Baseline v2: `LSA=11.1%`, `Action Accuracy=5.6%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=4`, `schemaInvalidResponses=1`, `rateLimitFailures=3`.
+- Advanced v2: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=13`, `schemaInvalidResponses=6`, `rateLimitFailures=13`.
 - Saved evidence:
   - `artifacts/experiments/baseline-v1.json`
   - `artifacts/experiments/advanced-v1.json`
+  - `artifacts/experiments/baseline-v2.json`
+  - `artifacts/experiments/advanced-v2.json`
+  - `artifacts/experiments/contract-smoke.json`
   - `artifacts/trajectories/`
 - Run commands:
   - `TALLI_INTERPRETER_MODE=baseline`
   - `TALLI_INTERPRETER_MODE=advanced`
   - `npm run benchmark`
+  - `npm run smoke:contract`
 
 ## Tests
 

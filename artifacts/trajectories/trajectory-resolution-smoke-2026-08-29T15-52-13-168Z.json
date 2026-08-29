@@ -1,0 +1,1353 @@
+{
+  "generatedAt": "2026-08-29T15:52:08.155Z",
+  "provider": "openai-compatible",
+  "model": "openai/gpt-oss-120b",
+  "successGate": {
+    "schemaValidCount": 5,
+    "semanticCorrectCount": 0,
+    "duplicateAmbiguitySafe": false,
+    "passed": false
+  },
+  "cases": [
+    {
+      "name": "existing-customer-partial-payment",
+      "utterance": "Amina dropped 15k this morning.",
+      "language": "en",
+      "candidatePackage": {
+        "clock": {
+          "referenceNow": "2026-08-29T09:00:00+01:00",
+          "timezone": "Africa/Lagos"
+        },
+        "referenceDate": "2026-08-29",
+        "referenceWeekday": "Saturday",
+        "temporalHints": {
+          "today": "2026-08-29",
+          "yesterday": "2026-08-28",
+          "tomorrow": "2026-08-30",
+          "nextFriday": "2026-09-04",
+          "nextMonday": "2026-08-31"
+        },
+        "currentUtterance": "Amina dropped 15k this morning.",
+        "language": "en",
+        "recentTurns": [
+          {
+            "turnId": "seed-1",
+            "index": 1,
+            "text": "Amina took 60k goods."
+          }
+        ],
+        "customerCandidates": [
+          {
+            "customerId": "resolution-smoke-seed-1_0001",
+            "displayName": "Amina",
+            "aliases": [],
+            "reasonCodes": [
+              "has_activity",
+              "has_open_obligation",
+              "latest_customer",
+              "pronoun_with_recent_reference",
+              "recent_turn_name",
+              "recent_turn_reference",
+              "utterance_contains_name"
+            ],
+            "openObligationIds": [
+              "resolution-smoke-seed-1_0003"
+            ],
+            "settledObligationIds": [],
+            "totalOutstandingMinor": 6000000,
+            "latestActivityAt": "2026-08-28T08:00:00.000Z"
+          }
+        ],
+        "obligationCandidates": [
+          {
+            "obligationId": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerDisplayName": "Amina",
+            "customerAliases": [],
+            "status": "open",
+            "originalAmountMinor": 6000000,
+            "paidMinor": 0,
+            "outstandingMinor": 6000000,
+            "dueAt": null,
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "customerObligationOrdinal": 1,
+            "customerOpenOrdinal": 1,
+            "reasonCodes": [
+              "first_obligation_for_customer",
+              "first_open_obligation_for_customer",
+              "open_obligation",
+              "positive_outstanding_balance",
+              "recent_turn_customer_reference",
+              "utterance_customer_name"
+            ],
+            "recentRelevantEvent": {
+              "id": "resolution-smoke-seed-1_0004",
+              "kind": "obligation.created",
+              "timestamp": "2026-08-28T08:00:00.000Z",
+              "turnId": "seed-1",
+              "summary": "obligation resolution-smoke-seed-1_0003 created 6000000"
+            }
+          }
+        ],
+        "selectionNotes": [
+          "Choose only from the supplied candidate IDs when a target is already represented.",
+          "If the target is still materially ambiguous, return request_clarification.",
+          "Customer candidates: 1; obligation candidates: 1."
+        ]
+      },
+      "modelIntent": null,
+      "compiledAction": {
+        "type": "REQUEST_CLARIFICATION",
+        "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+        "ambiguityKind": "other",
+        "candidateCustomerIds": [],
+        "candidateObligationIds": [],
+        "permittedMutation": false,
+        "evidence": []
+      },
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 2,
+        "latencyMs": 422,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "parseErrors": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "requestIds": [],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          },
+          {
+            "attempt": 2,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 2,
+        "failureReason": "fetch failed"
+      },
+      "compilerDiagnostics": null,
+      "mutationOccurred": false,
+      "clarificationOccurred": true,
+      "semanticCorrect": false,
+      "failureModes": [
+        "payment/settlement interpretation"
+      ],
+      "beforeSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Amina",
+            "aliases": [],
+            "normalizedNames": [
+              "amina"
+            ],
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Amina",
+            "originalAmountMinor": 6000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 6000000,
+            "status": "open",
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 6000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      },
+      "afterSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Amina",
+            "aliases": [],
+            "normalizedNames": [
+              "amina"
+            ],
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Amina",
+            "originalAmountMinor": 6000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 6000000,
+            "status": "open",
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 6000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      }
+    },
+    {
+      "name": "natural-reference-first-obligation",
+      "utterance": "Binta paid 8k on the first one.",
+      "language": "en",
+      "candidatePackage": {
+        "clock": {
+          "referenceNow": "2026-08-29T09:00:00+01:00",
+          "timezone": "Africa/Lagos"
+        },
+        "referenceDate": "2026-08-29",
+        "referenceWeekday": "Saturday",
+        "temporalHints": {
+          "today": "2026-08-29",
+          "yesterday": "2026-08-28",
+          "tomorrow": "2026-08-30",
+          "nextFriday": "2026-09-04",
+          "nextMonday": "2026-08-31"
+        },
+        "currentUtterance": "Binta paid 8k on the first one.",
+        "language": "en",
+        "recentTurns": [
+          {
+            "turnId": "seed-2",
+            "index": 1,
+            "text": "Binta took 35k goods later in the week."
+          }
+        ],
+        "customerCandidates": [
+          {
+            "customerId": "resolution-smoke-seed-1_0001",
+            "displayName": "Binta",
+            "aliases": [],
+            "reasonCodes": [
+              "has_activity",
+              "has_open_obligation",
+              "latest_customer",
+              "recent_turn_name",
+              "recent_turn_reference",
+              "reference_language_with_recent_reference",
+              "utterance_contains_name"
+            ],
+            "openObligationIds": [
+              "resolution-smoke-seed-1_0003",
+              "resolution-smoke-seed-2_0001"
+            ],
+            "settledObligationIds": [],
+            "totalOutstandingMinor": 5500000,
+            "latestActivityAt": "2026-08-25T08:00:00.000Z"
+          }
+        ],
+        "obligationCandidates": [
+          {
+            "obligationId": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerDisplayName": "Binta",
+            "customerAliases": [],
+            "status": "open",
+            "originalAmountMinor": 2000000,
+            "paidMinor": 0,
+            "outstandingMinor": 2000000,
+            "dueAt": null,
+            "createdAt": "2026-08-21T08:00:00.000Z",
+            "updatedAt": "2026-08-21T08:00:00.000Z",
+            "customerObligationOrdinal": 1,
+            "customerOpenOrdinal": 1,
+            "reasonCodes": [
+              "first_obligation_for_customer",
+              "first_open_obligation_for_customer",
+              "open_obligation",
+              "positive_outstanding_balance",
+              "recent_turn_customer_reference",
+              "reference_language_open_debt",
+              "utterance_customer_name"
+            ],
+            "recentRelevantEvent": {
+              "id": "resolution-smoke-seed-1_0004",
+              "kind": "obligation.created",
+              "timestamp": "2026-08-21T08:00:00.000Z",
+              "turnId": "seed-1",
+              "summary": "obligation resolution-smoke-seed-1_0003 created 2000000"
+            }
+          },
+          {
+            "obligationId": "resolution-smoke-seed-2_0001",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerDisplayName": "Binta",
+            "customerAliases": [],
+            "status": "open",
+            "originalAmountMinor": 3500000,
+            "paidMinor": 0,
+            "outstandingMinor": 3500000,
+            "dueAt": null,
+            "createdAt": "2026-08-25T08:00:00.000Z",
+            "updatedAt": "2026-08-25T08:00:00.000Z",
+            "customerObligationOrdinal": 2,
+            "customerOpenOrdinal": 2,
+            "reasonCodes": [
+              "later_obligation_for_customer",
+              "later_open_obligation_for_customer",
+              "open_obligation",
+              "positive_outstanding_balance",
+              "recent_turn_customer_reference",
+              "reference_language_open_debt",
+              "utterance_customer_name"
+            ],
+            "recentRelevantEvent": {
+              "id": "resolution-smoke-seed-2_0002",
+              "kind": "obligation.created",
+              "timestamp": "2026-08-25T08:00:00.000Z",
+              "turnId": "seed-2",
+              "summary": "obligation resolution-smoke-seed-2_0001 created 3500000"
+            }
+          }
+        ],
+        "selectionNotes": [
+          "Choose only from the supplied candidate IDs when a target is already represented.",
+          "If the target is still materially ambiguous, return request_clarification.",
+          "Customer candidates: 1; obligation candidates: 2."
+        ]
+      },
+      "modelIntent": null,
+      "compiledAction": {
+        "type": "REQUEST_CLARIFICATION",
+        "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+        "ambiguityKind": "other",
+        "candidateCustomerIds": [],
+        "candidateObligationIds": [],
+        "permittedMutation": false,
+        "evidence": []
+      },
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 2,
+        "latencyMs": 137,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "parseErrors": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "requestIds": [],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          },
+          {
+            "attempt": 2,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 2,
+        "failureReason": "fetch failed"
+      },
+      "compilerDiagnostics": null,
+      "mutationOccurred": false,
+      "clarificationOccurred": true,
+      "semanticCorrect": false,
+      "failureModes": [
+        "reference resolution"
+      ],
+      "beforeSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Binta",
+            "aliases": [],
+            "normalizedNames": [
+              "binta"
+            ],
+            "createdAt": "2026-08-21T08:00:00.000Z",
+            "updatedAt": "2026-08-21T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Binta",
+            "originalAmountMinor": 2000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 2000000,
+            "status": "open",
+            "createdAt": "2026-08-21T08:00:00.000Z",
+            "updatedAt": "2026-08-21T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          },
+          {
+            "id": "resolution-smoke-seed-2_0001",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Binta",
+            "originalAmountMinor": 3500000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 3500000,
+            "status": "open",
+            "createdAt": "2026-08-25T08:00:00.000Z",
+            "updatedAt": "2026-08-25T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-2_0002"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 5500000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      },
+      "afterSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Binta",
+            "aliases": [],
+            "normalizedNames": [
+              "binta"
+            ],
+            "createdAt": "2026-08-21T08:00:00.000Z",
+            "updatedAt": "2026-08-21T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Binta",
+            "originalAmountMinor": 2000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 2000000,
+            "status": "open",
+            "createdAt": "2026-08-21T08:00:00.000Z",
+            "updatedAt": "2026-08-21T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          },
+          {
+            "id": "resolution-smoke-seed-2_0001",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Binta",
+            "originalAmountMinor": 3500000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 3500000,
+            "status": "open",
+            "createdAt": "2026-08-25T08:00:00.000Z",
+            "updatedAt": "2026-08-25T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-2_0002"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 5500000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      }
+    },
+    {
+      "name": "correction-targeting",
+      "utterance": "Actually, that Kemi debt was 45k, not 30k.",
+      "language": "en",
+      "candidatePackage": {
+        "clock": {
+          "referenceNow": "2026-08-29T09:00:00+01:00",
+          "timezone": "Africa/Lagos"
+        },
+        "referenceDate": "2026-08-29",
+        "referenceWeekday": "Saturday",
+        "temporalHints": {
+          "today": "2026-08-29",
+          "yesterday": "2026-08-28",
+          "tomorrow": "2026-08-30",
+          "nextFriday": "2026-09-04",
+          "nextMonday": "2026-08-31"
+        },
+        "currentUtterance": "Actually, that Kemi debt was 45k, not 30k.",
+        "language": "en",
+        "recentTurns": [
+          {
+            "turnId": "seed-1",
+            "index": 1,
+            "text": "Kemi took 30k goods."
+          },
+          {
+            "turnId": "seed-2",
+            "index": 2,
+            "text": "Kemi dropped 10k before the correction."
+          }
+        ],
+        "customerCandidates": [
+          {
+            "customerId": "resolution-smoke-seed-1_0001",
+            "displayName": "Kemi",
+            "aliases": [],
+            "reasonCodes": [
+              "has_activity",
+              "has_open_obligation",
+              "latest_customer",
+              "pronoun_with_recent_reference",
+              "recent_turn_name",
+              "recent_turn_reference",
+              "reference_language_with_recent_reference",
+              "utterance_contains_name"
+            ],
+            "openObligationIds": [
+              "resolution-smoke-seed-1_0003"
+            ],
+            "settledObligationIds": [],
+            "totalOutstandingMinor": 2000000,
+            "latestActivityAt": "2026-08-26T08:00:00.000Z"
+          }
+        ],
+        "obligationCandidates": [
+          {
+            "obligationId": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerDisplayName": "Kemi",
+            "customerAliases": [],
+            "status": "open",
+            "originalAmountMinor": 3000000,
+            "paidMinor": 1000000,
+            "outstandingMinor": 2000000,
+            "dueAt": null,
+            "createdAt": "2026-08-20T08:00:00.000Z",
+            "updatedAt": "2026-08-26T08:00:00.000Z",
+            "customerObligationOrdinal": 1,
+            "customerOpenOrdinal": 1,
+            "reasonCodes": [
+              "amount_hint_match",
+              "first_obligation_for_customer",
+              "first_open_obligation_for_customer",
+              "open_obligation",
+              "positive_outstanding_balance",
+              "recent_turn_customer_reference",
+              "utterance_customer_name"
+            ],
+            "recentRelevantEvent": {
+              "id": "resolution-smoke-seed-2_0001",
+              "kind": "payment.recorded",
+              "timestamp": "2026-08-26T08:00:00.000Z",
+              "turnId": "seed-2",
+              "summary": "payment 1000000 recorded (3000000 -> 2000000)"
+            }
+          }
+        ],
+        "selectionNotes": [
+          "Choose only from the supplied candidate IDs when a target is already represented.",
+          "If the target is still materially ambiguous, return request_clarification.",
+          "Customer candidates: 1; obligation candidates: 1."
+        ]
+      },
+      "modelIntent": null,
+      "compiledAction": {
+        "type": "REQUEST_CLARIFICATION",
+        "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+        "ambiguityKind": "other",
+        "candidateCustomerIds": [],
+        "candidateObligationIds": [],
+        "permittedMutation": false,
+        "evidence": []
+      },
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 2,
+        "latencyMs": 27,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "parseErrors": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "requestIds": [],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          },
+          {
+            "attempt": 2,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 2,
+        "failureReason": "fetch failed"
+      },
+      "compilerDiagnostics": null,
+      "mutationOccurred": false,
+      "clarificationOccurred": true,
+      "semanticCorrect": false,
+      "failureModes": [
+        "correction handling"
+      ],
+      "beforeSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Kemi",
+            "aliases": [],
+            "normalizedNames": [
+              "kemi"
+            ],
+            "createdAt": "2026-08-20T08:00:00.000Z",
+            "updatedAt": "2026-08-20T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Kemi",
+            "originalAmountMinor": 3000000,
+            "totalPaidMinor": 1000000,
+            "outstandingMinor": 2000000,
+            "status": "open",
+            "createdAt": "2026-08-20T08:00:00.000Z",
+            "updatedAt": "2026-08-26T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004",
+              "resolution-smoke-seed-2_0001"
+            ],
+            "paymentEventIds": [
+              "resolution-smoke-seed-2_0001"
+            ],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 2000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 1000000
+        }
+      },
+      "afterSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Kemi",
+            "aliases": [],
+            "normalizedNames": [
+              "kemi"
+            ],
+            "createdAt": "2026-08-20T08:00:00.000Z",
+            "updatedAt": "2026-08-20T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Kemi",
+            "originalAmountMinor": 3000000,
+            "totalPaidMinor": 1000000,
+            "outstandingMinor": 2000000,
+            "status": "open",
+            "createdAt": "2026-08-20T08:00:00.000Z",
+            "updatedAt": "2026-08-26T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004",
+              "resolution-smoke-seed-2_0001"
+            ],
+            "paymentEventIds": [
+              "resolution-smoke-seed-2_0001"
+            ],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 2000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 1000000
+        }
+      }
+    },
+    {
+      "name": "duplicate-name-ambiguity",
+      "utterance": "Musa just dropped 10k.",
+      "language": "en",
+      "candidatePackage": {
+        "clock": {
+          "referenceNow": "2026-08-29T09:00:00+01:00",
+          "timezone": "Africa/Lagos"
+        },
+        "referenceDate": "2026-08-29",
+        "referenceWeekday": "Saturday",
+        "temporalHints": {
+          "today": "2026-08-29",
+          "yesterday": "2026-08-28",
+          "tomorrow": "2026-08-30",
+          "nextFriday": "2026-09-04",
+          "nextMonday": "2026-08-31"
+        },
+        "currentUtterance": "Musa just dropped 10k.",
+        "language": "en",
+        "recentTurns": [
+          {
+            "turnId": "seed-2",
+            "index": 1,
+            "text": "Second Musa took 40k goods."
+          }
+        ],
+        "customerCandidates": [
+          {
+            "customerId": "resolution-smoke-seed-1_0001",
+            "displayName": "Musa",
+            "aliases": [],
+            "reasonCodes": [
+              "has_activity",
+              "has_open_obligation",
+              "latest_customer",
+              "recent_turn_name",
+              "recent_turn_reference",
+              "utterance_contains_name"
+            ],
+            "openObligationIds": [
+              "resolution-smoke-seed-1_0003",
+              "resolution-smoke-seed-2_0001"
+            ],
+            "settledObligationIds": [],
+            "totalOutstandingMinor": 6000000,
+            "latestActivityAt": "2026-08-23T08:00:00.000Z"
+          }
+        ],
+        "obligationCandidates": [
+          {
+            "obligationId": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerDisplayName": "Musa",
+            "customerAliases": [],
+            "status": "open",
+            "originalAmountMinor": 2000000,
+            "paidMinor": 0,
+            "outstandingMinor": 2000000,
+            "dueAt": null,
+            "createdAt": "2026-08-22T08:00:00.000Z",
+            "updatedAt": "2026-08-22T08:00:00.000Z",
+            "customerObligationOrdinal": 1,
+            "customerOpenOrdinal": 1,
+            "reasonCodes": [
+              "first_obligation_for_customer",
+              "first_open_obligation_for_customer",
+              "open_obligation",
+              "positive_outstanding_balance",
+              "recent_turn_customer_reference",
+              "utterance_customer_name"
+            ],
+            "recentRelevantEvent": {
+              "id": "resolution-smoke-seed-1_0004",
+              "kind": "obligation.created",
+              "timestamp": "2026-08-22T08:00:00.000Z",
+              "turnId": "seed-1",
+              "summary": "obligation resolution-smoke-seed-1_0003 created 2000000"
+            }
+          },
+          {
+            "obligationId": "resolution-smoke-seed-2_0001",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerDisplayName": "Musa",
+            "customerAliases": [],
+            "status": "open",
+            "originalAmountMinor": 4000000,
+            "paidMinor": 0,
+            "outstandingMinor": 4000000,
+            "dueAt": null,
+            "createdAt": "2026-08-23T08:00:00.000Z",
+            "updatedAt": "2026-08-23T08:00:00.000Z",
+            "customerObligationOrdinal": 2,
+            "customerOpenOrdinal": 2,
+            "reasonCodes": [
+              "later_obligation_for_customer",
+              "later_open_obligation_for_customer",
+              "open_obligation",
+              "positive_outstanding_balance",
+              "recent_turn_customer_reference",
+              "utterance_customer_name"
+            ],
+            "recentRelevantEvent": {
+              "id": "resolution-smoke-seed-2_0002",
+              "kind": "obligation.created",
+              "timestamp": "2026-08-23T08:00:00.000Z",
+              "turnId": "seed-2",
+              "summary": "obligation resolution-smoke-seed-2_0001 created 4000000"
+            }
+          }
+        ],
+        "selectionNotes": [
+          "Choose only from the supplied candidate IDs when a target is already represented.",
+          "If the target is still materially ambiguous, return request_clarification.",
+          "Customer candidates: 1; obligation candidates: 2."
+        ]
+      },
+      "modelIntent": null,
+      "compiledAction": {
+        "type": "REQUEST_CLARIFICATION",
+        "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+        "ambiguityKind": "other",
+        "candidateCustomerIds": [],
+        "candidateObligationIds": [],
+        "permittedMutation": false,
+        "evidence": []
+      },
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 2,
+        "latencyMs": 13,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "parseErrors": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "requestIds": [],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          },
+          {
+            "attempt": 2,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 2,
+        "failureReason": "fetch failed"
+      },
+      "compilerDiagnostics": null,
+      "mutationOccurred": false,
+      "clarificationOccurred": true,
+      "semanticCorrect": false,
+      "failureModes": [
+        "customer/entity resolution",
+        "unnecessary clarification"
+      ],
+      "beforeSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Musa",
+            "aliases": [],
+            "normalizedNames": [
+              "musa"
+            ],
+            "createdAt": "2026-08-22T08:00:00.000Z",
+            "updatedAt": "2026-08-22T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Musa",
+            "originalAmountMinor": 2000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 2000000,
+            "status": "open",
+            "createdAt": "2026-08-22T08:00:00.000Z",
+            "updatedAt": "2026-08-22T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          },
+          {
+            "id": "resolution-smoke-seed-2_0001",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Musa",
+            "originalAmountMinor": 4000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 4000000,
+            "status": "open",
+            "createdAt": "2026-08-23T08:00:00.000Z",
+            "updatedAt": "2026-08-23T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-2_0002"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 6000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      },
+      "afterSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Musa",
+            "aliases": [],
+            "normalizedNames": [
+              "musa"
+            ],
+            "createdAt": "2026-08-22T08:00:00.000Z",
+            "updatedAt": "2026-08-22T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Musa",
+            "originalAmountMinor": 2000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 2000000,
+            "status": "open",
+            "createdAt": "2026-08-22T08:00:00.000Z",
+            "updatedAt": "2026-08-22T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          },
+          {
+            "id": "resolution-smoke-seed-2_0001",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Musa",
+            "originalAmountMinor": 4000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 4000000,
+            "status": "open",
+            "createdAt": "2026-08-23T08:00:00.000Z",
+            "updatedAt": "2026-08-23T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-2_0002"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 6000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      }
+    },
+    {
+      "name": "pidgin-partial-payment",
+      "utterance": "Mama Tobi don drop 20k from the debt wey she get.",
+      "language": "pcm",
+      "candidatePackage": {
+        "clock": {
+          "referenceNow": "2026-08-29T09:00:00+01:00",
+          "timezone": "Africa/Lagos"
+        },
+        "referenceDate": "2026-08-29",
+        "referenceWeekday": "Saturday",
+        "temporalHints": {
+          "today": "2026-08-29",
+          "yesterday": "2026-08-28",
+          "tomorrow": "2026-08-30",
+          "nextFriday": "2026-09-04",
+          "nextMonday": "2026-08-31"
+        },
+        "currentUtterance": "Mama Tobi don drop 20k from the debt wey she get.",
+        "language": "pcm",
+        "recentTurns": [
+          {
+            "turnId": "seed-1",
+            "index": 1,
+            "text": "Mama Tobi carry 50k goods."
+          }
+        ],
+        "customerCandidates": [
+          {
+            "customerId": "resolution-smoke-seed-1_0001",
+            "displayName": "Mama Tobi",
+            "aliases": [
+              "Tobi"
+            ],
+            "reasonCodes": [
+              "has_activity",
+              "has_open_obligation",
+              "latest_customer",
+              "pronoun_with_recent_reference",
+              "recent_turn_name",
+              "recent_turn_reference",
+              "utterance_contains_name"
+            ],
+            "openObligationIds": [
+              "resolution-smoke-seed-1_0003"
+            ],
+            "settledObligationIds": [],
+            "totalOutstandingMinor": 5000000,
+            "latestActivityAt": "2026-08-28T08:00:00.000Z"
+          }
+        ],
+        "obligationCandidates": [
+          {
+            "obligationId": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerDisplayName": "Mama Tobi",
+            "customerAliases": [
+              "Tobi"
+            ],
+            "status": "open",
+            "originalAmountMinor": 5000000,
+            "paidMinor": 0,
+            "outstandingMinor": 5000000,
+            "dueAt": null,
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "customerObligationOrdinal": 1,
+            "customerOpenOrdinal": 1,
+            "reasonCodes": [
+              "first_obligation_for_customer",
+              "first_open_obligation_for_customer",
+              "open_obligation",
+              "positive_outstanding_balance",
+              "recent_turn_customer_reference",
+              "utterance_customer_name"
+            ],
+            "recentRelevantEvent": {
+              "id": "resolution-smoke-seed-1_0004",
+              "kind": "obligation.created",
+              "timestamp": "2026-08-28T08:00:00.000Z",
+              "turnId": "seed-1",
+              "summary": "obligation resolution-smoke-seed-1_0003 created 5000000"
+            }
+          }
+        ],
+        "selectionNotes": [
+          "Choose only from the supplied candidate IDs when a target is already represented.",
+          "If the target is still materially ambiguous, return request_clarification.",
+          "Customer candidates: 1; obligation candidates: 1."
+        ]
+      },
+      "modelIntent": null,
+      "compiledAction": {
+        "type": "REQUEST_CLARIFICATION",
+        "question": "I could not produce a safe ledger action from this state-aware turn. Please clarify.",
+        "ambiguityKind": "other",
+        "candidateCustomerIds": [],
+        "candidateObligationIds": [],
+        "permittedMutation": false,
+        "evidence": []
+      },
+      "providerDiagnostics": {
+        "provider": "openai-compatible",
+        "model": "openai/gpt-oss-120b",
+        "baseUrl": "https://api.groq.com/openai/v1",
+        "configured": true,
+        "contractName": "LedgerIntent",
+        "contractVersion": "2026-08-29.intent-v1",
+        "attempts": 2,
+        "latencyMs": 14,
+        "responseFormatUsed": true,
+        "rawOutputs": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "parseErrors": [
+          "fetch failed",
+          "fetch failed"
+        ],
+        "requestIds": [],
+        "attemptLogs": [
+          {
+            "attempt": 1,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          },
+          {
+            "attempt": 2,
+            "requestId": "",
+            "responseFormatUsed": true,
+            "rawOutput": "fetch failed",
+            "parseSucceeded": false,
+            "parseError": "fetch failed",
+            "schemaIssuePaths": [],
+            "failureKind": "provider_error"
+          }
+        ],
+        "rateLimitFailures": 0,
+        "schemaInvalidResponses": 0,
+        "providerFailures": 2,
+        "failureReason": "fetch failed"
+      },
+      "compilerDiagnostics": null,
+      "mutationOccurred": false,
+      "clarificationOccurred": true,
+      "semanticCorrect": false,
+      "failureModes": [
+        "Nigerian Pidgin interpretation"
+      ],
+      "beforeSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Mama Tobi",
+            "aliases": [
+              "Tobi"
+            ],
+            "normalizedNames": [
+              "mama tobi",
+              "tobi"
+            ],
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Mama Tobi",
+            "originalAmountMinor": 5000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 5000000,
+            "status": "open",
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 5000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      },
+      "afterSnapshot": {
+        "id": "resolution-smoke",
+        "currency": "NGN",
+        "customers": [
+          {
+            "id": "resolution-smoke-seed-1_0001",
+            "displayName": "Mama Tobi",
+            "aliases": [
+              "Tobi"
+            ],
+            "normalizedNames": [
+              "mama tobi",
+              "tobi"
+            ],
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0002"
+            ]
+          }
+        ],
+        "obligations": [
+          {
+            "id": "resolution-smoke-seed-1_0003",
+            "customerId": "resolution-smoke-seed-1_0001",
+            "customerName": "Mama Tobi",
+            "originalAmountMinor": 5000000,
+            "totalPaidMinor": 0,
+            "outstandingMinor": 5000000,
+            "status": "open",
+            "createdAt": "2026-08-28T08:00:00.000Z",
+            "updatedAt": "2026-08-28T08:00:00.000Z",
+            "dueAt": null,
+            "sourceEventIds": [
+              "resolution-smoke-seed-1_0004"
+            ],
+            "paymentEventIds": [],
+            "correctionEventIds": []
+          }
+        ],
+        "totals": {
+          "openOutstandingMinor": 5000000,
+          "settledOutstandingMinor": 0,
+          "totalPaidMinor": 0
+        }
+      }
+    }
+  ]
+}

@@ -54,3 +54,14 @@
 - Advanced v2 metrics: `LSA=5.6%`, `Action Accuracy=0%`, `abstentionRequiredTurnCount=1`, `unsafeMutationCount=0`, `UMR=0`, `providerFailures=13`, `schemaInvalidResponses=6`, `rateLimitFailures=13`.
 - Main takeaway: the compact contract improved provider reliability enough for smoke testing, but the advanced path still underperformed the baseline on the locked benchmark.
 - Evidence saved at `artifacts/experiments/baseline-v2.json`, `artifacts/experiments/advanced-v2.json`, and `artifacts/experiments/contract-smoke.json`.
+
+## Milestone 5 - Candidate-Based Resolution
+
+- Observed failure: v2 still over-clarified and did not reliably outperform the baseline on entity, obligation, reference, and correction resolution.
+- Hypothesis: the model should interpret language over a small deterministic candidate set instead of searching the raw ledger state.
+- Implementation: deterministic candidate retrieval, candidate-centered advanced context, candidate validation in the compiler, and a dedicated advanced-only resolution smoke harness.
+- Infrastructure interruption: the Groq provider path returned `fetch failed` and direct endpoint connectivity returned HTTP `000`, so the first v3 smoke could not reach a real model output.
+- Provider fallback: `.env` was switched to OpenRouter with `OPENAI_BASE_URL=https://openrouter.ai/api/v1` and `OPENAI_MODEL=z-ai/glm-5.2:free`, which preserved the candidate-resolution architecture without changing benchmark fixtures.
+- OpenRouter smoke: a direct JSON-mode connectivity check reached the provider but returned HTTP `429` with upstream rate-limit messaging; the five-case advanced smoke suite still surfaced provider failures and did not pass the success gate.
+- Control benchmarks after the change stayed healthy: perfect `LSA=1.0`, wrong `LSA=0.0556`, unsafe `LSA=0.9444`, with the locked abstention turn count unchanged at `1`.
+- Evidence saved at `artifacts/experiments/resolution-smoke-*.json` and `artifacts/trajectories/trajectory-resolution-smoke-*.json`.

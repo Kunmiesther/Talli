@@ -268,18 +268,21 @@ describe('llm-backed interpreters', () => {
     expect(model.lastRequest?.context).toMatchObject({
       currentUtterance: 'Mama Tobi don bring 20k from that money.',
       language: 'pcm',
-      customers: [
+      customerCandidates: [
         expect.objectContaining({
-          id: expect.any(String),
+          customerId: expect.any(String),
           displayName: 'Mama Tobi',
           aliases: ['Tobi'],
-          openObligationIds: [expect.any(String)],
+          reasonCodes: expect.arrayContaining([
+            expect.stringMatching(/name|obligation|reference/i),
+          ]),
         }),
       ],
-      obligations: [
+      obligationCandidates: [
         expect.objectContaining({
-          customerName: 'Mama Tobi',
+          customerDisplayName: 'Mama Tobi',
           outstandingMinor: nairaToMinorUnits(50_000),
+          reasonCodes: expect.arrayContaining([expect.any(String)]),
         }),
       ],
       recentTurns: [
@@ -288,6 +291,7 @@ describe('llm-backed interpreters', () => {
           text: 'Mama Tobi carry goods of 50k yesterday.',
         }),
       ],
+      selectionNotes: expect.arrayContaining([expect.any(String)]),
     });
   });
 

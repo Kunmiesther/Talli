@@ -244,6 +244,7 @@ export class AdvancedInterpreter implements ActionInterpreter {
       clock,
       snapshot: input.snapshot,
       document: input.document,
+      resolutionCandidates: advancedContext,
     });
 
     this.lastDiagnostics = {

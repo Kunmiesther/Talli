@@ -9,7 +9,8 @@
     "test": "vitest run",
     "lint": "biome check .",
     "benchmark": "tsx src/benchmark/run.ts",
-    "smoke:contract": "tsx src/benchmark/contract-smoke.ts"
+    "smoke:contract": "tsx src/benchmark/contract-smoke.ts",
+    "smoke:resolution": "tsx src/benchmark/resolution-smoke.ts"
   },
   "dependencies": {
     "zod": "^3.25.76"

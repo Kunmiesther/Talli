@@ -7,6 +7,10 @@ import {
   normalizeLedgerName,
 } from '../domain/ledger.js';
 import { formatNgn } from '../domain/money.js';
+import {
+  type ResolutionCandidatePackage,
+  buildResolutionCandidates,
+} from './resolution-candidates.js';
 
 export interface ReferenceClock {
   referenceNow: string;
@@ -47,7 +51,7 @@ export interface CompactEventContext {
   summary: string;
 }
 
-export interface AdvancedContextPackage {
+export interface AdvancedContextPackage extends ResolutionCandidatePackage {
   clock: ReferenceClock;
   currentUtterance: string;
   language: string;
@@ -65,10 +69,6 @@ export interface AdvancedContextPackage {
     index: number;
     text: string;
   }>;
-  customers: CompactCustomerContext[];
-  obligations: CompactObligationContext[];
-  recentEvents: CompactEventContext[];
-  selectionNotes: string[];
 }
 
 export interface BaselineContextPackage {
@@ -361,45 +361,14 @@ export function buildAdvancedContextPackage(input: {
   language: string;
   clock: ReferenceClock;
 }): AdvancedContextPackage {
-  const recentTexts = input.recentTurns.map((turn) => turn.text);
-  const scoredCustomers = selectCustomers(input.snapshot, input.utterance, recentTexts);
-  const selectedCustomers = scoredCustomers.slice(0, 5).map((entry) => entry.customer);
-  const relevantObligations = selectRelevantObligations(
-    input.snapshot,
-    selectedCustomers,
-    input.utterance,
-  );
-  const customers = buildCustomerContexts(input.snapshot, selectedCustomers);
-  const obligations = buildObligationContexts(relevantObligations);
-  const recentEvents = buildRecentEvents(input.snapshot, input.document);
-
-  const selectionNotes = [
-    'Use the stable IDs in this context when a target is uniquely resolved.',
-    'If target selection is materially ambiguous, request clarification instead of guessing.',
-  ];
-
-  if (recentTextsHasReference(recentTexts)) {
-    selectionNotes.push(
-      'The utterance or recent conversation contains historical reference language.',
-    );
-  }
+  const resolutionCandidates = buildResolutionCandidates(input);
 
   return {
     clock: input.clock,
-    currentUtterance: input.utterance,
-    language: input.language,
     referenceDate: formatDay(new Date(input.clock.referenceNow), input.clock.timezone),
     referenceWeekday: formatWeekday(new Date(input.clock.referenceNow), input.clock.timezone),
     temporalHints: buildTemporalHints(input.clock),
-    recentTurns: input.recentTurns.slice(-4).map((turn, index, array) => ({
-      turnId: turn.turnId,
-      index: input.recentTurns.length - array.length + index + 1,
-      text: turn.text,
-    })),
-    customers,
-    obligations,
-    recentEvents,
-    selectionNotes,
+    ...resolutionCandidates,
   };
 }
 

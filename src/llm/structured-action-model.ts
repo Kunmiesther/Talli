@@ -129,6 +129,7 @@ function loadLocalEnvFallback(): void {
   }
 
   const content = readFileSync(envPath, 'utf8');
+  const initiallyConfiguredKeys = new Set(Object.keys(process.env));
   for (const line of content.split(/\r?\n/)) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) {
@@ -142,7 +143,7 @@ function loadLocalEnvFallback(): void {
 
     const key = trimmed.slice(0, equalsIndex).trim();
     const rawValue = trimmed.slice(equalsIndex + 1).trim();
-    if (!key || process.env[key]) {
+    if (!key || initiallyConfiguredKeys.has(key)) {
       continue;
     }
 

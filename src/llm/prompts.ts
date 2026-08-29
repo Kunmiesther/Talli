@@ -19,8 +19,8 @@ export function buildBaselineSystemPrompt(): string {
 export function buildAdvancedSystemPrompt(): string {
   return [
     `You are Talli Advanced. Output exactly one JSON object matching ${LEDGER_INTENT_CONTRACT_NAME}.`,
-    'Use the supplied compact ledger context to resolve customers and obligations.',
-    'Use stable IDs from context when a target is uniquely resolved.',
+    'Use the supplied candidate-centered ledger context to resolve customers and obligations.',
+    'Choose from the supplied customerCandidates and obligationCandidates when a target is already represented.',
     'Never invent customers, obligations, balances, or dates.',
     'If the target is materially ambiguous, return request_clarification.',
     'Corrections amend an existing obligation; settlements target the remaining balance; partial payments reduce it.',
@@ -60,7 +60,7 @@ export function buildAdvancedUserPrompt(input: {
   language?: string;
 }): string {
   return asJson({
-    task: 'Extract one safe LedgerIntent using the supplied compact ledger context.',
+    task: 'Extract one safe LedgerIntent using the supplied candidate-centered ledger context.',
     utterance: input.utterance,
     language: input.language ?? 'unknown',
     referenceClock: input.context.clock,
@@ -68,7 +68,7 @@ export function buildAdvancedUserPrompt(input: {
     contract: ledgerIntentContractSummary(),
     outputRules: [
       'Return a single JSON object only.',
-      'Use stable IDs from the context when a target is resolved.',
+      'Use stable IDs from customerCandidates and obligationCandidates when a target is resolved.',
       'If the customer or obligation remains materially ambiguous, return request_clarification.',
       'If correcting an amount, target the existing obligation and do not create a new debt.',
       'If payment would exceed the outstanding balance, request clarification rather than guessing.',

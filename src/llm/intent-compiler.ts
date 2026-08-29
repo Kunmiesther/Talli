@@ -12,6 +12,7 @@ import {
 } from '../domain/ledger.js';
 import { type ReferenceClock, buildTemporalHints } from './context.js';
 import type { LedgerIntent, LedgerIntentCustomer, LedgerIntentObligation } from './intent.js';
+import type { ResolutionCandidatePackage } from './resolution-candidates.js';
 
 export interface IntentCompilationRequest {
   intent: LedgerIntent;
@@ -20,6 +21,7 @@ export interface IntentCompilationRequest {
   clock: ReferenceClock;
   snapshot: LedgerSnapshot;
   document: LedgerDocument;
+  resolutionCandidates?: ResolutionCandidatePackage;
 }
 
 export interface IntentCompilationDiagnostics {
@@ -65,10 +67,27 @@ function noAction(reason?: string): LedgerAction {
   });
 }
 
-function normalizeCandidateIds(values: readonly string[] | undefined): string[] {
-  return [
+function normalizeCandidateIds(
+  values: readonly string[] | undefined,
+  allowedIds?: ReadonlySet<string> | null,
+): string[] {
+  const normalized = [
     ...new Set((values ?? []).filter((value): value is string => typeof value === 'string')),
-  ].sort((left, right) => left.localeCompare(right));
+  ];
+  if (allowedIds) {
+    return normalized
+      .filter((value) => allowedIds.has(value))
+      .sort((left, right) => left.localeCompare(right));
+  }
+  return normalized.sort((left, right) => left.localeCompare(right));
+}
+
+function buildAllowedIdSet(values: readonly string[] | undefined): ReadonlySet<string> | null {
+  if (values === undefined) {
+    return null;
+  }
+
+  return new Set(normalizeCandidateIds(values));
 }
 
 function localMidnightIso(date: string): string {
@@ -99,6 +118,7 @@ function deriveDueAtFromUtterance(utterance: string, clock: ReferenceClock): str
 function resolveCustomerForCreate(
   snapshot: LedgerSnapshot,
   customer: LedgerIntentCustomer,
+  allowedCustomerIds?: ReadonlySet<string> | null,
 ):
   | { kind: 'resolved'; ref: CustomerRef }
   | { kind: 'new'; ref: CustomerRef }
@@ -108,7 +128,7 @@ function resolveCustomerForCreate(
     return { kind: 'missing' };
   }
 
-  const candidateIds = normalizeCandidateIds(customer.candidateIds);
+  const candidateIds = normalizeCandidateIds(customer.candidateIds, allowedCustomerIds);
   if (candidateIds.length === 1) {
     const customerId = candidateIds[0];
     if (!customerId) {
@@ -121,6 +141,9 @@ function resolveCustomerForCreate(
   }
 
   if (customer.id) {
+    if (allowedCustomerIds && !allowedCustomerIds.has(customer.id)) {
+      return { kind: 'missing' };
+    }
     const found = snapshot.customers.find((entry) => entry.id === customer.id);
     if (found) {
       return { kind: 'resolved', ref: { kind: 'id', customerId: found.id } };
@@ -133,7 +156,12 @@ function resolveCustomerForCreate(
   }
 
   const normalized = normalizeLedgerName(customer.name);
-  const matches = snapshot.customers.filter((entry) => entry.normalizedNames.includes(normalized));
+  const matches = snapshot.customers.filter((entry) => {
+    if (allowedCustomerIds && !allowedCustomerIds.has(entry.id)) {
+      return false;
+    }
+    return entry.normalizedNames.includes(normalized);
+  });
   if (matches.length === 1) {
     const single = matches[0];
     if (single) {
@@ -151,6 +179,7 @@ function resolveCustomerForCreate(
 function resolveCustomerForExisting(
   snapshot: LedgerSnapshot,
   customer: LedgerIntentCustomer,
+  allowedCustomerIds?: ReadonlySet<string> | null,
 ):
   | { kind: 'resolved'; ref: CustomerRef }
   | { kind: 'clarify'; candidateCustomerIds: string[] }
@@ -159,7 +188,7 @@ function resolveCustomerForExisting(
     return { kind: 'missing' };
   }
 
-  const candidateIds = normalizeCandidateIds(customer.candidateIds);
+  const candidateIds = normalizeCandidateIds(customer.candidateIds, allowedCustomerIds);
   if (candidateIds.length === 1) {
     const customerId = candidateIds[0];
     if (!customerId) {
@@ -172,6 +201,9 @@ function resolveCustomerForExisting(
   }
 
   if (customer.id) {
+    if (allowedCustomerIds && !allowedCustomerIds.has(customer.id)) {
+      return { kind: 'missing' };
+    }
     const found = snapshot.customers.find((entry) => entry.id === customer.id);
     if (found) {
       return { kind: 'resolved', ref: { kind: 'id', customerId: found.id } };
@@ -184,7 +216,12 @@ function resolveCustomerForExisting(
   }
 
   const normalized = normalizeLedgerName(customer.name);
-  const matches = snapshot.customers.filter((entry) => entry.normalizedNames.includes(normalized));
+  const matches = snapshot.customers.filter((entry) => {
+    if (allowedCustomerIds && !allowedCustomerIds.has(entry.id)) {
+      return false;
+    }
+    return entry.normalizedNames.includes(normalized);
+  });
   if (matches.length === 1) {
     const single = matches[0];
     if (single) {
@@ -204,6 +241,7 @@ function buildObligationReference(
   document: LedgerDocument,
   obligation: LedgerIntentObligation,
   customerRef: CustomerRef | undefined,
+  allowedObligationIds?: ReadonlySet<string> | null,
 ):
   | { kind: 'resolved'; ref: ObligationRef }
   | { kind: 'clarify'; candidateObligationIds: string[] }
@@ -212,7 +250,7 @@ function buildObligationReference(
     return { kind: 'missing' };
   }
 
-  const candidateIds = normalizeCandidateIds(obligation.candidateIds);
+  const candidateIds = normalizeCandidateIds(obligation.candidateIds, allowedObligationIds);
   if (candidateIds.length === 1) {
     const obligationId = candidateIds[0];
     if (!obligationId) {
@@ -225,6 +263,9 @@ function buildObligationReference(
   }
 
   if (obligation.id) {
+    if (allowedObligationIds && !allowedObligationIds.has(obligation.id)) {
+      return { kind: 'missing' };
+    }
     const found = snapshot.obligations.find((entry) => entry.id === obligation.id);
     if (found) {
       return { kind: 'resolved', ref: { kind: 'id', obligationId: found.id } };
@@ -243,6 +284,9 @@ function buildObligationReference(
     if (referencedObligationIds.length === 1) {
       const obligationId = referencedObligationIds[0];
       if (!obligationId) {
+        return { kind: 'missing' };
+      }
+      if (allowedObligationIds && !allowedObligationIds.has(obligationId)) {
         return { kind: 'missing' };
       }
       return {
@@ -275,6 +319,9 @@ function buildObligationReference(
       if (openObligations.length === 1) {
         const single = openObligations[0];
         if (single) {
+          if (allowedObligationIds && !allowedObligationIds.has(single.id)) {
+            return { kind: 'missing' };
+          }
           return {
             kind: 'resolved',
             ref: { kind: 'id', obligationId: single.id },
@@ -284,6 +331,9 @@ function buildObligationReference(
     }
 
     const nameMatches = snapshot.obligations.filter((entry) => {
+      if (allowedObligationIds && !allowedObligationIds.has(entry.id)) {
+        return false;
+      }
       const obligationName = normalizeLedgerName(entry.customerName);
       return normalizedPhrase.includes(obligationName) || obligationName.includes(normalizedPhrase);
     });
@@ -320,7 +370,10 @@ function buildObligationReference(
       if (openObligations.length > 1) {
         return {
           kind: 'clarify',
-          candidateObligationIds: openObligations.map((entry) => entry.id),
+          candidateObligationIds: normalizeCandidateIds(
+            openObligations.map((entry) => entry.id),
+            allowedObligationIds,
+          ),
         };
       }
       if (customerObligations.length > 1) {
@@ -328,6 +381,9 @@ function buildObligationReference(
           .sort((left, right) => left.createdAt.localeCompare(right.createdAt))
           .at(-1);
         if (latestCreated) {
+          if (allowedObligationIds && !allowedObligationIds.has(latestCreated.id)) {
+            return { kind: 'missing' };
+          }
           return {
             kind: 'resolved',
             ref: { kind: 'latestForCustomer', customer: customerRef },
@@ -340,18 +396,29 @@ function buildObligationReference(
   return { kind: 'missing' };
 }
 
-function createClarificationFromIntent(intent: LedgerIntent, fallback: string): LedgerAction {
+function createClarificationFromIntent(
+  intent: LedgerIntent,
+  fallback: string,
+  allowedCustomerIds?: ReadonlySet<string> | null,
+  allowedObligationIds?: ReadonlySet<string> | null,
+): LedgerAction {
   const clarification = intent.clarification;
   return clarificationAction(
     clarification?.reason ?? intent.reason ?? fallback,
     'other',
-    clarification?.candidateCustomerIds ?? [],
-    clarification?.candidateObligationIds ?? [],
+    normalizeCandidateIds(clarification?.candidateCustomerIds, allowedCustomerIds),
+    normalizeCandidateIds(clarification?.candidateObligationIds, allowedObligationIds),
   );
 }
 
 export function compileLedgerIntent(request: IntentCompilationRequest): IntentCompilationResult {
   const intent = request.intent;
+  const allowedCustomerIds = buildAllowedIdSet(
+    request.resolutionCandidates?.customerCandidates.map((candidate) => candidate.customerId),
+  );
+  const allowedObligationIds = buildAllowedIdSet(
+    request.resolutionCandidates?.obligationCandidates.map((candidate) => candidate.obligationId),
+  );
   const baseDiagnostics: IntentCompilationDiagnostics = {
     outcome: 'no_action',
     reason: 'No action compiled.',
@@ -373,7 +440,12 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
   }
 
   if (intent.intent === 'request_clarification') {
-    const action = createClarificationFromIntent(intent, 'Please clarify.');
+    const action = createClarificationFromIntent(
+      intent,
+      'Please clarify.',
+      allowedCustomerIds,
+      allowedObligationIds,
+    );
     return {
       action,
       diagnostics: {
@@ -385,7 +457,11 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
   }
 
   if (intent.intent === 'create_obligation') {
-    const customer = resolveCustomerForCreate(request.snapshot, intent.customer);
+    const customer = resolveCustomerForCreate(
+      request.snapshot,
+      intent.customer,
+      allowedCustomerIds,
+    );
     if (customer.kind === 'clarify') {
       return {
         action: clarificationAction(
@@ -455,6 +531,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
       request.document,
       intent.obligation,
       undefined,
+      allowedObligationIds,
     );
     if (obligation.kind === 'clarify') {
       return {
@@ -521,7 +598,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
 
   if (intent.intent === 'settle_obligation') {
     const customerRef = intent.customer
-      ? resolveCustomerForExisting(request.snapshot, intent.customer)
+      ? resolveCustomerForExisting(request.snapshot, intent.customer, allowedCustomerIds)
       : { kind: 'missing' as const };
     const customer: CustomerRef | undefined =
       customerRef.kind === 'resolved'
@@ -536,6 +613,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
       request.document,
       intent.obligation,
       customer,
+      allowedObligationIds,
     );
 
     if (obligation.kind === 'clarify') {
@@ -592,6 +670,23 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
     const customerResolution = intent.customer
       ? resolveCustomerForExisting(request.snapshot, intent.customer)
       : { kind: 'missing' as const };
+    if (customerResolution.kind === 'clarify') {
+      return {
+        action: clarificationAction(
+          'Which customer did you mean?',
+          'customer',
+          customerResolution.candidateCustomerIds,
+          [],
+        ),
+        diagnostics: {
+          ...baseDiagnostics,
+          outcome: 'clarification',
+          reason: 'Ambiguous customer for payment.',
+          customerResolution: 'ambiguous',
+          obligationResolution: 'missing',
+        },
+      };
+    }
     const customerRef =
       customerResolution.kind === 'resolved'
         ? customerResolution.ref
@@ -606,6 +701,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
       request.document,
       intent.obligation,
       customerRef,
+      allowedObligationIds,
     );
     if (obligation.kind === 'clarify') {
       return {
@@ -620,12 +716,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
           outcome: 'clarification',
           reason: 'Ambiguous obligation for payment.',
           obligationResolution: 'ambiguous',
-          customerResolution:
-            customerResolution.kind === 'resolved'
-              ? 'resolved'
-              : customerResolution.kind === 'clarify'
-                ? 'ambiguous'
-                : 'missing',
+          customerResolution: customerResolution.kind === 'resolved' ? 'resolved' : 'missing',
         },
       };
     }
@@ -716,12 +807,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
           ...baseDiagnostics,
           outcome: 'clarification',
           reason: 'Missing payment target.',
-          customerResolution:
-            customerResolution.kind === 'resolved'
-              ? 'resolved'
-              : customerResolution.kind === 'clarify'
-                ? 'ambiguous'
-                : 'missing',
+          customerResolution: customerResolution.kind === 'resolved' ? 'resolved' : 'missing',
           obligationResolution: 'missing',
         },
       };
@@ -734,12 +820,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
           ...baseDiagnostics,
           outcome: 'clarification',
           reason: 'Missing payment amount.',
-          customerResolution:
-            customerResolution.kind === 'resolved'
-              ? 'resolved'
-              : customerResolution.kind === 'clarify'
-                ? 'ambiguous'
-                : 'missing',
+          customerResolution: customerResolution.kind === 'resolved' ? 'resolved' : 'missing',
           obligationResolution: 'resolved',
           customerRef,
           obligationRef: obligation.ref,
@@ -764,12 +845,7 @@ export function compileLedgerIntent(request: IntentCompilationRequest): IntentCo
         ...baseDiagnostics,
         outcome: 'action',
         reason: 'Compiled payment intent.',
-        customerResolution:
-          customerResolution.kind === 'resolved'
-            ? 'resolved'
-            : customerResolution.kind === 'clarify'
-              ? 'ambiguous'
-              : 'missing',
+        customerResolution: customerResolution.kind === 'resolved' ? 'resolved' : 'missing',
         obligationResolution: 'resolved',
         customerRef,
         obligationRef: obligation.ref,

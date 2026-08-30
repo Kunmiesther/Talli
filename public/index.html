@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Talli | Speak naturally. Talli remembers who owes what.</title>
     <meta
       name="description"
@@ -96,6 +93,8 @@
                 <img
                   src="/assets/hero-merchant.jpg"
                   alt="A merchant serving customers while speaking into a phone in a local market stall."
+                  loading="eager"
+                  fetchpriority="high"
                 />
               </figure>
 
@@ -103,7 +102,7 @@
                 <div class="voice-rail__steps">
                   <span class="voice-rail__step">
                     <i class="fa-solid fa-microphone"></i>
-                    Voice
+                    Speak
                   </span>
                   <span class="voice-rail__step">
                     <i class="fa-solid fa-comment-dots"></i>
@@ -116,7 +115,7 @@
                 </div>
                 <div class="voice-rail__quote">
                   <p class="voice-rail__label">Example turn</p>
-                  <blockquote>“Mama Tobi brought 20k.”</blockquote>
+                  <blockquote>"Mama Tobi brought 20k."</blockquote>
                   <p>
                     Talli recorded <strong>&#8358;20,000</strong> from Mama Tobi.
                     <strong>&#8358;30,000 remains.</strong>
@@ -134,47 +133,26 @@
                 <p class="eyebrow">Interactive workspace</p>
                 <h2 id="workspace-title">The ledger is the product.</h2>
                 <p class="section-lede">
-                  Speak a payment, correction, or new credit line. The demo updates the ledger,
-                  shows what Talli understood, and keeps any clarification visible until it is
+                  Speak a payment, correction, or new credit line. Talli updates the ledger,
+                  shows what it understood, and keeps any clarification visible until it is
                   resolved.
                 </p>
               </div>
-              <div class="status-stack">
-                <span class="status-pill" data-role="api-health-pill">
-                  <i class="fa-solid fa-circle-notch fa-spin"></i>
-                  Checking API
-                </span>
-                <span class="status-pill status-pill--muted" data-role="model-pill">
-                  <i class="fa-solid fa-circle-info"></i>
-                  Waiting for data
-                </span>
-              </div>
             </div>
 
-            <div class="workspace-toolbar reveal">
-              <p class="workspace-toolbar__note">
-                Demo data is synthetic. Seed or reset from here.
-              </p>
-              <div class="demo-actions">
-                <button class="button button--secondary button--small" type="button" data-role="seed-demo">
-                  <i class="fa-solid fa-seedling"></i>
-                  Seed demo
-                </button>
-                <button class="button button--danger button--small" type="button" data-role="reset-demo">
-                  <i class="fa-solid fa-rotate-left"></i>
-                  Reset demo
-                </button>
-              </div>
-            </div>
+            <p class="workspace-note reveal" data-role="workspace-note">
+              Speak a credit update or type one below. Talli asks before it changes anything
+              unsafe.
+            </p>
 
             <div class="composer card card--workspace reveal">
               <div class="composer__header">
                 <div>
                   <p class="section-kicker">Speak or type</p>
-                  <h3>Update the ledger in plain language</h3>
+                <h3>Update the ledger in plain language</h3>
                 </div>
                 <p class="composer__hint" data-role="voice-support-note">
-                  Browser speech recognition not loaded yet.
+                  Voice input will appear here if your browser supports it.
                 </p>
               </div>
 
@@ -187,7 +165,7 @@
                   aria-pressed="false"
                 >
                   <i class="fa-solid fa-microphone"></i>
-                  <span>Voice</span>
+                  <span class="sr-only" data-role="mic-label">Voice input</span>
                 </button>
 
                 <label class="sr-only" for="composer-input">Message to Talli</label>
@@ -203,7 +181,7 @@
                     Clear
                   </button>
                   <button class="button button--primary button--small" type="submit" data-role="send-message">
-                    <i class="fa-solid fa-paper-plane"></i>
+                    <i class="fa-solid fa-arrow-right"></i>
                     Send
                   </button>
                 </div>
@@ -316,7 +294,7 @@
               <article class="step-card card reveal">
                 <span class="step-card__index">1</span>
                 <h3>Say what happened</h3>
-                <p>“Amaka took 25k goods today.”</p>
+                <p>"Amaka took 25k goods today."</p>
               </article>
               <article class="step-card card reveal">
                 <span class="step-card__index">2</span>
@@ -378,7 +356,7 @@
               <article class="capability card reveal">
                 <i class="fa-solid fa-link"></i>
                 <h3>Natural follow-up references</h3>
-                <p>Use references like “that one from last week” when the context supports it.</p>
+                <p>Use references like "that one from last week" when the context supports it.</p>
               </article>
               <article class="capability card reveal">
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -408,7 +386,7 @@
                   Deterministic ledger actions
                 </li>
                 <li>
-                  <i class="fa-solid fa-clock-rotate-left"></i>
+                  <i class="fa-solid fa-arrow-rotate-left"></i>
                   Preserved amendment history
                 </li>
                 <li>
@@ -417,7 +395,7 @@
                 </li>
                 <li>
                   <i class="fa-solid fa-triangle-exclamation"></i>
-                  Safe provider failure behavior
+                  Safe failure behavior
                 </li>
               </ul>
             </div>
@@ -432,22 +410,22 @@
               <div class="scenario-list">
                 <article class="scenario card">
                   <p class="scenario__label">Credit sale</p>
-                  <blockquote>“Chioma collected &#8358;18,000 of provisions.”</blockquote>
+                  <blockquote>"Chioma collected &#8358;18,000 of provisions."</blockquote>
                   <p>Talli records the new debt and keeps the customer balance current.</p>
                 </article>
                 <article class="scenario card">
                   <p class="scenario__label">Partial payment</p>
-                  <blockquote>“She brought &#8358;5,000 today.”</blockquote>
+                  <blockquote>"She brought &#8358;5,000 today."</blockquote>
                   <p>The balance drops by the paid amount and the remaining debt stays visible.</p>
                 </article>
                 <article class="scenario card">
                   <p class="scenario__label">Settlement</p>
-                  <blockquote>“She has paid the remaining amount.”</blockquote>
+                  <blockquote>"She has paid the remaining amount."</blockquote>
                   <p>Open debt closes when the remaining balance is resolved in full.</p>
                 </article>
                 <article class="scenario card">
                   <p class="scenario__label">Correction</p>
-                  <blockquote>“Actually it was &#8358;16,000, not &#8358;18,000.”</blockquote>
+                  <blockquote>"Actually it was &#8358;16,000, not &#8358;18,000."</blockquote>
                   <p>The original amount is amended and the correction remains in history.</p>
                 </article>
                 <article class="scenario card scenario--wide">
@@ -463,18 +441,24 @@
                 <img
                   src="/assets/notebook-ledger.jpg"
                   alt="A notebook, phone, and calculator on a market counter as a merchant records credit details."
+                  loading="lazy"
+                  decoding="async"
                 />
               </figure>
               <figure class="photo-card photo-card--stack photo-card--offset">
                 <img
                   src="/assets/merchant-balance-review.jpg"
                   alt="A merchant reviewing customer balances on a smartphone while standing beside a small shop counter."
+                  loading="lazy"
+                  decoding="async"
                 />
               </figure>
               <figure class="photo-card photo-card--stack photo-card--offset-2">
                 <img
                   src="/assets/market-conversation.jpg"
                   alt="A merchant in a busy local market speaking with customers beside a ledger notebook."
+                  loading="lazy"
+                  decoding="async"
                 />
               </figure>
             </div>
@@ -487,6 +471,8 @@
               <img
                 src="/assets/ledger-closeup.jpg"
                 alt="Close-up of a hand writing in a ledger notebook beside a phone and calculator."
+                loading="lazy"
+                decoding="async"
               />
             </figure>
 
@@ -507,9 +493,7 @@
             <div>
               <p class="eyebrow">Final check</p>
               <h2 id="final-cta-title">Your ledger should not depend on memory.</h2>
-              <p>
-                Speak an update and let Talli keep track.
-              </p>
+              <p>Speak an update and let Talli keep track.</p>
             </div>
             <a class="button button--primary" href="#workspace">Try Talli</a>
           </div>
@@ -523,58 +507,11 @@
             <p>Voice-first conversational credit ledger for informal traders and small merchants.</p>
           </div>
           <div class="footer__meta">
-            <span>Hackathon project</span>
+            <span>Speak naturally. Talli remembers who owes what.</span>
             <span>&copy; 2026</span>
           </div>
         </div>
       </footer>
     </div>
-
-    <div class="modal-backdrop" data-role="confirm-backdrop" hidden>
-      <div class="modal card" role="dialog" aria-modal="true" aria-labelledby="reset-title">
-        <div class="modal__head">
-          <p class="section-kicker">Confirm reset</p>
-          <h3 id="reset-title">Reset the synthetic demo ledger?</h3>
-        </div>
-        <p>
-          This clears the local demo state for the current browser session. The data is synthetic
-          and can be seeded again immediately.
-        </p>
-        <div class="modal__actions">
-          <button class="button button--ghost" type="button" data-role="cancel-reset">Keep demo</button>
-          <button class="button button--danger" type="button" data-role="confirm-reset">
-            <i class="fa-solid fa-rotate-left"></i>
-            Reset now
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <template id="feed-item-template">
-      <article class="turn card">
-        <div class="turn__meta">
-          <span class="turn__badge"></span>
-          <time class="turn__time"></time>
-        </div>
-        <p class="turn__input"></p>
-        <div class="turn__response"></div>
-      </article>
-    </template>
-
-    <template id="customer-row-template">
-      <button class="customer-row" type="button">
-        <span class="customer-row__name"></span>
-        <span class="customer-row__balance"></span>
-        <span class="customer-row__status"></span>
-        <span class="customer-row__due"></span>
-      </button>
-    </template>
-
-    <template id="candidate-template">
-      <button class="candidate" type="button">
-        <strong class="candidate__title"></strong>
-        <span class="candidate__detail"></span>
-      </button>
-    </template>
   </body>
 </html>

@@ -3,10 +3,13 @@ const TIMEZONE = 'Africa/Lagos';
 const STORAGE_KEYS = {
   conversation: 'talli:conversation',
   selectedCustomer: 'talli:selectedCustomer',
-  autoSeeded: 'talli:autoSeeded',
 };
 
-const DEFAULT_WORKSPACE_NOTE = 'Demo data is synthetic. Seed or reset from here.';
+const DEFAULT_WORKSPACE_NOTE =
+  'Speak a credit update or type one below. Talli asks before it changes anything unsafe.';
+
+const SAFE_FAILURE_NOTICE =
+  "Talli couldn't process that update right now. Nothing was changed. Please try again.";
 
 const moneyFormatter = new Intl.NumberFormat('en-NG', {
   style: 'currency',
@@ -41,7 +44,6 @@ const state = {
   loading: true,
   sending: false,
   listening: false,
-  apiOnline: false,
   health: null,
   ledger: null,
   customerDetails: new Map(),
@@ -49,12 +51,12 @@ const state = {
   conversation: loadStoredJson(STORAGE_KEYS.conversation, []),
   clarification: null,
   transcriptPreview: '',
+  pendingSubmission: null,
   voiceSupport: {
     supported: false,
-    note: 'Speech recognition is not available in this browser. Type your update instead.',
+    note: "Voice input isn't available here. Type your update instead.",
     status: 'ready',
   },
-  resetArmed: false,
   notice: '',
 };
 
@@ -137,6 +139,8 @@ function detectLanguage(text) {
 
 function statusLabel(status) {
   switch (status) {
+    case 'pending':
+      return 'Processing';
     case 'applied':
       return 'Recorded';
     case 'clarification_required':
@@ -144,7 +148,7 @@ function statusLabel(status) {
     case 'no_action':
       return 'No action';
     case 'error':
-      return 'Safe failure';
+      return 'No change';
     default:
       return 'Update';
   }
@@ -152,6 +156,8 @@ function statusLabel(status) {
 
 function statusIcon(status) {
   switch (status) {
+    case 'pending':
+      return 'fa-spinner fa-spin';
     case 'applied':
       return 'fa-circle-check';
     case 'clarification_required':
@@ -255,38 +261,9 @@ function aggregatePaymentCount() {
   return count;
 }
 
-function renderHealth() {
-  const healthPill = dom.apiHealthPill;
-  const modelPill = dom.modelPill;
-
-  if (state.loading) {
-    healthPill.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Checking API';
-    modelPill.innerHTML = '<i class="fa-solid fa-circle-info"></i> Waiting for data';
-    return;
-  }
-
-  if (!state.apiOnline) {
-    healthPill.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> API offline';
-    modelPill.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Type only';
-    return;
-  }
-
-  const health = state.health;
-  if (!health) {
-    healthPill.innerHTML = '<i class="fa-solid fa-circle-info"></i> API ready';
-    modelPill.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Safe demo mode';
-    return;
-  }
-
-  healthPill.innerHTML = '<i class="fa-solid fa-circle-check"></i> API online';
-  if (health.modelAvailable) {
-    const provider = health.provider ? `Provider: ${health.provider}` : 'Provider connected';
-    const model = health.model ? `Model: ${health.model}` : 'Model connected';
-    modelPill.innerHTML = `<i class="fa-solid fa-wave-square"></i> ${escapeHtml(provider)} · ${escapeHtml(model)}`;
-  } else {
-    modelPill.innerHTML =
-      '<i class="fa-solid fa-shield-halved"></i> Provider unavailable, ledger stays safe';
-  }
+function customerSummaryObligationCount(customerId) {
+  const detail = state.customerDetails.get(customerId);
+  return detail?.obligations?.length ?? 0;
 }
 
 function renderMetrics() {
@@ -295,7 +272,7 @@ function renderMetrics() {
     dom.metricsGrid.innerHTML = `
       ${renderMetricCard('Total outstanding', formatMoney(0), 'Waiting for the ledger')}
       ${renderMetricCard('Customers owing', '0', 'No customer loaded yet')}
-      ${renderMetricCard('Settled debts', '0', 'Seed the demo to inspect history')}
+      ${renderMetricCard('Settled debts', '0', 'Closed obligations will appear here')}
       ${renderMetricCard('Payments recorded', '0', 'Derived from customer histories')}
     `;
     dom.ledgerCount.textContent = '0 customers';
@@ -312,7 +289,11 @@ function renderMetrics() {
   ).length;
 
   dom.metricsGrid.innerHTML = `
-    ${renderMetricCard('Total outstanding', formatMoney(ledger.totals.openOutstandingMinor), `${ledger.obligations.length} obligations tracked`)}
+    ${renderMetricCard(
+      'Total outstanding',
+      formatMoney(ledger.totals.openOutstandingMinor),
+      `${ledger.obligations.length} obligations tracked`,
+    )}
     ${renderMetricCard('Customers owing', String(owingCustomers), 'Customers with open balances')}
     ${renderMetricCard('Settled debts', String(settledDebts), 'Closed obligations in history')}
     ${renderMetricCard('Payments recorded', String(paymentCount), 'Derived from customer histories')}
@@ -328,7 +309,7 @@ function renderCustomerList() {
     dom.customerList.innerHTML = `
       <div class="empty-state">
         <i class="fa-solid fa-users"></i>
-        <p>Seed the synthetic demo ledger to inspect customer balances.</p>
+        <p>No credit records yet. Speak or type an update to get started.</p>
       </div>
     `;
     return;
@@ -356,6 +337,11 @@ function renderCustomerList() {
           : 'Closed';
       const balance =
         summary.outstandingMinor > 0 ? formatMoney(summary.outstandingMinor) : 'Settled';
+      const aliasText = customer.aliases?.length
+        ? `${customer.aliases.length} alias${customer.aliases.length === 1 ? '' : 'es'}`
+        : `${customerSummaryObligationCount(customer.id)} obligation${
+            customerSummaryObligationCount(customer.id) === 1 ? '' : 's'
+          }`;
       return `
         <button
           class="customer-row${selected}"
@@ -365,7 +351,7 @@ function renderCustomerList() {
         >
           <span class="customer-row__name">${escapeHtml(customer.displayName)}</span>
           <span class="customer-row__balance">${escapeHtml(balance)}</span>
-          <span class="customer-row__status">${escapeHtml(statusText)} &middot; ${customer.aliases?.length ? `${customer.aliases.length} alias${customer.aliases.length === 1 ? '' : 'es'}` : `${customerSummaryObligationCount(customer.id)} obligation${customerSummaryObligationCount(customer.id) === 1 ? '' : 's'}`}</span>
+          <span class="customer-row__status">${escapeHtml(statusText)} &middot; ${escapeHtml(aliasText)}</span>
           <span class="customer-row__due">${escapeHtml(dueText)}</span>
         </button>
       `;
@@ -373,26 +359,45 @@ function renderCustomerList() {
     .join('');
 }
 
-function customerSummaryObligationCount(customerId) {
-  const detail = state.customerDetails.get(customerId);
-  return detail?.obligations?.length ?? 0;
+function renderPendingTurn() {
+  if (!state.pendingSubmission) {
+    return '';
+  }
+
+  return `
+    <article class="turn card turn--pending">
+      <div class="turn__meta">
+        <span class="turn__badge">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          Processing
+          &middot; Update
+        </span>
+        <time class="turn__time">${escapeHtml(formatDateTime(state.pendingSubmission.timestamp))}</time>
+      </div>
+      <p class="turn__input">${escapeHtml(state.pendingSubmission.text)}</p>
+      <div class="turn__response">
+        <p>Talli is updating your ledger&hellip;</p>
+      </div>
+    </article>
+  `;
 }
 
 function renderActivityFeed() {
   const items = state.conversation;
-  dom.turnCount.textContent = `${items.length} turn${items.length === 1 ? '' : 's'}`;
+  const visibleCount = items.length + (state.pendingSubmission ? 1 : 0);
+  dom.turnCount.textContent = `${visibleCount} turn${visibleCount === 1 ? '' : 's'}`;
 
-  if (items.length === 0) {
+  if (visibleCount === 0) {
     dom.activityFeed.innerHTML = '';
     dom.activityEmpty.hidden = false;
     return;
   }
 
   dom.activityEmpty.hidden = true;
-  dom.activityFeed.innerHTML = items
+  dom.activityFeed.innerHTML = `${renderPendingTurn()}${items
     .map((item) => {
       const response = item.response;
-      const responseHtml = renderResponseBlock(response, item);
+      const responseHtml = renderResponseBlock(response);
       const statusClass = `turn--${response.status}`;
       return `
         <article class="turn card ${statusClass}">
@@ -400,7 +405,7 @@ function renderActivityFeed() {
             <span class="turn__badge">
               <i class="fa-solid ${statusIcon(response.status)}"></i>
               ${escapeHtml(statusLabel(response.status))}
-              · ${escapeHtml(actionLabel(response.action?.type))}
+              &middot; ${escapeHtml(actionLabel(response.action?.type))}
             </span>
             <time class="turn__time">${escapeHtml(formatDateTime(item.timestamp))}</time>
           </div>
@@ -409,10 +414,10 @@ function renderActivityFeed() {
         </article>
       `;
     })
-    .join('');
+    .join('')}`;
 }
 
-function renderResponseBlock(response, item) {
+function renderResponseBlock(response) {
   const summary = escapeHtml(responseSummary(response));
   const extra = [];
 
@@ -440,11 +445,11 @@ function renderResponseBlock(response, item) {
     );
   }
 
-  if (item.response.status === 'error' && item.response.errorCode) {
+  if (response.status === 'error') {
     extra.push(
       `<div class="turn-chip">
-        <span class="turn-chip__label">Safe failure</span>
-        <span class="turn-chip__copy">${escapeHtml(item.response.errorCode)}</span>
+        <span class="turn-chip__label">Outcome</span>
+        <span class="turn-chip__copy">Nothing changed.</span>
       </div>`,
     );
   }
@@ -473,7 +478,7 @@ function renderClarification() {
       return `
         <button class="candidate" type="button" data-candidate-suggestion="${escapeHtml(suggestion)}">
           <strong class="candidate__title">${escapeHtml(candidate.displayName)}</strong>
-          <span class="candidate__detail">${escapeHtml(kindLabel)} · tap to fill a safe follow-up</span>
+          <span class="candidate__detail">${escapeHtml(kindLabel)} &middot; tap to fill a safe follow-up</span>
         </button>
       `;
     })
@@ -525,10 +530,6 @@ function renderCustomerDetail() {
   const recentTurns = [...(detail.recentTurns ?? [])].sort((left, right) =>
     left.timestamp.localeCompare(right.timestamp),
   );
-  const totalOriginalMinor = detail.obligations.reduce(
-    (sum, obligation) => sum + obligation.originalAmountMinor,
-    0,
-  );
   const totalPaidMinor = detail.obligations.reduce(
     (sum, obligation) => sum + obligation.totalPaidMinor,
     0,
@@ -543,13 +544,21 @@ function renderCustomerDetail() {
       <div>
         <h4>${escapeHtml(customer.displayName)}</h4>
         <div class="detail-hero__meta">
-          <span>${escapeHtml(customer.aliases?.length ? `${customer.aliases.length} alias${customer.aliases.length === 1 ? '' : 'es'}` : 'No aliases recorded')}</span>
+          <span>${escapeHtml(
+            customer.aliases?.length
+              ? `${customer.aliases.length} alias${customer.aliases.length === 1 ? '' : 'es'}`
+              : 'No aliases recorded',
+          )}</span>
           <span>Updated ${escapeHtml(formatLongDate(lastUpdated) || 'recently')}</span>
         </div>
       </div>
       <span class="status-pill ${summary.outstandingMinor > 0 ? 'status-pill--warning' : ''}">
         <i class="fa-solid ${summary.outstandingMinor > 0 ? 'fa-circle-exclamation' : 'fa-circle-check'}"></i>
-        ${escapeHtml(summary.outstandingMinor > 0 ? `${formatMoney(summary.outstandingMinor)} outstanding` : 'Settled')}
+        ${escapeHtml(
+          summary.outstandingMinor > 0
+            ? `${formatMoney(summary.outstandingMinor)} outstanding`
+            : 'Settled',
+        )}
       </span>
     </div>
 
@@ -625,7 +634,7 @@ function renderObligationItem(obligation) {
   const meta = [
     obligation.dueAt ? `Due ${formatDate(obligation.dueAt)}` : 'No due date',
     `${formatMoney(obligation.totalPaidMinor)} paid`,
-  ].join(' · ');
+  ].join(' &middot; ');
 
   return `
     <article class="obligation-item">
@@ -673,7 +682,7 @@ function eventCopy(event) {
     case 'customer.created':
       return `${event.displayName} added on ${formatDateTime(event.timestamp)}.`;
     case 'obligation.created':
-      return `${formatMoney(event.originalAmountMinor)} opened${event.dueAt ? ` · due ${formatDate(event.dueAt)}` : ''}.`;
+      return `${formatMoney(event.originalAmountMinor)} opened${event.dueAt ? ` &middot; due ${formatDate(event.dueAt)}` : ''}.`;
     case 'payment.recorded':
       return `${formatMoney(event.amountMinor)} moved from ${formatMoney(event.outstandingBeforeMinor)} to ${formatMoney(event.outstandingAfterMinor)} outstanding.`;
     case 'obligation.corrected':
@@ -697,16 +706,12 @@ function renderTurnChip(turn) {
   `;
 }
 
-function renderConversationEmpty() {
-  dom.activityFeed.innerHTML = '';
-  dom.activityEmpty.hidden = false;
-}
-
 function renderComposerState() {
   const voiceNote = dom.voiceSupportNote;
   const stateChip = dom.composerState;
   const transcript = dom.transcriptPreview;
   const mic = dom.micToggle;
+  const micLabel = dom.micLabel;
   const sendDisabled = state.sending || state.listening || !dom.composerInput.value.trim();
 
   if (!state.voiceSupport.supported) {
@@ -724,10 +729,11 @@ function renderComposerState() {
     mic.dataset.state = '';
   }
 
-  if (state.listening) {
+  if (state.pendingSubmission) {
+    stateChip.innerHTML =
+      '<i class="fa-solid fa-spinner fa-spin"></i> Talli is updating your ledger';
+  } else if (state.listening) {
     stateChip.innerHTML = '<i class="fa-solid fa-wave-square"></i> Listening';
-  } else if (state.sending) {
-    stateChip.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Recording ledger update';
   } else if (state.transcriptPreview) {
     stateChip.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Transcript ready';
   } else if (state.clarification) {
@@ -741,38 +747,36 @@ function renderComposerState() {
     (state.listening ? 'Listening for speech...' : 'Speech will appear here before you send it.');
   mic.setAttribute('aria-pressed', String(state.listening));
   mic.setAttribute('aria-label', state.listening ? 'Stop voice input' : 'Start voice input');
-  mic.querySelector('span').textContent = state.listening ? 'Stop' : 'Voice';
+  mic.setAttribute('title', state.listening ? 'Stop voice input' : 'Start voice input');
+  micLabel.textContent = state.listening ? 'Stop voice input' : 'Voice input';
   dom.sendMessage.disabled = sendDisabled;
   dom.micToggle.disabled = state.sending || !state.voiceSupport.supported;
 }
 
 function renderNotice() {
-  dom.workspaceToolbarNote.textContent = state.notice || DEFAULT_WORKSPACE_NOTE;
+  dom.workspaceNote.textContent = state.notice || DEFAULT_WORKSPACE_NOTE;
 }
 
 function renderAll() {
-  renderHealth();
   renderMetrics();
   renderCustomerList();
   renderActivityFeed();
   renderClarification();
   renderCustomerDetail();
   renderComposerState();
-  if (state.notice) {
-    renderNotice();
-  }
+  renderNotice();
   saveStoredJson(STORAGE_KEYS.conversation, state.conversation);
   saveStoredJson(STORAGE_KEYS.selectedCustomer, state.selectedCustomerId);
 }
 
 function setNotice(message) {
   state.notice = message;
-  dom.workspaceToolbarNote.textContent = message;
+  dom.workspaceNote.textContent = message;
 }
 
 function clearNotice() {
   state.notice = '';
-  dom.workspaceToolbarNote.textContent = DEFAULT_WORKSPACE_NOTE;
+  dom.workspaceNote.textContent = DEFAULT_WORKSPACE_NOTE;
 }
 
 async function apiRequest(path, options = {}) {
@@ -830,18 +834,6 @@ const api = {
       }),
     });
   },
-  async seedDemo() {
-    return apiRequest('/api/demo/seed', {
-      method: 'POST',
-      body: JSON.stringify({ sessionId: SESSION_ID }),
-    });
-  },
-  async resetDemo() {
-    return apiRequest('/api/demo/reset', {
-      method: 'POST',
-      body: JSON.stringify({ sessionId: SESSION_ID }),
-    });
-  },
 };
 
 async function loadDashboard() {
@@ -851,22 +843,9 @@ async function loadDashboard() {
 
   try {
     const health = await api.health();
-    state.apiOnline = true;
     state.health = health;
-    state.notice = '';
 
-    let ledger = await api.ledger();
-    if (
-      ledger.customers.length === 0 &&
-      ledger.obligations.length === 0 &&
-      !sessionStorage.getItem(STORAGE_KEYS.autoSeeded)
-    ) {
-      await api.seedDemo();
-      sessionStorage.setItem(STORAGE_KEYS.autoSeeded, '1');
-      ledger = await api.ledger();
-      state.notice = 'Synthetic demo ledger loaded.';
-    }
-
+    const ledger = await api.ledger();
     state.ledger = ledger;
     await loadCustomerDetails(ledger.customers);
 
@@ -889,10 +868,8 @@ async function loadDashboard() {
       }
     }
   } catch (error) {
-    state.apiOnline = false;
     state.health = null;
-    state.notice =
-      'The API is offline. Typed updates still remain available once the server returns.';
+    state.notice = "Talli couldn't load right now. Your ledger stays safe.";
     console.error(error);
   } finally {
     state.loading = false;
@@ -960,36 +937,28 @@ async function submitComposer() {
   }
 
   state.sending = true;
-  state.transcriptPreview = text;
-  clearRecognitionBuffer();
-  renderComposerState();
-  clearNotice();
-
-  const pendingConversationItem = {
+  state.pendingSubmission = {
     id: crypto.randomUUID(),
     timestamp: new Date().toISOString(),
     text,
-    response: {
-      status: 'no_action',
-      message: 'Sending...',
-      action: { type: 'NO_ACTION' },
-      ledgerChange: null,
-      clarification: null,
-      turnId: null,
-      sessionId: SESSION_ID,
-      errorCode: null,
-      modelAvailable: Boolean(state.health?.modelAvailable),
-    },
   };
+  state.transcriptPreview = text;
+  clearRecognitionBuffer();
+  setNotice('Talli is updating your ledger...');
+  renderAll();
 
   try {
     const response = await api.message(text);
-    pendingConversationItem.response = response;
-    state.conversation = [...state.conversation, pendingConversationItem].slice(-24);
+    const conversationItem = {
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      text,
+      response,
+    };
+    state.conversation = [...state.conversation, conversationItem].slice(-24);
 
     if (response.status === 'clarification_required') {
-      state.clarification = pendingConversationItem;
-      state.transcriptPreview = '';
+      state.clarification = conversationItem;
     } else {
       state.clarification = null;
     }
@@ -1001,8 +970,8 @@ async function submitComposer() {
 
     dom.composerInput.value = '';
     state.transcriptPreview = '';
+    state.pendingSubmission = null;
     clearRecognitionBuffer();
-    await refreshLedgerData();
     setNotice(
       response.status === 'applied'
         ? 'Ledger updated.'
@@ -1010,10 +979,17 @@ async function submitComposer() {
           ? 'Clarification stays visible until you resolve it.'
           : response.status === 'no_action'
             ? 'No ledger change was made.'
-            : 'The backend returned a safe failure.',
+            : SAFE_FAILURE_NOTICE,
     );
+    renderAll();
+    try {
+      await refreshLedgerData();
+    } catch (refreshError) {
+      console.error(refreshError);
+      setNotice('The update was recorded, but the ledger view could not refresh.');
+      renderAll();
+    }
   } catch (error) {
-    const safeMessage = 'The API is offline right now. Nothing was changed.';
     state.conversation = [
       ...state.conversation,
       {
@@ -1022,23 +998,23 @@ async function submitComposer() {
         text,
         response: {
           status: 'error',
-          message: safeMessage,
+          message: SAFE_FAILURE_NOTICE,
           action: { type: 'NO_ACTION' },
           ledgerChange: null,
           clarification: null,
           turnId: null,
           sessionId: SESSION_ID,
-          errorCode: 'API_OFFLINE',
-          modelAvailable: false,
+          errorCode: 'SAFE_FAILURE',
+          modelAvailable: Boolean(state.health?.modelAvailable),
         },
       },
     ].slice(-24);
-    state.apiOnline = false;
-    state.health = null;
-    state.notice = safeMessage;
+    state.pendingSubmission = null;
+    state.notice = SAFE_FAILURE_NOTICE;
     console.error(error);
   } finally {
     state.sending = false;
+    state.pendingSubmission = null;
     renderAll();
     dom.composerInput.focus();
   }
@@ -1064,8 +1040,7 @@ function initSpeechRecognition() {
   const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognitionCtor) {
     state.voiceSupport.supported = false;
-    state.voiceSupport.note =
-      'Voice input is not available in this browser. Type your update instead.';
+    state.voiceSupport.note = "Voice input isn't available here. Type your update instead.";
     renderComposerState();
     return;
   }
@@ -1073,7 +1048,7 @@ function initSpeechRecognition() {
   state.voiceSupport.supported = true;
   state.voiceSupport.note = 'Voice input is ready. Speak, then review the text before sending.';
   recognition = new SpeechRecognitionCtor();
-  recognition.lang = 'en-NG';
+  recognition.lang = 'en-GB';
   recognition.continuous = false;
   recognition.interimResults = true;
   recognition.maxAlternatives = 1;
@@ -1109,12 +1084,22 @@ function initSpeechRecognition() {
   recognition.addEventListener('error', (event) => {
     state.listening = false;
     state.voiceSupport.status = 'error';
+    console.warn('SpeechRecognition error', {
+      error: event.error,
+      message: event.message ?? null,
+    });
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
       state.voiceSupport.note = 'Microphone permission was denied. Type your update instead.';
     } else if (event.error === 'network') {
-      state.voiceSupport.note = 'Speech recognition could not connect. Type your update instead.';
+      state.voiceSupport.note = "Voice input couldn't connect. Please type your update instead.";
+    } else if (event.error === 'audio-capture') {
+      state.voiceSupport.note = "We couldn't access your microphone. Type your update instead.";
+    } else if (event.error === 'no-speech') {
+      state.voiceSupport.note = 'No speech was captured. Try again or type your update instead.';
+    } else if (event.error === 'aborted') {
+      state.voiceSupport.note = 'Voice input stopped. Type your update instead.';
     } else {
-      state.voiceSupport.note = 'Voice input failed safely. Type your update instead.';
+      state.voiceSupport.note = 'Voice input failed. Type your update instead.';
     }
     renderComposerState();
   });
@@ -1128,7 +1113,7 @@ function initSpeechRecognition() {
       state.transcriptPreview = combined;
       state.voiceSupport.note = 'Transcript ready. Review the text before sending.';
     } else if (!hadError) {
-      state.voiceSupport.note = 'No final transcript captured. Try again or type your update.';
+      state.voiceSupport.note = 'No speech was captured. Try again or type your update.';
       state.transcriptPreview = '';
     }
     state.voiceSupport.status = hadError ? 'error' : 'ready';
@@ -1150,7 +1135,7 @@ function toggleRecognition() {
     recognition.start();
   } catch {
     state.voiceSupport.status = 'error';
-    state.voiceSupport.note = 'Voice input could not start. Type your update instead.';
+    state.voiceSupport.note = "Voice input couldn't start. Type your update instead.";
     renderComposerState();
   }
 }
@@ -1213,82 +1198,16 @@ function bindEvents() {
     }
   });
 
-  dom.seedDemo.addEventListener('click', async () => {
-    state.sending = true;
-    renderComposerState();
-    try {
-      await api.seedDemo();
-      sessionStorage.setItem(STORAGE_KEYS.autoSeeded, '1');
-      state.conversation = [];
-      state.clarification = null;
-      state.selectedCustomerId = null;
-      state.notice = 'Synthetic demo ledger seeded.';
-      await refreshLedgerData();
-      if (state.ledger?.customers?.[0]?.id) {
-        state.selectedCustomerId = state.ledger.customers[0].id;
-        await ensureCustomerDetail(state.selectedCustomerId);
-      }
-      dom.composerInput.focus();
-    } catch (error) {
-      state.notice = 'Could not seed the demo ledger.';
-      console.error(error);
-    } finally {
-      state.sending = false;
-      renderAll();
-    }
-  });
-
-  dom.resetDemo.addEventListener('click', () => {
-    state.resetArmed = true;
-    dom.confirmBackdrop.hidden = false;
-  });
-
-  dom.cancelReset.addEventListener('click', () => {
-    state.resetArmed = false;
-    dom.confirmBackdrop.hidden = true;
-  });
-
-  dom.confirmReset.addEventListener('click', async () => {
-    dom.confirmBackdrop.hidden = true;
-    state.resetArmed = false;
-    state.sending = true;
-    renderComposerState();
-    try {
-      await api.resetDemo();
-      sessionStorage.removeItem(STORAGE_KEYS.conversation);
-      sessionStorage.removeItem(STORAGE_KEYS.selectedCustomer);
-      state.conversation = [];
-      state.clarification = null;
-      state.selectedCustomerId = null;
-      state.customerDetails = new Map();
-      state.notice = 'Synthetic demo ledger reset.';
-      await refreshLedgerData();
-      dom.composerInput.value = '';
-      state.transcriptPreview = '';
-      clearRecognitionBuffer();
-      dom.composerInput.focus();
-    } catch (error) {
-      state.notice = 'Could not reset the demo ledger.';
-      console.error(error);
-    } finally {
-      state.sending = false;
-      renderAll();
-    }
-  });
-
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !dom.confirmBackdrop.hidden) {
-      dom.confirmBackdrop.hidden = true;
-      state.resetArmed = false;
-      dom.composerInput.focus();
+    if (event.key === 'Escape' && dom.primaryNav.dataset.open === 'true') {
+      dom.primaryNav.dataset.open = 'false';
+      dom.navToggle.setAttribute('aria-expanded', 'false');
     }
   });
 }
 
 function cacheDom() {
-  dom.apiHealthPill = document.querySelector('[data-role="api-health-pill"]');
-  dom.modelPill = document.querySelector('[data-role="model-pill"]');
-  dom.workspaceToolbarNote = document.querySelector('.workspace-toolbar__note');
+  dom.workspaceNote = document.querySelector('[data-role="workspace-note"]');
   dom.ledgerCount = document.querySelector('[data-role="ledger-count"]');
   dom.customerCount = document.querySelector('[data-role="customer-count"]');
   dom.turnCount = document.querySelector('[data-role="turn-count"]');
@@ -1306,16 +1225,12 @@ function cacheDom() {
   dom.composerForm = document.querySelector('[data-role="composer-form"]');
   dom.composerInput = document.querySelector('[data-role="composer-input"]');
   dom.micToggle = document.querySelector('[data-role="mic-toggle"]');
+  dom.micLabel = document.querySelector('[data-role="mic-label"]');
   dom.clearComposer = document.querySelector('[data-role="clear-composer"]');
   dom.sendMessage = document.querySelector('[data-role="send-message"]');
   dom.composerState = document.querySelector('[data-role="composer-state"]');
   dom.voiceSupportNote = document.querySelector('[data-role="voice-support-note"]');
   dom.transcriptPreview = document.querySelector('[data-role="transcript-preview"]');
-  dom.seedDemo = document.querySelector('[data-role="seed-demo"]');
-  dom.resetDemo = document.querySelector('[data-role="reset-demo"]');
-  dom.confirmBackdrop = document.querySelector('[data-role="confirm-backdrop"]');
-  dom.cancelReset = document.querySelector('[data-role="cancel-reset"]');
-  dom.confirmReset = document.querySelector('[data-role="confirm-reset"]');
   dom.navToggle = document.querySelector('[data-role="nav-toggle"]');
   dom.primaryNav = document.querySelector('[data-role="primary-nav"]');
   dom.tryButtons = document.querySelectorAll('a[href="#workspace"]');

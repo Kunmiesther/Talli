@@ -21,7 +21,13 @@ describe('static frontend serving', () => {
       const rootResponse = await handleTalliApiRequest(service, new Request('http://localhost/'));
       expect(rootResponse.status).toBe(200);
       expect(rootResponse.headers.get('content-type')).toContain('text/html');
-      expect(await rootResponse.text()).toContain('Talli');
+      const rootHtml = await rootResponse.text();
+      expect(rootHtml).toContain('Talli');
+      expect(rootHtml).not.toContain('Seed demo');
+      expect(rootHtml).not.toContain('Reset demo');
+      expect(rootHtml).not.toContain('hackathon project');
+      expect(rootHtml).not.toContain('API online');
+      expect(rootHtml).not.toContain('provider');
 
       const cssResponse = await handleTalliApiRequest(
         service,
@@ -37,12 +43,36 @@ describe('static frontend serving', () => {
       expect(jsResponse.status).toBe(200);
       expect(jsResponse.headers.get('content-type')).toContain('text/javascript');
 
-      const assetResponse = await handleTalliApiRequest(
+      for (const assetPath of [
+        '/assets/hero-merchant.jpg',
+        '/assets/ledger-closeup.jpg',
+        '/assets/market-conversation.jpg',
+        '/assets/merchant-balance-review.jpg',
+        '/assets/notebook-ledger.jpg',
+      ]) {
+        const assetResponse = await handleTalliApiRequest(
+          service,
+          new Request(`http://localhost${assetPath}`),
+        );
+        expect(assetResponse.status).toBe(200);
+        expect(assetResponse.headers.get('content-type')).toContain('image/jpeg');
+        expect((await assetResponse.arrayBuffer()).byteLength).toBeGreaterThan(0);
+      }
+
+      const fontCssResponse = await handleTalliApiRequest(
         service,
-        new Request('http://localhost/assets/hero-merchant.jpg'),
+        new Request('http://localhost/vendor/fontawesome/css/all.min.css'),
       );
-      expect(assetResponse.status).toBe(200);
-      expect(assetResponse.headers.get('content-type')).toContain('image/jpeg');
+      expect(fontCssResponse.status).toBe(200);
+      expect(fontCssResponse.headers.get('content-type')).toContain('text/css');
+
+      const fontResponse = await handleTalliApiRequest(
+        service,
+        new Request('http://localhost/vendor/fontawesome/webfonts/fa-solid-900.woff2'),
+      );
+      expect(fontResponse.status).toBe(200);
+      expect(fontResponse.headers.get('content-type')).toContain('font/woff2');
+      expect((await fontResponse.arrayBuffer()).byteLength).toBeGreaterThan(0);
 
       const healthResponse = await handleTalliApiRequest(
         service,

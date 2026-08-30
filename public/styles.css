@@ -519,6 +519,27 @@ textarea:focus-visible {
   color: var(--warning);
 }
 
+.workspace-note {
+  margin: 1rem 0 1.1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(180, 93, 61, 0.16);
+  border-left: 4px solid var(--accent);
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--ink-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.turn--pending {
+  border-color: rgba(180, 93, 61, 0.2);
+  background: linear-gradient(180deg, rgba(255, 250, 245, 0.96), rgba(255, 244, 235, 0.84));
+}
+
+.turn--pending .turn__badge {
+  background: rgba(180, 93, 61, 0.1);
+  color: var(--accent-deep);
+}
+
 .composer {
   margin-bottom: 1.25rem;
   padding: 1.15rem;
@@ -559,23 +580,48 @@ textarea:focus-visible {
 }
 
 .mic-button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  min-width: 7rem;
-  padding: 0.85rem 1rem;
-  border-radius: 16px;
+  width: 4.6rem;
+  min-width: 4.6rem;
+  height: 4.6rem;
+  padding: 0;
+  border-radius: 999px;
   border: 1px solid rgba(22, 38, 46, 0.12);
   background: linear-gradient(180deg, #ffffff, #f5efe5);
   color: var(--ink);
   font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  overflow: visible;
+}
+
+.mic-button i {
+  font-size: 1.15rem;
+}
+
+.mic-button::after {
+  content: "";
+  position: absolute;
+  inset: -0.36rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
 }
 
 .mic-button[data-state="listening"] {
   background: linear-gradient(180deg, #ffe9e1, #f5d4ca);
   color: var(--accent-deep);
   border-color: rgba(180, 93, 61, 0.25);
+}
+
+.mic-button[data-state="listening"]::after {
+  border-color: rgba(180, 93, 61, 0.25);
+  animation: pulse-ring 1.7s ease-out infinite;
+  opacity: 1;
 }
 
 .mic-button[data-state="error"] {
@@ -640,6 +686,21 @@ textarea:focus-visible {
   margin: 0;
   color: var(--ink-soft);
   font-size: 0.95rem;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
 }
 
 .workspace-grid {
@@ -1344,7 +1405,6 @@ body[data-loading="true"] .hero {
   }
 
   .section-head,
-  .workspace-toolbar,
   .composer__header,
   .composer__state,
   .detail-hero,
@@ -1352,10 +1412,6 @@ body[data-loading="true"] .hero {
   .footer__inner {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .status-stack {
-    justify-items: start;
   }
 
   .composer__form {
@@ -1400,6 +1456,12 @@ body[data-loading="true"] .hero {
 
   .voice-rail__steps {
     grid-template-columns: 1fr;
+  }
+
+  .mic-button {
+    width: 4.25rem;
+    min-width: 4.25rem;
+    height: 4.25rem;
   }
 
   .detail-stats {

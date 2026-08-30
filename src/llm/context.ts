@@ -6,7 +6,7 @@ import {
   type ObligationRecord,
   normalizeLedgerName,
 } from '../domain/ledger.js';
-import { formatNgn } from '../domain/money.js';
+import { formatMinorUnits } from '../domain/money.js';
 import {
   type ResolutionCandidatePackage,
   buildResolutionCandidates,
@@ -127,11 +127,23 @@ function summarizeEvent(event: LedgerEvent, snapshot: LedgerSnapshot): string {
     case 'customer.created':
       return `customer ${event.displayName} (${event.customerId}) created`;
     case 'obligation.created':
-      return `obligation ${event.obligationId} for ${snapshot.obligations.find((obligation) => obligation.id === event.obligationId)?.customerName ?? event.customerId} created ${formatNgn(event.originalAmountMinor)}${event.dueAt ? ` due ${event.dueAt}` : ''}`;
+      return `obligation ${event.obligationId} for ${snapshot.obligations.find((obligation) => obligation.id === event.obligationId)?.customerName ?? event.customerId} created ${formatMinorUnits(
+        event.originalAmountMinor,
+        snapshot.currency,
+      )}${event.dueAt ? ` due ${event.dueAt}` : ''}`;
     case 'payment.recorded':
-      return `payment ${event.amountMinor} recorded for ${event.obligationId} (${event.outstandingBeforeMinor} -> ${event.outstandingAfterMinor})`;
+      return `payment ${formatMinorUnits(
+        event.amountMinor,
+        snapshot.currency,
+      )} recorded for ${event.obligationId} (${formatMinorUnits(
+        event.outstandingBeforeMinor,
+        snapshot.currency,
+      )} -> ${formatMinorUnits(event.outstandingAfterMinor, snapshot.currency)})`;
     case 'obligation.corrected':
-      return `obligation ${event.obligationId} corrected from ${formatNgn(event.previousAmountMinor)} to ${formatNgn(event.correctedAmountMinor)}`;
+      return `obligation ${event.obligationId} corrected from ${formatMinorUnits(
+        event.previousAmountMinor,
+        snapshot.currency,
+      )} to ${formatMinorUnits(event.correctedAmountMinor, snapshot.currency)}`;
     case 'decision.clarification_requested':
       return `clarification requested: ${event.question}`;
     case 'decision.no_action':

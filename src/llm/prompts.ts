@@ -24,7 +24,7 @@ export function buildAdvancedSystemPrompt(): string {
     'Never invent customers, obligations, balances, or dates.',
     'If the target is materially ambiguous, return request_clarification.',
     'Corrections amend an existing obligation; settlements target the remaining balance; partial payments reduce it.',
-    'English and Nigerian Pidgin are both valid inputs.',
+    'English is the primary demonstration language.',
     'Normalize dates relative to the supplied reference clock only.',
     'JSON only. No markdown, no commentary, no extra keys.',
   ].join(' ');

@@ -11,12 +11,6 @@ const DEFAULT_WORKSPACE_NOTE =
 const SAFE_FAILURE_NOTICE =
   "Talli couldn't process that update right now. Nothing was changed. Please try again.";
 
-const moneyFormatter = new Intl.NumberFormat('en-NG', {
-  style: 'currency',
-  currency: 'NGN',
-  maximumFractionDigits: 0,
-});
-
 const dateFormatter = new Intl.DateTimeFormat('en-NG', {
   day: 'numeric',
   month: 'short',
@@ -95,9 +89,21 @@ function escapeHtml(value) {
 
 function formatMoney(minorUnits) {
   if (typeof minorUnits !== 'number' || Number.isNaN(minorUnits)) {
-    return moneyFormatter.format(0);
+    const currency = state.ledger?.currency ?? 'NGN';
+    const locale = currency === 'NGN' ? 'en-NG' : 'en-US';
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+      maximumFractionDigits: 2,
+    }).format(0);
   }
-  return moneyFormatter.format(minorUnits / 100);
+  const currency = state.ledger?.currency ?? 'NGN';
+  const locale = currency === 'NGN' ? 'en-NG' : 'en-US';
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 2,
+  }).format(minorUnits / 100);
 }
 
 function formatDate(value) {
@@ -712,6 +718,7 @@ function renderComposerState() {
   const transcript = dom.transcriptPreview;
   const mic = dom.micToggle;
   const micLabel = dom.micLabel;
+  const sendLabel = dom.sendLabel;
   const sendDisabled = state.sending || state.listening || !dom.composerInput.value.trim();
 
   if (!state.voiceSupport.supported) {
@@ -749,6 +756,8 @@ function renderComposerState() {
   mic.setAttribute('aria-label', state.listening ? 'Stop voice input' : 'Start voice input');
   mic.setAttribute('title', state.listening ? 'Stop voice input' : 'Start voice input');
   micLabel.textContent = state.listening ? 'Stop voice input' : 'Voice input';
+  sendLabel.textContent = state.sending ? 'Sending...' : 'Send';
+  dom.sendMessage.setAttribute('aria-busy', String(state.sending));
   dom.sendMessage.disabled = sendDisabled;
   dom.micToggle.disabled = state.sending || !state.voiceSupport.supported;
 }
@@ -1228,6 +1237,7 @@ function cacheDom() {
   dom.micLabel = document.querySelector('[data-role="mic-label"]');
   dom.clearComposer = document.querySelector('[data-role="clear-composer"]');
   dom.sendMessage = document.querySelector('[data-role="send-message"]');
+  dom.sendLabel = document.querySelector('[data-role="send-label"]');
   dom.composerState = document.querySelector('[data-role="composer-state"]');
   dom.voiceSupportNote = document.querySelector('[data-role="voice-support-note"]');
   dom.transcriptPreview = document.querySelector('[data-role="transcript-preview"]');

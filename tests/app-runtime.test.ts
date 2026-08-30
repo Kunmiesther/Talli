@@ -6,7 +6,7 @@ import { handleTalliApiRequest } from '../src/app/api.js';
 import { TalliSessionStore } from '../src/app/storage.js';
 import { createTalliService } from '../src/app/talli-service.js';
 import { ledgerActionSchema } from '../src/domain/actions.js';
-import { formatNgn, nairaToMinorUnits } from '../src/domain/money.js';
+import { formatMinorUnits, formatNgn, nairaToMinorUnits } from '../src/domain/money.js';
 import type { ActionInterpreter, AdvancedInterpreterInput } from '../src/interpreters.js';
 import type { StructuredActionModelDiagnostics } from '../src/llm/structured-action-model.js';
 
@@ -207,14 +207,14 @@ describe('Talli application runtime', () => {
     try {
       await runtime.service.resetDemoLedger('demo');
       await runtime.service.processMessage({
-        text: 'Kemi took 24 thousand worth of goods.',
+        text: 'Ledger turn one.',
         sessionId: 'demo',
         referenceTime: '2026-08-29T09:00:00+01:00',
         timezone: 'Africa/Lagos',
         language: 'en',
       });
       await runtime.service.processMessage({
-        text: 'Kemi brought 4k.',
+        text: 'Ledger turn two.',
         sessionId: 'demo',
         referenceTime: '2026-08-29T09:00:00+01:00',
         timezone: 'Africa/Lagos',
@@ -222,7 +222,7 @@ describe('Talli application runtime', () => {
       });
 
       const response = await runtime.service.processMessage({
-        text: 'That Kemi money, it was 42 thousand.',
+        text: 'Ledger turn three.',
         sessionId: 'demo',
         referenceTime: '2026-08-29T09:00:00+01:00',
         timezone: 'Africa/Lagos',
@@ -242,6 +242,132 @@ describe('Talli application runtime', () => {
       expect(
         ledger.obligations.some((entry) => entry.outstandingMinor === nairaToMinorUnits(38_000)),
       ).toBe(true);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('processes explicit customer and amount phrases without a model provider', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      const created = await runtime.service.processMessage({
+        text: 'Bisi owes 5k',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(created.status).toBe('applied');
+      expect(created.message).toContain('Bisi now owes');
+      expect(created.message).toContain(formatNgn(nairaToMinorUnits(5_000)));
+
+      let ledger = await runtime.service.getLedger('demo');
+      expect(ledger.currency).toBe('NGN');
+      expect(ledger.customers).toHaveLength(1);
+      expect(ledger.customers[0]?.displayName).toBe('Bisi');
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(5_000));
+
+      const paid = await runtime.service.processMessage({
+        text: 'Bisi paid 2k',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(paid.status).toBe('applied');
+      expect(paid.message).toContain(formatNgn(nairaToMinorUnits(2_000)));
+      expect(paid.message).toContain(`${formatNgn(nairaToMinorUnits(3_000))} remains`);
+
+      ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(3_000));
+
+      const corrected = await runtime.service.processMessage({
+        text: 'Actually Bisi owes 4k, not 5k',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(corrected.status).toBe('applied');
+      expect(corrected.message).toContain(formatNgn(nairaToMinorUnits(4_000)));
+
+      ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.originalAmountMinor).toBe(nairaToMinorUnits(4_000));
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(2_000));
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('processes explicit currency updates and clarifies on currency conflicts', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      const created = await runtime.service.processMessage({
+        text: 'Sarah owes 200 dollars',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(created.status).toBe('applied');
+      expect(created.message).toContain(formatMinorUnits(20_000, 'USD'));
+
+      let ledger = await runtime.service.getLedger('demo');
+      expect(ledger.currency).toBe('USD');
+      expect(ledger.customers[0]?.displayName).toBe('Sarah');
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(20_000);
+
+      const paid = await runtime.service.processMessage({
+        text: 'Sarah paid 50',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(paid.status).toBe('applied');
+      expect(paid.message).toContain(formatMinorUnits(5_000, 'USD'));
+      expect(paid.message).toContain(`${formatMinorUnits(15_000, 'USD')} remains`);
+
+      ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(15_000);
+
+      const corrected = await runtime.service.processMessage({
+        text: 'Actually Sarah owes 180, not 200',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(corrected.status).toBe('applied');
+      expect(corrected.message).toContain(formatMinorUnits(18_000, 'USD'));
+      expect(corrected.message).toContain(formatMinorUnits(13_000, 'USD'));
+
+      ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.originalAmountMinor).toBe(18_000);
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(13_000);
+
+      const beforeConflict = await runtime.service.getLedger('demo');
+      const conflict = await runtime.service.processMessage({
+        text: 'James owes 10 pounds',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(conflict.status).toBe('clarification_required');
+      expect(conflict.message).toContain('currently using USD');
+
+      const afterConflict = await runtime.service.getLedger('demo');
+      expect(afterConflict).toEqual(beforeConflict);
     } finally {
       await runtime.cleanup();
     }
@@ -280,7 +406,7 @@ describe('Talli application runtime', () => {
       await runtime.service.seedDemoLedger('demo');
 
       const first = await runtime.service.processMessage({
-        text: 'Musa paid 10k.',
+        text: 'Please ask about the customer.',
         sessionId: 'demo',
         referenceTime: '2026-08-29T09:00:00+01:00',
         timezone: 'Africa/Lagos',
@@ -294,7 +420,7 @@ describe('Talli application runtime', () => {
       );
 
       const second = await runtime.service.processMessage({
-        text: 'The one who owes 30k.',
+        text: 'Use the first option.',
         sessionId: 'demo',
         referenceTime: '2026-08-29T09:00:00+01:00',
         timezone: 'Africa/Lagos',
@@ -319,7 +445,7 @@ describe('Talli application runtime', () => {
       await runtime.service.seedDemoLedger('demo');
       const before = await runtime.service.getLedger('demo');
       const response = await runtime.service.processMessage({
-        text: 'Mama Tobi paid 10k.',
+        text: 'Please review the ledger.',
         sessionId: 'demo',
       });
 
@@ -363,7 +489,7 @@ describe('Talli application runtime', () => {
         runtime.service,
         new Request('http://localhost/api/message', {
           method: 'POST',
-          body: JSON.stringify({ text: 'Mama Tobi paid 10k.' }),
+          body: JSON.stringify({ text: 'Please review the ledger.' }),
         }),
       );
 

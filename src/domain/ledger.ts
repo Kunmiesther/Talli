@@ -9,9 +9,9 @@ import type {
   RequestClarificationAction,
   SettleObligationAction,
 } from './actions.js';
-import { formatNgn } from './money.js';
+import { formatMinorUnits } from './money.js';
 
-export type LedgerCurrency = 'NGN';
+export type LedgerCurrency = string;
 export type LedgerEventKind =
   | 'customer.created'
   | 'obligation.created'
@@ -157,10 +157,13 @@ export interface ApplyResult {
 
 const DEFAULT_ACTOR: LedgerEventBase['actor'] = 'system';
 
-export function createLedgerDocument(id: string = randomUUID()): LedgerDocument {
+export function createLedgerDocument(
+  id: string = randomUUID(),
+  currency: LedgerCurrency = 'NGN',
+): LedgerDocument {
   return {
     id,
-    currency: 'NGN',
+    currency,
     events: [],
   };
 }
@@ -1263,9 +1266,10 @@ export function summarizeSnapshot(snapshot: LedgerSnapshot): string {
   const obligations = snapshot.obligations
     .map((obligation) => {
       const status = obligation.status === 'settled' ? 'settled' : 'open';
-      return `${obligation.customerName} ${formatNgn(obligation.originalAmountMinor)} / ${formatNgn(
-        obligation.outstandingMinor,
-      )} ${status}`;
+      return `${obligation.customerName} ${formatMinorUnits(
+        obligation.originalAmountMinor,
+        snapshot.currency,
+      )} / ${formatMinorUnits(obligation.outstandingMinor, snapshot.currency)} ${status}`;
     })
     .join('; ');
   return `customers=[${customers}] obligations=[${obligations}]`;

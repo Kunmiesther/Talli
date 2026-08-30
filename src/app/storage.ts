@@ -38,6 +38,7 @@ export interface SessionState {
   version: 1;
   sessionId: string;
   ledgerId: string;
+  ledgerCurrency: string;
   createdAt: string;
   updatedAt: string;
   timezone: string;
@@ -109,6 +110,7 @@ function defaultState(sessionId: string, timezone: string): SessionState {
     version: 1,
     sessionId,
     ledgerId: sessionId,
+    ledgerCurrency: 'NGN',
     createdAt: now,
     updatedAt: now,
     timezone,
@@ -208,7 +210,11 @@ export class TalliSessionStore {
 
     const state =
       (await readJsonFile<SessionState>(statePath)) ?? defaultState(sessionId, this.timezone);
-    const document = await this.loadDocumentFromEvents(ledgerPath, state.ledgerId);
+    const document = await this.loadDocumentFromEvents(
+      ledgerPath,
+      state.ledgerId,
+      state.ledgerCurrency ?? 'NGN',
+    );
 
     return {
       document,
@@ -223,18 +229,22 @@ export class TalliSessionStore {
     };
   }
 
-  async loadDocumentFromEvents(ledgerPath: string, ledgerId: string): Promise<LedgerDocument> {
+  async loadDocumentFromEvents(
+    ledgerPath: string,
+    ledgerId: string,
+    currency: string,
+  ): Promise<LedgerDocument> {
     try {
       const raw = await readFile(ledgerPath, 'utf8');
       const events = parseLedgerEvents(raw);
       return {
-        ...createLedgerDocument(ledgerId),
+        ...createLedgerDocument(ledgerId, currency),
         id: ledgerId,
         events,
       };
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-        return createLedgerDocument(ledgerId);
+        return createLedgerDocument(ledgerId, currency);
       }
       throw error;
     }
@@ -293,6 +303,8 @@ export class TalliSessionStore {
       ...seed.state,
       sessionId,
       ledgerId: seed.state?.ledgerId ?? seed.document.id,
+      ledgerCurrency:
+        seed.state?.ledgerCurrency ?? seed.document.currency ?? baseState.ledgerCurrency,
       createdAt: seed.state?.createdAt ?? baseState.createdAt,
       updatedAt: new Date().toISOString(),
       recentTurns: seed.state?.recentTurns ?? [],
@@ -302,6 +314,7 @@ export class TalliSessionStore {
     const nextDocument = {
       ...seed.document,
       id: nextState.ledgerId,
+      currency: nextState.ledgerCurrency,
     };
     await this.save({ document: nextDocument, state: nextState, ledgerPath, statePath });
   }

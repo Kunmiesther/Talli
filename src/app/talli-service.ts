@@ -8,10 +8,12 @@ import {
   projectLedger,
   summarizeSnapshot,
 } from '../domain/ledger.js';
-import { formatNgn } from '../domain/money.js';
+import { formatMinorUnits } from '../domain/money.js';
 import type { ActionInterpreter } from '../interpreters.js';
 import { AdvancedInterpreter, type AdvancedInterpreterInput } from '../interpreters.js';
+import { compileLedgerIntent } from '../llm/intent-compiler.js';
 import { createConfiguredStructuredActionModel } from '../llm/structured-action-model.js';
+import { parseExplicitLedgerIntent } from './explicit-intent.js';
 import {
   type ConversationTurnRecord,
   type LoadedSession,
@@ -77,6 +79,10 @@ export interface TalliServiceOptions {
 
 const SAFE_PROVIDER_FAILURE_MESSAGE =
   "I couldn't interpret that safely just now. Nothing was changed. Please try again.";
+
+function formatMoney(minorUnits: number, currency: string): string {
+  return formatMinorUnits(minorUnits, currency);
+}
 
 function detectLanguage(text: string): 'en' | 'pcm' | 'mixed' {
   if (/\b(don|wey|na|carry|dey|dem|im|una|fit|oo|eh|sha)\b/i.test(text)) {
@@ -181,7 +187,10 @@ function formatClarification(
     candidates.push({
       kind: 'obligation',
       id: obligation.id,
-      displayName: `${obligation.customerName} ${formatNgn(obligation.outstandingMinor)} remaining`,
+      displayName: `${obligation.customerName} ${formatMoney(
+        obligation.outstandingMinor,
+        snapshot.currency,
+      )} remaining`,
     });
   }
 
@@ -328,7 +337,10 @@ function clarificationMessage(
     ...action.candidateObligationIds.map((obligationId) => {
       const obligation = snapshot.obligations.find((entry) => entry.id === obligationId);
       return obligation
-        ? `${obligation.customerName} (${formatNgn(obligation.outstandingMinor)} remaining)`
+        ? `${obligation.customerName} (${formatMoney(
+            obligation.outstandingMinor,
+            snapshot.currency,
+          )} remaining)`
         : obligationId;
     }),
   ].filter(Boolean);
@@ -431,12 +443,128 @@ export class TalliService {
     const timezone = input.timezone ?? this.store.timezone;
     const language = input.language ?? detectLanguage(input.text);
     const loaded = await this.store.load(sessionId);
-    const snapshotBefore = projectLedger(loaded.document);
+    let workingDocument = loaded.document;
+    let snapshotBefore = projectLedger(workingDocument);
     const currentTurns = loaded.state.recentTurns.slice(-8).map((turn) => ({
       turnId: turn.turnId,
       text: turn.inputText,
     }));
     const pendingClarification = loaded.state.pendingClarification;
+
+    const directParse = parseExplicitLedgerIntent({
+      text: input.text,
+      snapshot: snapshotBefore,
+    });
+
+    if (
+      directParse?.explicitCurrency &&
+      workingDocument.currency !== directParse.explicitCurrency
+    ) {
+      const isEmptyLedger =
+        snapshotBefore.customers.length === 0 &&
+        snapshotBefore.obligations.length === 0 &&
+        workingDocument.events.length === 0;
+      if (isEmptyLedger) {
+        workingDocument = {
+          ...workingDocument,
+          currency: directParse.explicitCurrency,
+        };
+        snapshotBefore = projectLedger(workingDocument);
+      } else {
+        const question = `This ledger is currently using ${workingDocument.currency}, but your update says ${directParse.explicitCurrency}. Switch the ledger currency first.`;
+        const response: TalliMessageResponse = {
+          status: 'clarification_required',
+          message: question,
+          action: ledgerActionSchema.parse({
+            type: 'REQUEST_CLARIFICATION',
+            question,
+            ambiguityKind: 'other',
+            candidateCustomerIds: [],
+            candidateObligationIds: [],
+            permittedMutation: false,
+            evidence: [],
+          }),
+          ledgerChange: null,
+          clarification: {
+            question,
+            candidates: [],
+          },
+          turnId,
+          sessionId,
+          errorCode: null,
+          modelAvailable: Boolean(this.interpreter),
+        };
+        await this.recordTurn({
+          loaded,
+          sessionId,
+          turnId,
+          input,
+          language,
+          status: 'clarification_required',
+          message: response.message,
+          errorCode: response.errorCode,
+          actionType: 'REQUEST_CLARIFICATION',
+          customerId: null,
+          obligationId: null,
+          amountMinor: null,
+          outstandingMinor: null,
+          clarification: {
+            question,
+            ambiguityKind: 'other',
+            candidateCustomerIds: [],
+            candidateObligationIds: [],
+          },
+          pendingClarification: loaded.state.pendingClarification,
+        });
+        return response;
+      }
+    }
+
+    if (directParse) {
+      const compiled = compileLedgerIntent({
+        intent: directParse.intent,
+        utterance: input.text,
+        language,
+        clock: {
+          referenceNow: referenceTime,
+          timezone,
+        },
+        snapshot: snapshotBefore,
+        document: workingDocument,
+      });
+      const parsedAction = compiled.action;
+      const result = applyLedgerAction(workingDocument, parsedAction, {
+        now: new Date(referenceTime),
+        actor: 'system',
+        turnId,
+        sourceText: input.text,
+      });
+      assertLedgerInvariants(result.snapshot);
+
+      const nextState = this.updateSessionState(loaded.state, {
+        turnId,
+        input,
+        language,
+        responseAction: parsedAction,
+        result,
+        sessionId,
+      });
+
+      const appendedEvents = result.document.events.slice(workingDocument.events.length);
+      await this.store.appendEvents(loaded.ledgerPath, appendedEvents);
+      await this.store.saveState(loaded.statePath, nextState);
+
+      return this.buildResponse({
+        sessionId,
+        turnId,
+        input,
+        language,
+        action: parsedAction,
+        result,
+        snapshotBefore,
+        snapshotAfter: result.snapshot,
+      });
+    }
 
     if (!this.interpreter) {
       const response = this.buildErrorResponse({
@@ -475,7 +603,7 @@ export class TalliService {
         timezone,
       },
       snapshot: snapshotBefore,
-      document: loaded.document,
+      document: workingDocument,
       recentTurns: currentTurns,
       pendingClarification,
     };
@@ -542,7 +670,7 @@ export class TalliService {
     }
 
     const parsedAction = ledgerActionSchema.parse(action);
-    const result = applyLedgerAction(loaded.document, parsedAction, {
+    const result = applyLedgerAction(workingDocument, parsedAction, {
       now: new Date(referenceTime),
       actor: 'system',
       turnId,
@@ -559,7 +687,7 @@ export class TalliService {
       sessionId,
     });
 
-    const appendedEvents = result.document.events.slice(loaded.document.events.length);
+    const appendedEvents = result.document.events.slice(workingDocument.events.length);
     await this.store.appendEvents(loaded.ledgerPath, appendedEvents);
     await this.store.saveState(loaded.statePath, nextState);
 
@@ -633,6 +761,7 @@ export class TalliService {
     const recentTurns = [...state.recentTurns, turnRecord].slice(-this.store.turnHistoryLimit);
     return {
       ...state,
+      ledgerCurrency: input.result.snapshot.currency,
       updatedAt: new Date().toISOString(),
       recentTurns,
       pendingClarification: clarification,
@@ -708,6 +837,7 @@ export class TalliService {
 
     const nextState: SessionState = {
       ...input.loaded.state,
+      ledgerCurrency: input.loaded.state.ledgerCurrency ?? input.loaded.document.currency,
       updatedAt: new Date().toISOString(),
       recentTurns: [...input.loaded.state.recentTurns, nextTurn].slice(
         -this.store.turnHistoryLimit,
@@ -788,8 +918,14 @@ export class TalliService {
               ? action.customer.customerId
               : 'that customer');
         const message = duePhrase
-          ? `${customerName} now owes ${formatNgn(obligation?.originalAmountMinor ?? action.amountMinor)}. Due ${duePhrase}.`
-          : `${customerName} now owes ${formatNgn(obligation?.originalAmountMinor ?? action.amountMinor)}.`;
+          ? `${customerName} now owes ${formatMoney(
+              obligation?.originalAmountMinor ?? action.amountMinor,
+              input.snapshotAfter.currency,
+            )}. Due ${duePhrase}.`
+          : `${customerName} now owes ${formatMoney(
+              obligation?.originalAmountMinor ?? action.amountMinor,
+              input.snapshotAfter.currency,
+            )}.`;
         return {
           status: 'applied',
           message,
@@ -819,8 +955,14 @@ export class TalliService {
         const customerName = obligation?.customerName ?? 'That customer';
         const message =
           remaining === 0
-            ? `Recorded ${formatNgn(paidAmount)} from ${customerName}.`
-            : `Recorded ${formatNgn(paidAmount)} from ${customerName}. ${formatNgn(remaining)} remains.`;
+            ? `Recorded ${formatMoney(paidAmount, input.snapshotAfter.currency)} from ${customerName}.`
+            : `Recorded ${formatMoney(
+                paidAmount,
+                input.snapshotAfter.currency,
+              )} from ${customerName}. ${formatMoney(
+                remaining,
+                input.snapshotAfter.currency,
+              )} remains.`;
         return {
           status: 'applied',
           message,
@@ -884,7 +1026,13 @@ export class TalliService {
         const remaining = obligation?.outstandingMinor ?? 0;
         return {
           status: 'applied',
-          message: `Updated ${customerName}'s original debt from ${formatNgn(previous)} to ${formatNgn(action.correctedAmountMinor)}. ${formatNgn(remaining)} remains.`,
+          message: `Updated ${customerName}'s original debt from ${formatMoney(
+            previous,
+            input.snapshotAfter.currency,
+          )} to ${formatMoney(
+            action.correctedAmountMinor,
+            input.snapshotAfter.currency,
+          )}. ${formatMoney(remaining, input.snapshotAfter.currency)} remains.`,
           action: summaryAction,
           ledgerChange: obligation
             ? {

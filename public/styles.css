@@ -583,6 +583,13 @@ textarea:focus-visible {
   color: var(--danger);
 }
 
+.mic-button[data-state="unsupported"] {
+  background: linear-gradient(180deg, #ece7dd, #e2dbcf);
+  color: var(--ink-soft);
+  border-color: rgba(22, 38, 46, 0.08);
+  opacity: 0.82;
+}
+
 .composer textarea {
   width: 100%;
   min-height: 4.8rem;

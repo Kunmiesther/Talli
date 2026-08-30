@@ -1,2 +1,3 @@
 artifacts/**
 public/vendor/**
+dist/**

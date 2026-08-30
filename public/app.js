@@ -712,7 +712,6 @@ function renderComposerState() {
   if (!state.voiceSupport.supported) {
     voiceNote.textContent = state.voiceSupport.note;
     mic.dataset.state = 'unsupported';
-    mic.disabled = false;
   } else if (state.listening) {
     voiceNote.textContent =
       'Listening. Speak naturally, then stop to review the text before sending.';
@@ -744,7 +743,7 @@ function renderComposerState() {
   mic.setAttribute('aria-label', state.listening ? 'Stop voice input' : 'Start voice input');
   mic.querySelector('span').textContent = state.listening ? 'Stop' : 'Voice';
   dom.sendMessage.disabled = sendDisabled;
-  dom.micToggle.disabled = state.sending;
+  dom.micToggle.disabled = state.sending || !state.voiceSupport.supported;
 }
 
 function renderNotice() {

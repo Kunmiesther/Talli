@@ -6,3 +6,4 @@ dist
 .vite
 coverage
 *.tsbuildinfo
+.talli-data/

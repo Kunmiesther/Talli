@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Talli icon">
+  <rect x="8" y="8" width="48" height="48" rx="14" fill="#16262e"/>
+  <path d="M19 22h26v4H19zm0 8h26v4H19zm0 8h18v4H19z" fill="#f4eee4"/>
+  <path d="M42 23.5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5S45.88 26 44.5 26 42 24.88 42 23.5z" fill="#b45d3d"/>
+</svg>

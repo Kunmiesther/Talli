@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Talli | Speak naturally. Talli remembers who owes what.</title>
+    <meta
+      name="description"
+      content="Talli is a voice-first credit ledger for informal traders and small merchants. Speak or type everyday credit updates, keep balances accurate, and preserve history safely."
+    />
+    <meta name="theme-color" content="#f3ebe0" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Talli | Speak naturally. Talli remembers who owes what." />
+    <meta
+      property="og:description"
+      content="A voice-first conversational credit ledger for informal traders and small merchants."
+    />
+    <meta property="og:image" content="/assets/hero-merchant.jpg" />
+    <meta property="og:url" content="/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/vendor/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script type="module" src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#workspace">Skip to the product workspace</a>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="container topbar__inner">
+          <a class="brand" href="#product" aria-label="Talli home">
+            <span class="brand__mark" aria-hidden="true">
+              <i class="fa-solid fa-book-open"></i>
+            </span>
+            <span class="brand__copy">
+              <strong>Talli</strong>
+              <span>Voice-first credit ledger</span>
+            </span>
+          </a>
+
+          <button
+            class="nav-toggle"
+            type="button"
+            aria-controls="primary-nav"
+            aria-expanded="false"
+            data-role="nav-toggle"
+          >
+            <span class="nav-toggle__icon" aria-hidden="true">
+              <i class="fa-solid fa-bars"></i>
+            </span>
+            <span>Menu</span>
+          </button>
+
+          <nav class="primary-nav" id="primary-nav" data-role="primary-nav">
+            <a href="#product">Product</a>
+            <a href="#how-it-works">How it works</a>
+            <a href="#safety">Safety</a>
+            <a href="#use-cases">Use cases</a>
+            <a class="button button--primary button--small" href="#workspace">Try Talli</a>
+          </nav>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero section section--hero" id="product">
+          <div class="container hero__inner">
+            <div class="hero__copy reveal">
+              <p class="eyebrow">Voice bookkeeping for informal merchants</p>
+              <h1>Speak naturally. Talli remembers who owes what.</h1>
+              <p class="hero__lede">
+                Say what happened, type a correction, or answer a clarification. Talli turns
+                everyday credit updates into a trustworthy ledger, keeps the history, and asks
+                before changing anything it cannot resolve safely.
+              </p>
+              <div class="hero__actions">
+                <a class="button button--primary" href="#workspace">Try Talli</a>
+                <a class="button button--ghost" href="#how-it-works">See how it works</a>
+              </div>
+              <ul class="hero__proof">
+                <li><i class="fa-solid fa-microphone"></i> Voice or typed updates</li>
+                <li><i class="fa-solid fa-shield-halved"></i> Clarifies before mutating money</li>
+                <li><i class="fa-solid fa-language"></i> English and demonstrated Nigerian Pidgin</li>
+              </ul>
+            </div>
+
+            <div class="hero__visual reveal">
+              <figure class="photo-card photo-card--hero">
+                <img
+                  src="/assets/hero-merchant.jpg"
+                  alt="A merchant serving customers while speaking into a phone in a local market stall."
+                />
+              </figure>
+
+              <div class="voice-rail card card--elevated">
+                <div class="voice-rail__steps">
+                  <span class="voice-rail__step">
+                    <i class="fa-solid fa-microphone"></i>
+                    Voice
+                  </span>
+                  <span class="voice-rail__step">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    Understand
+                  </span>
+                  <span class="voice-rail__step">
+                    <i class="fa-solid fa-book-bookmark"></i>
+                    Record
+                  </span>
+                </div>
+                <div class="voice-rail__quote">
+                  <p class="voice-rail__label">Example turn</p>
+                  <blockquote>“Mama Tobi brought 20k.”</blockquote>
+                  <p>
+                    Talli recorded <strong>&#8358;20,000</strong> from Mama Tobi.
+                    <strong>&#8358;30,000 remains.</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section section--workspace" id="workspace" aria-labelledby="workspace-title">
+          <div class="container">
+            <div class="section-head reveal">
+              <div>
+                <p class="eyebrow">Interactive workspace</p>
+                <h2 id="workspace-title">The ledger is the product.</h2>
+                <p class="section-lede">
+                  Speak a payment, correction, or new credit line. The demo updates the ledger,
+                  shows what Talli understood, and keeps any clarification visible until it is
+                  resolved.
+                </p>
+              </div>
+              <div class="status-stack">
+                <span class="status-pill" data-role="api-health-pill">
+                  <i class="fa-solid fa-circle-notch fa-spin"></i>
+                  Checking API
+                </span>
+                <span class="status-pill status-pill--muted" data-role="model-pill">
+                  <i class="fa-solid fa-circle-info"></i>
+                  Waiting for data
+                </span>
+              </div>
+            </div>
+
+            <div class="workspace-toolbar reveal">
+              <p class="workspace-toolbar__note">
+                Demo data is synthetic. Seed or reset from here.
+              </p>
+              <div class="demo-actions">
+                <button class="button button--secondary button--small" type="button" data-role="seed-demo">
+                  <i class="fa-solid fa-seedling"></i>
+                  Seed demo
+                </button>
+                <button class="button button--danger button--small" type="button" data-role="reset-demo">
+                  <i class="fa-solid fa-rotate-left"></i>
+                  Reset demo
+                </button>
+              </div>
+            </div>
+
+            <div class="composer card card--workspace reveal">
+              <div class="composer__header">
+                <div>
+                  <p class="section-kicker">Speak or type</p>
+                  <h3>Update the ledger in plain language</h3>
+                </div>
+                <p class="composer__hint" data-role="voice-support-note">
+                  Browser speech recognition not loaded yet.
+                </p>
+              </div>
+
+              <form class="composer__form" data-role="composer-form">
+                <button
+                  class="mic-button"
+                  type="button"
+                  data-role="mic-toggle"
+                  aria-label="Start voice input"
+                  aria-pressed="false"
+                >
+                  <i class="fa-solid fa-microphone"></i>
+                  <span>Voice</span>
+                </button>
+
+                <label class="sr-only" for="composer-input">Message to Talli</label>
+                <textarea
+                  id="composer-input"
+                  data-role="composer-input"
+                  rows="3"
+                  placeholder="Say or type what happened. For example: Mama Tobi brought 20k."
+                ></textarea>
+
+                <div class="composer__actions">
+                  <button class="button button--ghost button--small" type="button" data-role="clear-composer">
+                    Clear
+                  </button>
+                  <button class="button button--primary button--small" type="submit" data-role="send-message">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Send
+                  </button>
+                </div>
+              </form>
+
+              <div class="composer__state">
+                <span class="state-chip" data-role="composer-state">
+                  <i class="fa-solid fa-circle-info"></i>
+                  Ready to record
+                </span>
+                <p class="composer__transcript" data-role="transcript-preview" aria-live="polite">
+                  Speech will appear here before you send it.
+                </p>
+              </div>
+            </div>
+
+            <div class="workspace-grid">
+              <section class="workspace-column">
+                <div class="panel card reveal">
+                  <div class="panel__head">
+                    <div>
+                      <p class="section-kicker">Activity</p>
+                      <h3>Conversation stream</h3>
+                    </div>
+                    <span class="panel__count" data-role="turn-count">0 turns</span>
+                  </div>
+                  <div class="clarification card card--notice" data-role="clarification-panel" hidden>
+                    <div class="card__head">
+                      <div>
+                        <p class="section-kicker">Clarification required</p>
+                        <h4 data-role="clarification-title">Talli needs one safe answer</h4>
+                      </div>
+                      <span class="status-pill status-pill--warning">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        No mutation yet
+                      </span>
+                    </div>
+                    <p class="clarification__question" data-role="clarification-question"></p>
+                    <div class="clarification__candidates" data-role="clarification-candidates"></div>
+                    <p class="clarification__hint">
+                      You can pick a candidate or reply naturally in the composer.
+                    </p>
+                  </div>
+                  <div class="feed" data-role="activity-feed"></div>
+                  <div class="empty-state" data-role="activity-empty" hidden>
+                    <i class="fa-solid fa-comment-dots"></i>
+                    <p>No turns yet. Speak or type an update to start the ledger.</p>
+                  </div>
+                </div>
+              </section>
+
+              <section class="workspace-column workspace-column--ledger">
+                <div class="panel card reveal">
+                  <div class="panel__head">
+                    <div>
+                      <p class="section-kicker">Ledger</p>
+                      <h3>Balances and customers</h3>
+                    </div>
+                    <span class="panel__count" data-role="ledger-count">0 customers</span>
+                  </div>
+                  <div class="metrics" data-role="metrics-grid"></div>
+                </div>
+
+                <div class="panel card reveal">
+                  <div class="panel__head">
+                    <div>
+                      <p class="section-kicker">Customers</p>
+                      <h3>Outstanding balances</h3>
+                    </div>
+                    <span class="panel__count" data-role="customer-count">0 owing</span>
+                  </div>
+                  <div class="customer-list" data-role="customer-list"></div>
+                </div>
+
+                <div class="panel card reveal">
+                  <div class="panel__head">
+                    <div>
+                      <p class="section-kicker">Customer detail</p>
+                      <h3 data-role="detail-title">Select a customer</h3>
+                    </div>
+                    <span class="panel__count" data-role="detail-status">Waiting</span>
+                  </div>
+                  <div class="customer-detail" data-role="customer-detail">
+                    <div class="empty-state empty-state--detail">
+                      <i class="fa-solid fa-user-tag"></i>
+                      <p>Choose a customer to inspect their obligations, payments, and corrections.</p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+
+        <section class="section section--process" id="how-it-works" aria-labelledby="how-title">
+          <div class="container">
+            <div class="section-head reveal">
+              <div>
+                <p class="eyebrow">How it works</p>
+                <h2 id="how-title">Three steps, one safe ledger.</h2>
+              </div>
+              <p class="section-lede">
+                Talli keeps the interface simple because the work is specific: speak what happened,
+                let the ledger resolve the customer and obligation, then review the recorded
+                balance.
+              </p>
+            </div>
+
+            <div class="steps">
+              <article class="step-card card reveal">
+                <span class="step-card__index">1</span>
+                <h3>Say what happened</h3>
+                <p>“Amaka took 25k goods today.”</p>
+              </article>
+              <article class="step-card card reveal">
+                <span class="step-card__index">2</span>
+                <h3>Talli resolves the ledger context</h3>
+                <p>It identifies the customer, obligation, and whether the update is a sale, payment, or correction.</p>
+              </article>
+              <article class="step-card card reveal">
+                <span class="step-card__index">3</span>
+                <h3>Your balance stays current</h3>
+                <p>Balances, history, and amendments update safely. If the target is uncertain, Talli asks first.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section section--capabilities" id="capabilities" aria-labelledby="capabilities-title">
+          <div class="container">
+            <div class="section-head reveal">
+              <div>
+                <p class="eyebrow">Product capabilities</p>
+                <h2 id="capabilities-title">Implemented capabilities, not generic AI claims.</h2>
+              </div>
+              <p class="section-lede">
+                These are the behaviors the backend already supports and the frontend makes visible.
+              </p>
+            </div>
+
+            <div class="capability-grid">
+              <article class="capability card reveal">
+                <i class="fa-solid fa-microphone-lines"></i>
+                <h3>Voice-first credit updates</h3>
+                <p>Speak naturally and the composer turns it into an editable text update.</p>
+              </article>
+              <article class="capability card reveal">
+                <i class="fa-solid fa-comments"></i>
+                <h3>Conversational ledger memory</h3>
+                <p>Talli keeps the running state, not just one-off messages.</p>
+              </article>
+              <article class="capability card reveal">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <h3>Credit creation</h3>
+                <p>Record a new obligation with a customer, amount, and due date when available.</p>
+              </article>
+              <article class="capability card reveal">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                <h3>Partial payments</h3>
+                <p>Record money brought back and keep the remaining balance accurate.</p>
+              </article>
+              <article class="capability card reveal">
+                <i class="fa-solid fa-circle-check"></i>
+                <h3>Full settlement</h3>
+                <p>Resolve an obligation cleanly when the debt is paid in full.</p>
+              </article>
+              <article class="capability card reveal">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <h3>Corrections and amendments</h3>
+                <p>Adjust the original amount while preserving the earlier event in history.</p>
+              </article>
+              <article class="capability card reveal">
+                <i class="fa-solid fa-link"></i>
+                <h3>Natural follow-up references</h3>
+                <p>Use references like “that one from last week” when the context supports it.</p>
+              </article>
+              <article class="capability card reveal">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h3>Ambiguity detection</h3>
+                <p>When Talli cannot safely choose, it shows a clarification instead of guessing.</p>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="section section--safety" id="safety" aria-labelledby="safety-title">
+          <div class="container safety">
+            <div class="safety__copy reveal">
+              <p class="eyebrow">Financial safety</p>
+              <h2 id="safety-title">Talli doesn&rsquo;t guess with your ledger.</h2>
+              <p class="section-lede">
+                Financial state should not change when the target is uncertain. Talli separates
+                interpretation from deterministic mutation, and if it cannot safely determine who
+                or what an update refers to, it asks.
+              </p>
+            </div>
+
+            <div class="safety__detail card reveal">
+              <ul class="safety-list">
+                <li>
+                  <i class="fa-solid fa-route"></i>
+                  Deterministic ledger actions
+                </li>
+                <li>
+                  <i class="fa-solid fa-clock-rotate-left"></i>
+                  Preserved amendment history
+                </li>
+                <li>
+                  <i class="fa-solid fa-ban"></i>
+                  No mutation during clarification
+                </li>
+                <li>
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                  Safe provider failure behavior
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section section--use-cases" id="use-cases" aria-labelledby="use-cases-title">
+          <div class="container use-cases">
+            <div class="use-cases__copy reveal">
+              <p class="eyebrow">Real-world use cases</p>
+              <h2 id="use-cases-title">Built around the conversations merchants already have.</h2>
+              <div class="scenario-list">
+                <article class="scenario card">
+                  <p class="scenario__label">Credit sale</p>
+                  <blockquote>“Chioma collected &#8358;18,000 of provisions.”</blockquote>
+                  <p>Talli records the new debt and keeps the customer balance current.</p>
+                </article>
+                <article class="scenario card">
+                  <p class="scenario__label">Partial payment</p>
+                  <blockquote>“She brought &#8358;5,000 today.”</blockquote>
+                  <p>The balance drops by the paid amount and the remaining debt stays visible.</p>
+                </article>
+                <article class="scenario card">
+                  <p class="scenario__label">Settlement</p>
+                  <blockquote>“She has paid the remaining amount.”</blockquote>
+                  <p>Open debt closes when the remaining balance is resolved in full.</p>
+                </article>
+                <article class="scenario card">
+                  <p class="scenario__label">Correction</p>
+                  <blockquote>“Actually it was &#8358;16,000, not &#8358;18,000.”</blockquote>
+                  <p>The original amount is amended and the correction remains in history.</p>
+                </article>
+                <article class="scenario card scenario--wide">
+                  <p class="scenario__label">Ambiguity</p>
+                  <blockquote>Two customers named Musa owe money, so Talli asks before recording a payment.</blockquote>
+                  <p>Clarification is a safety feature, not an error screen.</p>
+                </article>
+              </div>
+            </div>
+
+            <div class="use-cases__media reveal">
+              <figure class="photo-card photo-card--stack">
+                <img
+                  src="/assets/notebook-ledger.jpg"
+                  alt="A notebook, phone, and calculator on a market counter as a merchant records credit details."
+                />
+              </figure>
+              <figure class="photo-card photo-card--stack photo-card--offset">
+                <img
+                  src="/assets/merchant-balance-review.jpg"
+                  alt="A merchant reviewing customer balances on a smartphone while standing beside a small shop counter."
+                />
+              </figure>
+              <figure class="photo-card photo-card--stack photo-card--offset-2">
+                <img
+                  src="/assets/market-conversation.jpg"
+                  alt="A merchant in a busy local market speaking with customers beside a ledger notebook."
+                />
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section class="section section--story" id="story" aria-labelledby="story-title">
+          <div class="container story">
+            <figure class="photo-card photo-card--story reveal">
+              <img
+                src="/assets/ledger-closeup.jpg"
+                alt="Close-up of a hand writing in a ledger notebook beside a phone and calculator."
+              />
+            </figure>
+
+            <div class="story__copy reveal">
+              <p class="eyebrow">Product story</p>
+              <h2 id="story-title">Talli turns familiar credit habits into reliable financial state.</h2>
+              <p class="section-lede">
+                Many informal traders already track credit through memory, notebooks, scattered
+                chats, and verbal updates. The problem is not a lack of accounting software. The
+                problem is turning the way people already communicate into a trustworthy ledger.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section section--cta" id="final-cta" aria-labelledby="final-cta-title">
+          <div class="container final-cta card reveal">
+            <div>
+              <p class="eyebrow">Final check</p>
+              <h2 id="final-cta-title">Your ledger should not depend on memory.</h2>
+              <p>
+                Speak an update and let Talli keep track.
+              </p>
+            </div>
+            <a class="button button--primary" href="#workspace">Try Talli</a>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="container footer__inner">
+          <div>
+            <strong>Talli</strong>
+            <p>Voice-first conversational credit ledger for informal traders and small merchants.</p>
+          </div>
+          <div class="footer__meta">
+            <span>Hackathon project</span>
+            <span>&copy; 2026</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <div class="modal-backdrop" data-role="confirm-backdrop" hidden>
+      <div class="modal card" role="dialog" aria-modal="true" aria-labelledby="reset-title">
+        <div class="modal__head">
+          <p class="section-kicker">Confirm reset</p>
+          <h3 id="reset-title">Reset the synthetic demo ledger?</h3>
+        </div>
+        <p>
+          This clears the local demo state for the current browser session. The data is synthetic
+          and can be seeded again immediately.
+        </p>
+        <div class="modal__actions">
+          <button class="button button--ghost" type="button" data-role="cancel-reset">Keep demo</button>
+          <button class="button button--danger" type="button" data-role="confirm-reset">
+            <i class="fa-solid fa-rotate-left"></i>
+            Reset now
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <template id="feed-item-template">
+      <article class="turn card">
+        <div class="turn__meta">
+          <span class="turn__badge"></span>
+          <time class="turn__time"></time>
+        </div>
+        <p class="turn__input"></p>
+        <div class="turn__response"></div>
+      </article>
+    </template>
+
+    <template id="customer-row-template">
+      <button class="customer-row" type="button">
+        <span class="customer-row__name"></span>
+        <span class="customer-row__balance"></span>
+        <span class="customer-row__status"></span>
+        <span class="customer-row__due"></span>
+      </button>
+    </template>
+
+    <template id="candidate-template">
+      <button class="candidate" type="button">
+        <strong class="candidate__title"></strong>
+        <span class="candidate__detail"></span>
+      </button>
+    </template>
+  </body>
+</html>

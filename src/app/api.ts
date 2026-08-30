@@ -1,4 +1,6 @@
+import { readFile } from 'node:fs/promises';
 import { type IncomingMessage, type Server, createServer } from 'node:http';
+import { extname, relative, resolve } from 'node:path';
 import { URL } from 'node:url';
 import type { TalliMessageInput, TalliService } from './talli-service.js';
 
@@ -25,8 +27,77 @@ function jsonResponse(status: number, body: unknown): Response {
   });
 }
 
+const PUBLIC_DIR = resolve(process.cwd(), 'public');
+
+const CONTENT_TYPES: Record<string, string> = {
+  '.css': 'text/css; charset=utf-8',
+  '.gif': 'image/gif',
+  '.html': 'text/html; charset=utf-8',
+  '.ico': 'image/x-icon',
+  '.jpeg': 'image/jpeg',
+  '.jpg': 'image/jpeg',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.webp': 'image/webp',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+};
+
+function contentTypeForPath(filePath: string): string {
+  return CONTENT_TYPES[extname(filePath).toLowerCase()] ?? 'application/octet-stream';
+}
+
+async function readStaticFile(filePath: string): Promise<Response | null> {
+  try {
+    const file = await readFile(filePath);
+    return new Response(file, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store',
+        'Content-Type': contentTypeForPath(filePath),
+      },
+    });
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+async function serveFrontendAsset(pathname: string): Promise<Response | null> {
+  const normalized = pathname === '/' ? '/index.html' : pathname;
+  const candidatePath = resolve(PUBLIC_DIR, `.${normalized}`);
+  const relativePath = relative(PUBLIC_DIR, candidatePath);
+  if (relativePath.startsWith('..') || relativePath.includes(':')) {
+    return null;
+  }
+
+  const fileResponse = await readStaticFile(candidatePath);
+  if (fileResponse) {
+    return fileResponse;
+  }
+
+  if (normalized === '/index.html' || extname(normalized) === '') {
+    return readStaticFile(resolve(PUBLIC_DIR, 'index.html'));
+  }
+
+  return null;
+}
+
 async function routeRequest(service: TalliService, request: Request): Promise<Response> {
   const url = new URL(request.url);
+
+  if (request.method === 'GET' || request.method === 'HEAD') {
+    if (!url.pathname.startsWith('/api/')) {
+      const staticResponse = await serveFrontendAsset(url.pathname);
+      if (staticResponse) {
+        return staticResponse;
+      }
+    }
+  }
 
   if (request.method === 'GET' && url.pathname === '/api/health') {
     return jsonResponse(200, {

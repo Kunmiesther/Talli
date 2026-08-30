@@ -1,7 +1,8 @@
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { type IncomingMessage, type Server, createServer } from 'node:http';
-import { extname, relative, resolve } from 'node:path';
-import { URL } from 'node:url';
+import { dirname, extname, relative, resolve } from 'node:path';
+import { URL, fileURLToPath } from 'node:url';
 import type { TalliMessageInput, TalliService } from './talli-service.js';
 
 export interface TalliApiResponse<T = unknown> {
@@ -27,7 +28,26 @@ function jsonResponse(status: number, body: unknown): Response {
   });
 }
 
-const PUBLIC_DIR = resolve(process.cwd(), 'public');
+function findProjectRoot(startDir: string): string {
+  let currentDir = startDir;
+  while (true) {
+    if (
+      existsSync(resolve(currentDir, 'package.json')) &&
+      existsSync(resolve(currentDir, 'public', 'index.html'))
+    ) {
+      return currentDir;
+    }
+
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) {
+      return process.cwd();
+    }
+    currentDir = parentDir;
+  }
+}
+
+const MODULE_DIR = dirname(fileURLToPath(import.meta.url));
+const PUBLIC_DIR = resolve(findProjectRoot(MODULE_DIR), 'public');
 
 const CONTENT_TYPES: Record<string, string> = {
   '.css': 'text/css; charset=utf-8',

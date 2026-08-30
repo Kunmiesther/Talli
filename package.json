@@ -8,6 +8,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "lint": "biome check .",
+    "start": "node dist/src/app/server.js",
     "benchmark": "tsx src/benchmark/run.ts",
     "smoke:contract": "tsx src/benchmark/contract-smoke.ts",
     "smoke:resolution": "tsx src/benchmark/resolution-smoke.ts",

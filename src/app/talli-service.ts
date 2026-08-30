@@ -14,12 +14,13 @@ import { AdvancedInterpreter, type AdvancedInterpreterInput } from '../interpret
 import { compileLedgerIntent } from '../llm/intent-compiler.js';
 import { createConfiguredStructuredActionModel } from '../llm/structured-action-model.js';
 import { parseExplicitLedgerIntent } from './explicit-intent.js';
-import {
-  type ConversationTurnRecord,
-  type LoadedSession,
-  type PendingClarificationState,
-  type SessionState,
-  TalliSessionStore,
+import type { TalliStorageBackend } from './storage-contract.js';
+import { createConfiguredTalliStore } from './storage-factory.js';
+import type {
+  ConversationTurnRecord,
+  LoadedSession,
+  PendingClarificationState,
+  SessionState,
 } from './storage.js';
 
 export interface TalliMessageInput {
@@ -73,7 +74,7 @@ export interface TalliMessageResponse {
 
 export interface TalliServiceOptions {
   interpreter?: ActionInterpreter | null;
-  store?: TalliSessionStore;
+  store?: TalliStorageBackend;
   defaultSessionId?: string;
 }
 
@@ -374,12 +375,12 @@ function findResultObligation(
 }
 
 export class TalliService {
-  readonly store: TalliSessionStore;
+  readonly store: TalliStorageBackend;
   readonly interpreter: ActionInterpreter | null;
 
   constructor(options: TalliServiceOptions = {}) {
     this.store =
-      options.store ?? new TalliSessionStore({ defaultSessionId: options.defaultSessionId });
+      options.store ?? createConfiguredTalliStore({ defaultSessionId: options.defaultSessionId });
     this.interpreter =
       options.interpreter !== undefined ? options.interpreter : this.createDefaultInterpreter();
   }
@@ -394,6 +395,46 @@ export class TalliService {
 
   async loadSession(sessionId?: string): Promise<LoadedSession> {
     return this.store.load(sessionId);
+  }
+
+  async getCurrentUser(sessionId?: string) {
+    const activeSessionId = sessionId ?? this.store.defaultSessionId;
+    const [identity, loaded] = await Promise.all([
+      this.store.getUserIdentity(activeSessionId),
+      this.store.load(activeSessionId),
+    ]);
+    return {
+      userId: loaded.state.userId ?? activeSessionId,
+      sessionId: activeSessionId,
+      telegramUserId: identity.telegramUserId,
+      telegramUsername: identity.telegramUsername,
+      preferredCurrency: loaded.state.preferredCurrency ?? loaded.state.ledgerCurrency,
+      ledgerCurrency: loaded.document.currency,
+      connected: identity.telegramUserId !== null,
+    };
+  }
+
+  async createTelegramLinkToken(sessionId?: string, ttlMs?: number) {
+    return this.store.createTelegramLinkToken({
+      sessionId,
+      ttlMs,
+    });
+  }
+
+  async consumeTelegramLinkToken(input: {
+    token: string;
+    telegramUserId: string;
+    telegramUsername?: string | null;
+  }) {
+    return this.store.consumeTelegramLinkToken(input);
+  }
+
+  async getTelegramLinkToken(token: string) {
+    return this.store.getTelegramLinkToken(token);
+  }
+
+  async setPreferredCurrency(sessionId: string, currency: string): Promise<void> {
+    await this.store.setPreferredCurrency(sessionId, currency);
   }
 
   async getLedger(sessionId?: string): Promise<LedgerSnapshot> {
@@ -521,6 +562,12 @@ export class TalliService {
     }
 
     if (directParse) {
+      const adoptedExplicitCurrency =
+        directParse.explicitCurrency !== undefined &&
+        workingDocument.currency !== directParse.explicitCurrency &&
+        snapshotBefore.customers.length === 0 &&
+        snapshotBefore.obligations.length === 0 &&
+        workingDocument.events.length === 0;
       const compiled = compileLedgerIntent({
         intent: directParse.intent,
         utterance: input.text,
@@ -549,6 +596,9 @@ export class TalliService {
         result,
         sessionId,
       });
+      if (adoptedExplicitCurrency && directParse.explicitCurrency) {
+        nextState.preferredCurrency = directParse.explicitCurrency;
+      }
 
       const appendedEvents = result.document.events.slice(workingDocument.events.length);
       await this.store.appendEvents(loaded.ledgerPath, appendedEvents);
@@ -762,6 +812,7 @@ export class TalliService {
     return {
       ...state,
       ledgerCurrency: input.result.snapshot.currency,
+      preferredCurrency: input.result.snapshot.currency,
       updatedAt: new Date().toISOString(),
       recentTurns,
       pendingClarification: clarification,

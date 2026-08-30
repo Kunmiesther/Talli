@@ -1,4 +1,4 @@
-const SESSION_ID = 'default';
+const DEMO_SESSION_ID = 'default';
 const TIMEZONE = 'Africa/Lagos';
 const STORAGE_KEYS = {
   conversation: 'talli:conversation',
@@ -40,6 +40,15 @@ const state = {
   listening: false,
   health: null,
   ledger: null,
+  account: {
+    connected: false,
+    userId: null,
+    telegramUsername: null,
+    preferredCurrency: 'NGN',
+    linkToken: null,
+    linkTokenStatus: 'idle',
+    deepLink: null,
+  },
   customerDetails: new Map(),
   selectedCustomerId: loadStoredJson(STORAGE_KEYS.selectedCustomer, null),
   conversation: loadStoredJson(STORAGE_KEYS.conversation, []),
@@ -141,6 +150,18 @@ function formatLongDate(value) {
 
 function detectLanguage(text) {
   return /\b(don|wey|na|carry|dey|dem|im|una|fit|oo|eh|sha)\b/i.test(text) ? 'pcm' : 'en';
+}
+
+function isConnectedAccount() {
+  return Boolean(state.account?.connected);
+}
+
+function sessionQuerySuffix() {
+  return isConnectedAccount() ? '' : `?sessionId=${encodeURIComponent(DEMO_SESSION_ID)}`;
+}
+
+function ledgerPathSuffix() {
+  return sessionQuerySuffix();
 }
 
 function statusLabel(status) {
@@ -766,6 +787,34 @@ function renderNotice() {
   dom.workspaceNote.textContent = state.notice || DEFAULT_WORKSPACE_NOTE;
 }
 
+function renderAccountCard() {
+  if (!dom.accountStatus || !dom.connectTelegramButton || !dom.telegramLink) {
+    return;
+  }
+
+  if (state.account.connected) {
+    const username = state.account.telegramUsername
+      ? `@${state.account.telegramUsername}`
+      : 'Telegram';
+    dom.accountStatus.textContent = `Connected to Telegram as ${username}.`;
+    dom.connectTelegramButton.hidden = true;
+    dom.telegramLink.hidden = true;
+  } else {
+    dom.accountStatus.textContent =
+      'Connect Telegram to keep the same ledger in chat and on the web.';
+    dom.connectTelegramButton.hidden = false;
+    dom.connectTelegramButton.textContent =
+      state.account.linkTokenStatus === 'pending' ? 'Waiting for Telegram...' : 'Connect Telegram';
+    if (state.account.deepLink) {
+      dom.telegramLink.hidden = false;
+      dom.telegramLink.href = state.account.deepLink;
+      dom.telegramLink.textContent = 'Open Telegram';
+    } else {
+      dom.telegramLink.hidden = true;
+    }
+  }
+}
+
 function renderAll() {
   renderMetrics();
   renderCustomerList();
@@ -774,6 +823,12 @@ function renderAll() {
   renderCustomerDetail();
   renderComposerState();
   renderNotice();
+  renderAccountCard();
+  if (dom.currencySelect) {
+    dom.currencySelect.value = state.account.connected
+      ? state.account.preferredCurrency || state.ledger?.currency || 'NGN'
+      : state.ledger?.currency || 'NGN';
+  }
   saveStoredJson(STORAGE_KEYS.conversation, state.conversation);
   saveStoredJson(STORAGE_KEYS.selectedCustomer, state.selectedCustomerId);
 }
@@ -790,6 +845,7 @@ function clearNotice() {
 
 async function apiRequest(path, options = {}) {
   const response = await fetch(path, {
+    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
       ...(options.headers ?? {}),
@@ -820,27 +876,46 @@ const api = {
   async health() {
     return apiRequest('/api/health');
   },
+  async me() {
+    return apiRequest('/api/me');
+  },
   async ledger() {
-    return apiRequest(`/api/ledger?sessionId=${encodeURIComponent(SESSION_ID)}`);
+    return apiRequest(`/api/ledger${ledgerPathSuffix()}`);
   },
   async customers() {
-    return apiRequest(`/api/customers?sessionId=${encodeURIComponent(SESSION_ID)}`);
+    return apiRequest(`/api/customers${ledgerPathSuffix()}`);
   },
   async customer(customerId) {
-    return apiRequest(
-      `/api/customers/${encodeURIComponent(customerId)}?sessionId=${encodeURIComponent(SESSION_ID)}`,
-    );
+    return apiRequest(`/api/customers/${encodeURIComponent(customerId)}${ledgerPathSuffix()}`);
+  },
+  async createTelegramLink() {
+    return apiRequest('/api/auth/telegram/link-token', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  },
+  async linkStatus(token) {
+    return apiRequest(`/api/auth/telegram/link-status?token=${encodeURIComponent(token)}`);
+  },
+  async setCurrency(currency) {
+    return apiRequest('/api/preferences/currency', {
+      method: 'POST',
+      body: JSON.stringify({ currency }),
+    });
   },
   async message(text) {
+    const body = {
+      text,
+      referenceTime: new Date().toISOString(),
+      timezone: TIMEZONE,
+      language: detectLanguage(text),
+    };
+    if (!isConnectedAccount()) {
+      body.sessionId = DEMO_SESSION_ID;
+    }
     return apiRequest('/api/message', {
       method: 'POST',
-      body: JSON.stringify({
-        text,
-        sessionId: SESSION_ID,
-        referenceTime: new Date().toISOString(),
-        timezone: TIMEZONE,
-        language: detectLanguage(text),
-      }),
+      body: JSON.stringify(body),
     });
   },
 };
@@ -851,6 +926,17 @@ async function loadDashboard() {
   renderAll();
 
   try {
+    const me = await api.me();
+    state.account = {
+      connected: Boolean(me.connected),
+      userId: me.userId ?? null,
+      telegramUsername: me.telegramUsername ?? null,
+      preferredCurrency: me.preferredCurrency ?? 'NGN',
+      linkToken: null,
+      linkTokenStatus: 'idle',
+      deepLink: null,
+    };
+
     const health = await api.health();
     state.health = health;
 
@@ -875,6 +961,10 @@ async function loadDashboard() {
       if (state.clarification) {
         state.transcriptPreview = '';
       }
+    }
+
+    if (dom.currencySelect) {
+      dom.currencySelect.value = state.account.preferredCurrency || ledger.currency || 'NGN';
     }
   } catch (error) {
     state.health = null;
@@ -1012,7 +1102,7 @@ async function submitComposer() {
           ledgerChange: null,
           clarification: null,
           turnId: null,
-          sessionId: SESSION_ID,
+          sessionId: DEMO_SESSION_ID,
           errorCode: 'SAFE_FAILURE',
           modelAvailable: Boolean(state.health?.modelAvailable),
         },
@@ -1032,10 +1122,81 @@ async function submitComposer() {
 async function refreshLedgerData() {
   const ledger = await api.ledger();
   state.ledger = ledger;
+  if (!state.account.connected && dom.currencySelect) {
+    dom.currencySelect.value = ledger.currency ?? 'NGN';
+  }
   await loadCustomerDetails(ledger.customers);
   if (state.selectedCustomerId) {
     await ensureCustomerDetail(state.selectedCustomerId);
   }
+}
+
+async function connectTelegram() {
+  if (state.account.connected || state.account.linkTokenStatus === 'pending') {
+    return;
+  }
+
+  state.account.linkTokenStatus = 'pending';
+  state.account.deepLink = null;
+  renderAll();
+
+  try {
+    const response = await api.createTelegramLink();
+    state.account.linkToken = response.linkToken;
+    state.account.deepLink = response.deepLink;
+    renderAll();
+
+    const deadline = Date.now() + 2 * 60 * 1000;
+    while (Date.now() < deadline) {
+      const status = await api.linkStatus(response.linkToken);
+      if (status.connected) {
+        state.account.connected = true;
+        state.account.userId = status.userId ?? state.account.userId;
+        state.account.linkTokenStatus = 'connected';
+        state.account.preferredCurrency =
+          status.preferredCurrency || state.account.preferredCurrency;
+        state.account.deepLink = null;
+        setNotice('Telegram connected.');
+        await loadDashboard();
+        return;
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 1500));
+    }
+
+    state.account.linkTokenStatus = 'idle';
+    setNotice('Telegram link expired. Generate a fresh link and try again.');
+  } catch (error) {
+    console.error(error);
+    state.account.linkTokenStatus = 'idle';
+    state.account.deepLink = null;
+    setNotice('Talli could not create a Telegram link right now.');
+  } finally {
+    renderAll();
+  }
+}
+
+async function updateCurrencyPreference() {
+  const select = dom.currencySelect;
+  if (!select) {
+    return;
+  }
+
+  const currency = select.value.trim().toUpperCase();
+  if (!currency) {
+    return;
+  }
+
+  state.account.preferredCurrency = currency;
+  if (state.account.connected) {
+    await api.setCurrency(currency);
+    await refreshLedgerData();
+    setNotice(`Ledger currency set to ${currency}.`);
+  } else {
+    await api.setCurrency(currency);
+    await refreshLedgerData();
+    setNotice(`Demo ledger currency set to ${currency}.`);
+  }
+  renderAll();
 }
 
 function clearRecognitionBuffer() {
@@ -1177,6 +1338,12 @@ function bindEvents() {
 
   dom.micToggle.addEventListener('click', toggleRecognition);
   dom.clearComposer.addEventListener('click', clearComposer);
+  dom.connectTelegramButton?.addEventListener('click', () => {
+    void connectTelegram();
+  });
+  dom.currencySelect?.addEventListener('change', () => {
+    void updateCurrencyPreference();
+  });
   dom.composerForm.addEventListener('submit', (event) => {
     event.preventDefault();
     void submitComposer();
@@ -1227,6 +1394,10 @@ function cacheDom() {
   dom.customerDetail = document.querySelector('[data-role="customer-detail"]');
   dom.detailTitle = document.querySelector('[data-role="detail-title"]');
   dom.detailStatus = document.querySelector('[data-role="detail-status"]');
+  dom.accountStatus = document.querySelector('[data-role="account-status"]');
+  dom.connectTelegramButton = document.querySelector('[data-role="connect-telegram-button"]');
+  dom.telegramLink = document.querySelector('[data-role="telegram-link"]');
+  dom.currencySelect = document.querySelector('[data-role="currency-select"]');
   dom.clarificationPanel = document.querySelector('[data-role="clarification-panel"]');
   dom.clarificationTitle = document.querySelector('[data-role="clarification-title"]');
   dom.clarificationQuestion = document.querySelector('[data-role="clarification-question"]');

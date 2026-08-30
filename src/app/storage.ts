@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { type LedgerDocument, type LedgerEvent, createLedgerDocument } from '../domain/ledger.js';
@@ -37,14 +38,49 @@ export interface ConversationTurnRecord {
 export interface SessionState {
   version: 1;
   sessionId: string;
+  userId: string;
   ledgerId: string;
   ledgerCurrency: string;
+  preferredCurrency: string;
   createdAt: string;
   updatedAt: string;
   timezone: string;
   recentTurns: ConversationTurnRecord[];
   pendingClarification: PendingClarificationState | null;
   demoSeededAt: string | null;
+}
+
+export interface TelegramLinkRecord {
+  userId: string;
+  telegramUserId: string;
+  telegramUsername: string | null;
+  linkedAt: string | null;
+}
+
+export interface LinkTokenRecord {
+  token: string;
+  userId: string;
+  createdAt: string;
+  expiresAt: string;
+  consumedAt: string | null;
+  telegramUserId: string | null;
+  telegramUsername: string | null;
+  webSessionToken: string | null;
+}
+
+export interface WebSessionRecord {
+  token: string;
+  userId: string;
+  createdAt: string;
+  expiresAt: string;
+  revokedAt: string | null;
+}
+
+export interface AuthState {
+  version: 1;
+  telegramLinks: Record<string, TelegramLinkRecord>;
+  linkTokens: Record<string, LinkTokenRecord>;
+  webSessions: Record<string, WebSessionRecord>;
 }
 
 export interface LoadedSession {
@@ -58,6 +94,7 @@ export interface TalliStorageOptions {
   dataDir?: string;
   ledgerFile?: string;
   stateFile?: string;
+  authFile?: string;
   defaultSessionId?: string;
   timezone?: string;
   turnHistoryLimit?: number;
@@ -109,14 +146,25 @@ function defaultState(sessionId: string, timezone: string): SessionState {
   return {
     version: 1,
     sessionId,
+    userId: sessionId,
     ledgerId: sessionId,
     ledgerCurrency: 'NGN',
+    preferredCurrency: 'NGN',
     createdAt: now,
     updatedAt: now,
     timezone,
     recentTurns: [],
     pendingClarification: null,
     demoSeededAt: null,
+  };
+}
+
+function defaultAuthState(): AuthState {
+  return {
+    version: 1,
+    telegramLinks: {},
+    linkTokens: {},
+    webSessions: {},
   };
 }
 
@@ -169,6 +217,7 @@ export class TalliSessionStore {
   readonly turnHistoryLimit: number;
   private readonly configuredLedgerFile?: string;
   private readonly configuredStateFile?: string;
+  private readonly configuredAuthFile?: string;
 
   constructor(options: TalliStorageOptions = {}) {
     this.dataDir = resolveDataDir(options);
@@ -177,6 +226,7 @@ export class TalliSessionStore {
     this.turnHistoryLimit = options.turnHistoryLimit ?? DEFAULT_TURN_HISTORY_LIMIT;
     this.configuredLedgerFile = envValue(process.env.TALLI_LEDGER_FILE) ?? options.ledgerFile;
     this.configuredStateFile = envValue(process.env.TALLI_STATE_FILE) ?? options.stateFile;
+    this.configuredAuthFile = envValue(process.env.TALLI_AUTH_FILE) ?? options.authFile;
   }
 
   resolveSessionPaths(sessionId = this.defaultSessionId): {
@@ -204,6 +254,39 @@ export class TalliSessionStore {
     };
   }
 
+  resolveAuthPath(): string {
+    if (this.configuredAuthFile) {
+      return this.configuredAuthFile;
+    }
+    if (this.configuredLedgerFile) {
+      return `${this.configuredLedgerFile}.auth.json`.replace(
+        /\.ndjson\.auth\.json$/,
+        '.auth.json',
+      );
+    }
+    return join(this.dataDir, 'auth.json');
+  }
+
+  private async loadAuthState(): Promise<AuthState> {
+    return (await readJsonFile<AuthState>(this.resolveAuthPath())) ?? defaultAuthState();
+  }
+
+  private async saveAuthState(state: AuthState): Promise<void> {
+    await writeJsonAtomic(this.resolveAuthPath(), state);
+  }
+
+  private ensureStateIdentity(state: SessionState, sessionId: string): SessionState {
+    return {
+      ...state,
+      sessionId,
+      userId: state.userId ?? sessionId,
+      ledgerId: state.ledgerId || sessionId,
+      ledgerCurrency: state.ledgerCurrency ?? state.preferredCurrency ?? 'NGN',
+      preferredCurrency: state.preferredCurrency ?? state.ledgerCurrency ?? 'NGN',
+      timezone: state.timezone || this.timezone,
+    };
+  }
+
   async load(sessionId = this.defaultSessionId): Promise<LoadedSession> {
     const { ledgerPath, statePath, sessionDir } = this.resolveSessionPaths(sessionId);
     await mkdir(sessionDir, { recursive: true });
@@ -218,12 +301,7 @@ export class TalliSessionStore {
 
     return {
       document,
-      state: {
-        ...state,
-        sessionId,
-        ledgerId: state.ledgerId || sessionId,
-        timezone: state.timezone || this.timezone,
-      },
+      state: this.ensureStateIdentity(state, sessionId),
       ledgerPath,
       statePath,
     };
@@ -284,7 +362,7 @@ export class TalliSessionStore {
     await rm(sessionDir, { recursive: true, force: true });
     await mkdir(sessionDir, { recursive: true });
     const state = defaultState(sessionId, this.timezone);
-    const document = createLedgerDocument(state.ledgerId);
+    const document = createLedgerDocument(state.ledgerId, state.ledgerCurrency);
     await this.save({ document, state, ledgerPath, statePath });
   }
 
@@ -302,9 +380,15 @@ export class TalliSessionStore {
       ...baseState,
       ...seed.state,
       sessionId,
+      userId: seed.state?.userId ?? baseState.userId,
       ledgerId: seed.state?.ledgerId ?? seed.document.id,
       ledgerCurrency:
         seed.state?.ledgerCurrency ?? seed.document.currency ?? baseState.ledgerCurrency,
+      preferredCurrency:
+        seed.state?.preferredCurrency ??
+        seed.state?.ledgerCurrency ??
+        seed.document.currency ??
+        baseState.preferredCurrency,
       createdAt: seed.state?.createdAt ?? baseState.createdAt,
       updatedAt: new Date().toISOString(),
       recentTurns: seed.state?.recentTurns ?? [],
@@ -336,6 +420,136 @@ export class TalliSessionStore {
   async clear(sessionId = this.defaultSessionId): Promise<void> {
     const { sessionDir } = this.resolveSessionPaths(sessionId);
     await rm(sessionDir, { recursive: true, force: true });
+  }
+
+  async getTelegramLink(telegramUserId: string): Promise<TelegramLinkRecord | null> {
+    const auth = await this.loadAuthState();
+    return auth.telegramLinks[telegramUserId] ?? null;
+  }
+
+  async createTelegramLinkToken(
+    options: {
+      sessionId?: string;
+      ttlMs?: number;
+    } = {},
+  ): Promise<LinkTokenRecord> {
+    const auth = await this.loadAuthState();
+    const now = Date.now();
+    const sessionId = options.sessionId ?? randomUUID();
+    const token = `link_${randomUUID().replace(/-/g, '')}`;
+    const record: LinkTokenRecord = {
+      token,
+      userId: sessionId,
+      createdAt: new Date(now).toISOString(),
+      expiresAt: new Date(now + (options.ttlMs ?? 10 * 60 * 1000)).toISOString(),
+      consumedAt: null,
+      telegramUserId: null,
+      telegramUsername: null,
+      webSessionToken: null,
+    };
+    auth.linkTokens[token] = record;
+    await this.saveAuthState(auth);
+    return record;
+  }
+
+  async getTelegramLinkToken(token: string): Promise<LinkTokenRecord | null> {
+    const auth = await this.loadAuthState();
+    return auth.linkTokens[token] ?? null;
+  }
+
+  async consumeTelegramLinkToken(input: {
+    token: string;
+    telegramUserId: string;
+    telegramUsername?: string | null;
+  }): Promise<{ userId: string; webSessionToken: string } | null> {
+    const auth = await this.loadAuthState();
+    const tokenRecord = auth.linkTokens[input.token];
+    if (!tokenRecord || tokenRecord.consumedAt) {
+      return null;
+    }
+    if (new Date(tokenRecord.expiresAt).getTime() <= Date.now()) {
+      return null;
+    }
+
+    const now = new Date().toISOString();
+    const webSessionToken = `ws_${randomUUID().replace(/-/g, '')}`;
+    auth.linkTokens[input.token] = {
+      ...tokenRecord,
+      consumedAt: now,
+      telegramUserId: input.telegramUserId,
+      telegramUsername: input.telegramUsername ?? null,
+      webSessionToken,
+    };
+    auth.telegramLinks[input.telegramUserId] = {
+      userId: tokenRecord.userId,
+      telegramUserId: input.telegramUserId,
+      telegramUsername: input.telegramUsername ?? null,
+      linkedAt: now,
+    };
+    auth.webSessions[webSessionToken] = {
+      token: webSessionToken,
+      userId: tokenRecord.userId,
+      createdAt: now,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      revokedAt: null,
+    };
+    await this.saveAuthState(auth);
+    return {
+      userId: tokenRecord.userId,
+      webSessionToken,
+    };
+  }
+
+  async resolveWebSession(webSessionToken: string): Promise<string | null> {
+    const auth = await this.loadAuthState();
+    const session = auth.webSessions[webSessionToken];
+    if (!session || session.revokedAt) {
+      return null;
+    }
+    if (new Date(session.expiresAt).getTime() <= Date.now()) {
+      return null;
+    }
+    return session.userId;
+  }
+
+  async getWebSession(webSessionToken: string): Promise<WebSessionRecord | null> {
+    const auth = await this.loadAuthState();
+    return auth.webSessions[webSessionToken] ?? null;
+  }
+
+  async getUserIdentity(sessionId: string): Promise<{
+    userId: string;
+    telegramUserId: string | null;
+    telegramUsername: string | null;
+  }> {
+    const auth = await this.loadAuthState();
+    const link =
+      Object.values(auth.telegramLinks).find((entry) => entry.userId === sessionId) ?? null;
+    return {
+      userId: sessionId,
+      telegramUserId: link?.telegramUserId ?? null,
+      telegramUsername: link?.telegramUsername ?? null,
+    };
+  }
+
+  async setPreferredCurrency(sessionId: string, currency: string): Promise<void> {
+    const loaded = await this.load(sessionId);
+    const nextState: SessionState = {
+      ...loaded.state,
+      ledgerCurrency: currency,
+      preferredCurrency: currency,
+      updatedAt: new Date().toISOString(),
+    };
+    const nextDocument = {
+      ...loaded.document,
+      currency,
+    };
+    await this.save({
+      document: nextDocument,
+      state: nextState,
+      ledgerPath: loaded.ledgerPath,
+      statePath: loaded.statePath,
+    });
   }
 }
 

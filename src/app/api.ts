@@ -28,6 +28,74 @@ function jsonResponse(status: number, body: unknown): Response {
   });
 }
 
+function parseCookies(header: string | null): Map<string, string> {
+  const cookies = new Map<string, string>();
+  if (!header) {
+    return cookies;
+  }
+  for (const part of header.split(';')) {
+    const [rawKey, ...rawValueParts] = part.trim().split('=');
+    if (!rawKey || rawValueParts.length === 0) {
+      continue;
+    }
+    cookies.set(rawKey, decodeURIComponent(rawValueParts.join('=')));
+  }
+  return cookies;
+}
+
+function serializeCookie(options: {
+  name: string;
+  value: string;
+  httpOnly?: boolean;
+  sameSite?: 'Lax' | 'Strict' | 'None';
+  secure?: boolean;
+  maxAgeSeconds?: number;
+  path?: string;
+}): string {
+  const parts = [`${options.name}=${encodeURIComponent(options.value)}`];
+  parts.push(`Path=${options.path ?? '/'}`);
+  if (options.maxAgeSeconds !== undefined) {
+    parts.push(`Max-Age=${Math.max(0, Math.trunc(options.maxAgeSeconds))}`);
+  }
+  if (options.httpOnly !== false) {
+    parts.push('HttpOnly');
+  }
+  if (options.sameSite) {
+    parts.push(`SameSite=${options.sameSite}`);
+  }
+  if (options.secure) {
+    parts.push('Secure');
+  }
+  return parts.join('; ');
+}
+
+function isSecureRequest(request: Request): boolean {
+  const forwardedProto = request.headers.get('x-forwarded-proto');
+  if (forwardedProto?.toLowerCase() === 'https') {
+    return true;
+  }
+  return new URL(request.url).protocol === 'https:';
+}
+
+async function resolveSessionId(service: TalliService, request: Request): Promise<string> {
+  const url = new URL(request.url);
+  const querySessionId = url.searchParams.get('sessionId') ?? null;
+  if (querySessionId) {
+    return querySessionId;
+  }
+
+  const cookies = parseCookies(request.headers.get('cookie'));
+  const webSessionToken = cookies.get('talli_session');
+  if (webSessionToken) {
+    const resolved = await service.store.resolveWebSession(webSessionToken);
+    if (resolved) {
+      return resolved;
+    }
+  }
+
+  return service.store.defaultSessionId;
+}
+
 function findProjectRoot(startDir: string): string {
   let currentDir = startDir;
   while (true) {
@@ -128,21 +196,107 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
     });
   }
 
+  if (request.method === 'GET' && url.pathname === '/api/me') {
+    const sessionId = await resolveSessionId(service, request);
+    const current = await service.getCurrentUser(sessionId);
+    return jsonResponse(200, {
+      ok: true,
+      connected: current.connected,
+      userId: current.userId,
+      telegramUserId: current.telegramUserId,
+      telegramUsername: current.telegramUsername,
+      preferredCurrency: current.preferredCurrency,
+      ledgerCurrency: current.ledgerCurrency,
+      sessionId: current.sessionId,
+    });
+  }
+
   if (request.method === 'GET' && url.pathname === '/api/ledger') {
-    const sessionId = url.searchParams.get('sessionId') ?? undefined;
+    const sessionId = await resolveSessionId(service, request);
     return jsonResponse(200, await service.getLedger(sessionId));
   }
 
   if (request.method === 'GET' && url.pathname === '/api/customers') {
-    const sessionId = url.searchParams.get('sessionId') ?? undefined;
+    const sessionId = await resolveSessionId(service, request);
     const ledger = await service.getLedger(sessionId);
     return jsonResponse(200, ledger.customers);
   }
 
   if (request.method === 'GET' && url.pathname.startsWith('/api/customers/')) {
     const customerId = decodeURIComponent(url.pathname.slice('/api/customers/'.length));
-    const sessionId = url.searchParams.get('sessionId') ?? undefined;
+    const sessionId = await resolveSessionId(service, request);
     return jsonResponse(200, await service.getCustomerHistory(customerId, sessionId));
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/preferences/currency') {
+    const body = (await readJsonBody(request)) as { currency?: string };
+    const sessionId = await resolveSessionId(service, request);
+    if (typeof body.currency !== 'string' || !body.currency.trim()) {
+      return jsonResponse(400, {
+        status: 'error',
+        message: 'A currency code is required.',
+        errorCode: 'BAD_REQUEST',
+      });
+    }
+    await service.setPreferredCurrency(sessionId, body.currency.trim().toUpperCase());
+    return jsonResponse(200, {
+      ok: true,
+      sessionId,
+      preferredCurrency: body.currency.trim().toUpperCase(),
+    });
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/auth/telegram/link-token') {
+    const token = await service.createTelegramLinkToken();
+    const botUsername = process.env.TELEGRAM_BOT_USERNAME?.trim();
+    const deepLink = botUsername
+      ? `https://t.me/${botUsername}?start=link_${token.token}`
+      : `https://t.me/?start=link_${token.token}`;
+    return jsonResponse(200, {
+      ok: true,
+      linkToken: token.token,
+      expiresAt: token.expiresAt,
+      deepLink,
+    });
+  }
+
+  if (request.method === 'GET' && url.pathname === '/api/auth/telegram/link-status') {
+    const token = url.searchParams.get('token');
+    if (!token) {
+      return jsonResponse(400, {
+        ok: false,
+        status: 'missing_token',
+      });
+    }
+    const linkToken = await service.getTelegramLinkToken(token);
+    if (!linkToken) {
+      return jsonResponse(404, {
+        ok: false,
+        status: 'not_found',
+      });
+    }
+    const connected = Boolean(linkToken.consumedAt && linkToken.webSessionToken);
+    const response = jsonResponse(200, {
+      ok: true,
+      status: connected ? 'connected' : 'pending',
+      connected,
+      userId: linkToken.userId,
+      expiresAt: linkToken.expiresAt,
+    });
+    if (connected && linkToken.webSessionToken) {
+      response.headers.set(
+        'Set-Cookie',
+        serializeCookie({
+          name: 'talli_session',
+          value: linkToken.webSessionToken,
+          httpOnly: true,
+          sameSite: 'Lax',
+          secure: isSecureRequest(request),
+          maxAgeSeconds: 30 * 24 * 60 * 60,
+        }),
+      );
+    }
+    return response;
   }
 
   if (request.method === 'POST' && url.pathname === '/api/demo/reset') {
@@ -185,7 +339,11 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
       });
     }
 
-    const response = await service.processMessage(body);
+    const sessionId = body.sessionId ?? (await resolveSessionId(service, request));
+    const response = await service.processMessage({
+      ...body,
+      sessionId,
+    });
     return jsonResponse(200, response);
   }
 

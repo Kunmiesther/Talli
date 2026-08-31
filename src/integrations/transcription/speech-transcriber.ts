@@ -21,6 +21,8 @@ export interface SpeechTranscriberOptions {
 }
 
 const DEFAULT_BASE_URL = 'https://api.openai.com/v1';
+const DEFAULT_OPENAI_TRANSCRIPTION_MODEL = 'whisper-1';
+const DEFAULT_GROQ_TRANSCRIPTION_MODEL = 'whisper-large-v3-turbo';
 const DEFAULT_MAX_FILE_BYTES = 20 * 1024 * 1024;
 const DEFAULT_TIMEOUT_MS = 60_000;
 
@@ -70,6 +72,50 @@ function loadLocalEnvFallback(): void {
   }
 }
 
+function normalizeBaseUrl(value: string | undefined): string | undefined {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  const normalized = value.trim().replace(/\/+$/, '');
+  return normalized || undefined;
+}
+
+function baseUrlMatchesHost(baseUrl: string, hostname: string): boolean {
+  try {
+    return new URL(baseUrl).hostname === hostname;
+  } catch {
+    return baseUrl.toLowerCase().includes(hostname.toLowerCase());
+  }
+}
+
+function isGroqBaseUrl(baseUrl: string): boolean {
+  return baseUrlMatchesHost(baseUrl, 'api.groq.com');
+}
+
+function isOpenAIBaseUrl(baseUrl: string): boolean {
+  return baseUrlMatchesHost(baseUrl, 'api.openai.com');
+}
+
+export function resolveConfiguredTranscriptionModel(options: {
+  baseUrl: string;
+  explicitModel?: string;
+}): string {
+  if (options.explicitModel) {
+    return options.explicitModel;
+  }
+
+  if (isGroqBaseUrl(options.baseUrl)) {
+    return DEFAULT_GROQ_TRANSCRIPTION_MODEL;
+  }
+
+  if (options.baseUrl === DEFAULT_BASE_URL || isOpenAIBaseUrl(options.baseUrl)) {
+    return DEFAULT_OPENAI_TRANSCRIPTION_MODEL;
+  }
+
+  throw new Error('TRANSCRIPTION_MODEL is required for this transcription base URL.');
+}
+
 async function withTimeout<T>(
   promise: Promise<T>,
   timeoutMs: number,
@@ -104,7 +150,7 @@ export class OpenAICompatibleSpeechTranscriber implements SpeechTranscriber {
   constructor(options: SpeechTranscriberOptions) {
     this.apiKey = options.apiKey;
     this.model = options.model;
-    this.baseUrl = (options.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
+    this.baseUrl = normalizeBaseUrl(options.baseUrl) ?? DEFAULT_BASE_URL;
     this.maxFileBytes = options.maxFileBytes ?? DEFAULT_MAX_FILE_BYTES;
     this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     this.fetchImpl = options.fetchImpl ?? fetch;
@@ -170,14 +216,18 @@ export function createConfiguredSpeechTranscriber(): SpeechTranscriber | null {
     return null;
   }
 
-  const model =
+  const baseUrl =
+    normalizeBaseUrl(stripWrappingQuotes(process.env.TRANSCRIPTION_BASE_URL?.trim())) ||
+    normalizeBaseUrl(stripWrappingQuotes(process.env.OPENAI_BASE_URL?.trim())) ||
+    DEFAULT_BASE_URL;
+  const explicitModel =
     stripWrappingQuotes(process.env.TRANSCRIPTION_MODEL?.trim()) ||
     stripWrappingQuotes(process.env.OPENAI_TRANSCRIPTION_MODEL?.trim()) ||
-    'whisper-1';
-  const baseUrl =
-    stripWrappingQuotes(process.env.TRANSCRIPTION_BASE_URL?.trim()) ||
-    stripWrappingQuotes(process.env.OPENAI_BASE_URL?.trim()) ||
     undefined;
+  const model = resolveConfiguredTranscriptionModel({
+    baseUrl,
+    explicitModel,
+  });
 
   return new OpenAICompatibleSpeechTranscriber({
     apiKey,

@@ -96,6 +96,14 @@ The real-model modes require credentials:
 - `OPENAI_API_KEY`
 - `OPENAI_MODEL` with `gpt-5` as the default
 - `OPENAI_BASE_URL` for an OpenAI-compatible endpoint override
+- `TRANSCRIPTION_BASE_URL` for voice-note transcription; it can fall back to `OPENAI_BASE_URL`
+- `TRANSCRIPTION_MODEL` for voice-note transcription when you are not using OpenAI or Groq defaults
+
+Voice transcription defaults are provider-aware:
+
+- OpenAI-compatible OpenAI endpoints use `whisper-1`
+- Groq uses `whisper-large-v3-turbo`
+- other OpenAI-compatible endpoints must set `TRANSCRIPTION_MODEL` explicitly
 
 If those values come from `.env`, the loader strips surrounding quotes before creating the provider.
 
@@ -138,6 +146,7 @@ Useful environment variables:
 
 - `TALLI_DATA_DIR` or `TALLI_LEDGER_FILE` to control where the local event store lives.
 - `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_BASE_URL` for live provider-backed interpretation.
+- `TRANSCRIPTION_BASE_URL` and `TRANSCRIPTION_MODEL` for Telegram voice-note transcription.
 - `TALLI_PORT` or `PORT` for the local HTTP API.
 
 The demo and API both use the same text-first runtime path, so typed input and the future voice transcript flow will hit the same message endpoint.

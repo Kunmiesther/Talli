@@ -441,6 +441,10 @@ export class TalliService {
     return this.store.getTelegramLinkToken(token);
   }
 
+  async disconnectTelegram(sessionId: string): Promise<void> {
+    await this.store.disconnectTelegram(sessionId);
+  }
+
   async setPreferredCurrency(sessionId: string, currency: string): Promise<void> {
     await this.store.setPreferredCurrency(sessionId, currency);
   }
@@ -1049,7 +1053,10 @@ export class TalliService {
         const customerName = obligation?.customerName ?? 'That customer';
         const message =
           remaining === 0
-            ? `Recorded ${formatMoney(paidAmount, input.snapshotAfter.currency)} from ${customerName}.`
+            ? `Recorded ${formatMoney(
+                paidAmount,
+                input.snapshotAfter.currency,
+              )} from ${customerName}. ${customerName}'s debt is fully settled.`
             : `Recorded ${formatMoney(
                 paidAmount,
                 input.snapshotAfter.currency,

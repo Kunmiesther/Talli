@@ -427,6 +427,21 @@ export class TalliSessionStore {
     return auth.telegramLinks[telegramUserId] ?? null;
   }
 
+  async disconnectTelegram(sessionId: string): Promise<void> {
+    const auth = await this.loadAuthState();
+    let changed = false;
+    for (const [telegramUserId, record] of Object.entries(auth.telegramLinks)) {
+      if (record.userId !== sessionId) {
+        continue;
+      }
+      delete auth.telegramLinks[telegramUserId];
+      changed = true;
+    }
+    if (changed) {
+      await this.saveAuthState(auth);
+    }
+  }
+
   async createTelegramLinkToken(
     options: {
       sessionId?: string;

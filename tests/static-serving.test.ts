@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
@@ -110,6 +110,48 @@ describe('static frontend serving', () => {
         status: 'error',
         errorCode: 'NOT_FOUND',
       });
+    } finally {
+      process.chdir(originalCwd);
+      vi.resetModules();
+      await rm(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  it('preserves PNG bytes when an asset is served through the real HTTP bridge', async () => {
+    const originalCwd = process.cwd();
+    const tempDir = await mkdtemp(join(tmpdir(), 'talli-static-http-'));
+
+    process.chdir(tempDir);
+    vi.resetModules();
+
+    try {
+      const [{ createTalliHttpServer }, { createTalliService }] = await Promise.all([
+        import('../src/app/api.js'),
+        import('../src/app/talli-service.js'),
+      ]);
+      const service = createTalliService({ interpreter: null });
+      const server = createTalliHttpServer(service, 0);
+
+      await new Promise<void>((resolve, reject) => {
+        server.once('error', reject);
+        server.listen(0, '127.0.0.1', () => resolve());
+      });
+
+      try {
+        const address = server.address();
+        const port = typeof address === 'object' && address ? address.port : 0;
+        const sourcePath = join(originalCwd, 'public', 'assets', 'hero-merchant.png');
+        const sourceBytes = await readFile(sourcePath);
+        const response = await fetch(`http://127.0.0.1:${port}/assets/hero-merchant.png`);
+        const servedBytes = Buffer.from(await response.arrayBuffer());
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('content-type')).toContain('image/png');
+        expect(Array.from(servedBytes.slice(0, 8))).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+        expect(servedBytes.equals(sourceBytes)).toBe(true);
+      } finally {
+        await new Promise<void>((resolve) => server.close(() => resolve()));
+      }
     } finally {
       process.chdir(originalCwd);
       vi.resetModules();

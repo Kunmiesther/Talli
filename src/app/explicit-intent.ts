@@ -7,7 +7,7 @@ export interface ExplicitLedgerIntentResult {
 }
 
 const CUSTOMER_VERB_PATTERN =
-  /^(?:actually|correction|no|wait|sorry|please|uh|um|well|okay|ok|right|so|then|now|i mean|what i meant was|instead of|instead)?\s*(?<customer>[\p{L}][\p{L}'-]*(?:\s+[\p{L}][\p{L}'-]*){0,2})\s+(?<verb>owes|owed|paid|brought|gave|returned|settled|cleared|took|borrowed|bought|collected|will pay|pay|pays)\b/iu;
+  /^(?:actually|correction|no|wait|sorry|please|uh|um|well|okay|ok|right|so|then|now|i mean|what i meant was|instead of|instead)?\s*(?<customer>[\p{L}][\p{L}'-]*(?:\s+(?!has\b|have\b|had\b|is\b|was\b|were\b|am\b|are\b)[\p{L}][\p{L}'-]*){0,2})\s+(?:(?:has|have|had|is|was|were|am|are)\s+)?(?<verb>owes(?:\s+me)?|owed|is\s+owing(?:\s+me)?|owing(?:\s+me)?|paid(?:\s+back|\s+off)?|repaid|brought|gave|returned|settled|cleared|took|borrowed|bought(?:\s+on\s+credit)?|collected|will\s+pay|pay|pays)\b/iu;
 
 const MONEY_PATTERN =
   /(?<symbol>[$\u00A3\u20AC\u20A6])?\s*(?<amount>\d{1,3}(?:,\d{3})*|\d+(?:\.\d+)?)(?:\s*(?<multiplier>k|thousand|m|million))?(?:\s*(?<currency>dollars?|usd|naira|ngn|pounds?|gbp|euros?|eur))?/iu;
@@ -133,11 +133,15 @@ function looksLikeCorrection(text: string): boolean {
 }
 
 function hasPaymentVerb(text: string): boolean {
-  return /\b(paid|brought|gave|returned|sent)\b/i.test(text);
+  return /\b(paid(?:\s+back|\s+off)?|repaid|brought|gave|returned|sent|settled|cleared)\b/i.test(
+    text,
+  );
 }
 
 function hasObligationVerb(text: string): boolean {
-  return /\b(owes|owed|took|borrowed|bought|collected|got)\b/i.test(text);
+  return /\b(owes(?:\s+me)?|owed|is\s+owing(?:\s+me)?|owing(?:\s+me)?|took|borrowed|bought(?:\s+on\s+credit)?|collected|got)\b/i.test(
+    text,
+  );
 }
 
 function buildIntent(

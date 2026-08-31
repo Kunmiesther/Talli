@@ -33,6 +33,7 @@ export interface TalliStorageBackend {
   updateState(sessionId: string, updater: (state: SessionState) => SessionState): Promise<void>;
   clear(sessionId?: string): Promise<void>;
   getTelegramLink(telegramUserId: string): Promise<TelegramLinkRecord | null>;
+  disconnectTelegram(sessionId: string): Promise<void>;
   createTelegramLinkToken(options?: {
     sessionId?: string;
     ttlMs?: number;

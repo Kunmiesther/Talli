@@ -564,5 +564,30 @@
         </div>
       </footer>
     </div>
+
+    <div class="modal-backdrop" hidden data-role="telegram-disconnect-modal" aria-hidden="true">
+      <div
+        class="modal card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="telegram-disconnect-title"
+      >
+        <div class="modal__head">
+          <p class="section-kicker">Telegram</p>
+          <h3 id="telegram-disconnect-title">Disconnect Telegram?</h3>
+        </div>
+        <p data-role="telegram-disconnect-copy">
+          Talli will stop sending updates to this Telegram account. Your ledger will stay intact.
+        </p>
+        <div class="modal__actions">
+          <button class="button button--ghost button--small" type="button" data-role="telegram-disconnect-cancel">
+            Cancel
+          </button>
+          <button class="button button--danger button--small" type="button" data-role="telegram-disconnect-confirm">
+            Disconnect
+          </button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

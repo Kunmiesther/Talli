@@ -395,6 +395,12 @@ export class SupabaseTalliSessionStore implements TalliStorageBackend {
     };
   }
 
+  async disconnectTelegram(sessionId: string): Promise<void> {
+    await this.request(`telegram_links?user_id=eq.${encodeURIComponent(sessionId)}`, {
+      method: 'DELETE',
+    });
+  }
+
   async createTelegramLinkToken(
     options: {
       sessionId?: string;

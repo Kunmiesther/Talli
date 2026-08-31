@@ -6,6 +6,7 @@ import { handleTalliApiRequest } from '../src/app/api.js';
 import { TalliSessionStore } from '../src/app/storage.js';
 import { type TalliServiceOptions, createTalliService } from '../src/app/talli-service.js';
 import { ledgerActionSchema } from '../src/domain/actions.js';
+import { type LedgerEvent, createLedgerDocument } from '../src/domain/ledger.js';
 import { formatMinorUnits, formatNgn, nairaToMinorUnits } from '../src/domain/money.js';
 import type { ActionInterpreter, AdvancedInterpreterInput } from '../src/interpreters.js';
 import type { StructuredActionModelDiagnostics } from '../src/llm/structured-action-model.js';
@@ -94,6 +95,61 @@ async function tempService(
       await rm(dataDir, { recursive: true, force: true });
     },
   };
+}
+
+function createCustomerEvent(input: {
+  id: string;
+  displayName: string;
+  timestamp: string;
+}): LedgerEvent {
+  return {
+    id: `${input.id}:created`,
+    kind: 'customer.created',
+    timestamp: input.timestamp,
+    actor: 'system',
+    customerId: input.id,
+    displayName: input.displayName,
+    aliases: [],
+  };
+}
+
+function createObligationEvent(input: {
+  id: string;
+  customerId: string;
+  amountMinor: number;
+  timestamp: string;
+  dueAt?: string | null;
+}): LedgerEvent {
+  return {
+    id: `${input.id}:created`,
+    kind: 'obligation.created',
+    timestamp: input.timestamp,
+    actor: 'system',
+    customerId: input.customerId,
+    obligationId: input.id,
+    originalAmountMinor: input.amountMinor,
+    dueAt: input.dueAt ?? null,
+  };
+}
+
+function seedManualLedger(
+  runtime: Awaited<ReturnType<typeof tempService>>,
+  events: LedgerEvent[],
+  currency = 'USD',
+) {
+  const document = createLedgerDocument('demo');
+  document.currency = currency;
+  document.events = [...events];
+  return runtime.store.seed(
+    {
+      document,
+      state: {
+        ledgerCurrency: currency,
+        preferredCurrency: currency,
+      },
+    },
+    'demo',
+  );
 }
 
 describe('Talli application runtime', () => {
@@ -389,6 +445,174 @@ describe('Talli application runtime', () => {
     }
   });
 
+  it('settles a full payment when the amount exactly matches the remaining balance', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      await runtime.service.processMessage({
+        text: 'Sarah owes 200 dollars',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      const response = await runtime.service.processMessage({
+        text: 'Sarah has paid back the $200',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(response.status).toBe('applied');
+      expect(response.message.toLowerCase()).toContain('settled');
+
+      const ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations).toHaveLength(1);
+      expect(ledger.obligations[0]?.status).toBe('settled');
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(0);
+      expect(ledger.obligations[0]?.totalPaidMinor).toBe(nairaToMinorUnits(200));
+      expect(ledger.obligations[0]?.paymentEventIds).toHaveLength(1);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('records a partial payment when the payment is smaller than the balance', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      await runtime.service.processMessage({
+        text: 'Sarah owes 200 dollars',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      const response = await runtime.service.processMessage({
+        text: 'Sarah paid $50',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(response.status).toBe('applied');
+      expect(response.message).toContain(formatMinorUnits(15_000, 'USD'));
+
+      const ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.status).toBe('open');
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(150));
+      expect(ledger.obligations[0]?.totalPaidMinor).toBe(nairaToMinorUnits(50));
+      expect(ledger.obligations[0]?.paymentEventIds).toHaveLength(1);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('creates a new obligation from ordinary owing language and stores the due date', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      const response = await runtime.service.processMessage({
+        text: 'James is owing 500 dollars and will pay on Friday',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(response.status).toBe('applied');
+      expect(response.message).toContain('James now owes');
+      expect(response.message).toContain('Due Friday');
+
+      const ledger = await runtime.service.getLedger('demo');
+      expect(ledger.customers).toHaveLength(1);
+      expect(ledger.customers[0]?.displayName).toBe('James');
+      expect(ledger.obligations[0]?.originalAmountMinor).toBe(nairaToMinorUnits(500));
+      expect(ledger.obligations[0]?.dueAt).toBe(
+        new Date('2026-09-04T00:00:00+01:00').toISOString(),
+      );
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('asks for clarification when the customer name is ambiguous', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      await seedManualLedger(runtime, [
+        createCustomerEvent({
+          id: 'customer-sarah-a',
+          displayName: 'Sarah',
+          timestamp: '2026-08-30T08:00:00.000Z',
+        }),
+        createCustomerEvent({
+          id: 'customer-sarah-b',
+          displayName: 'Sarah',
+          timestamp: '2026-08-30T09:00:00.000Z',
+        }),
+      ]);
+
+      const before = await runtime.service.getLedger('demo');
+      const response = await runtime.service.processMessage({
+        text: 'Sarah paid $50',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(response.status).toBe('clarification_required');
+      expect(await runtime.service.getLedger('demo')).toEqual(before);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('asks for clarification when multiple open obligations exist for one customer', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      await seedManualLedger(runtime, [
+        createCustomerEvent({
+          id: 'customer-sarah',
+          displayName: 'Sarah',
+          timestamp: '2026-08-30T08:00:00.000Z',
+        }),
+        createObligationEvent({
+          id: 'obligation-sarah-1',
+          customerId: 'customer-sarah',
+          amountMinor: nairaToMinorUnits(120),
+          timestamp: '2026-08-30T08:30:00.000Z',
+        }),
+        createObligationEvent({
+          id: 'obligation-sarah-2',
+          customerId: 'customer-sarah',
+          amountMinor: nairaToMinorUnits(80),
+          timestamp: '2026-08-30T09:30:00.000Z',
+        }),
+      ]);
+
+      const before = await runtime.service.getLedger('demo');
+      const response = await runtime.service.processMessage({
+        text: 'Sarah paid $50',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(response.status).toBe('clarification_required');
+      expect(await runtime.service.getLedger('demo')).toEqual(before);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
   it('mirrors successful web updates to the linked Telegram chat once', async () => {
     const notifier = new RecordingTelegramNotifier();
     const runtime = await tempService(null, { telegramNotifier: notifier });
@@ -441,6 +665,81 @@ describe('Talli application runtime', () => {
 
       expect(response.status).toBe('applied');
       expect(notifier.messages).toHaveLength(0);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('disconnects a linked Telegram account without changing the ledger', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      await runtime.service.processMessage({
+        text: 'Sarah owes 200 dollars',
+        sessionId: 'demo',
+        referenceTime: '2026-08-31T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+      const before = await runtime.service.getLedger('demo');
+
+      const token = await runtime.service.createTelegramLinkToken('demo');
+      const linked = await runtime.service.consumeTelegramLinkToken({
+        token: token.token,
+        telegramUserId: '444',
+        telegramUsername: 'merchant',
+      });
+      expect(linked).not.toBeNull();
+
+      const cookie = `talli_session=${linked?.webSessionToken ?? ''}`;
+      const connectedMe = await handleTalliApiRequest(
+        runtime.service,
+        new Request('http://localhost/api/me', {
+          headers: {
+            cookie,
+          },
+        }),
+      );
+      expect(await connectedMe.json()).toMatchObject({
+        connected: true,
+        userId: 'demo',
+      });
+
+      const disconnectResponse = await handleTalliApiRequest(
+        runtime.service,
+        new Request('http://localhost/api/auth/telegram/disconnect', {
+          method: 'POST',
+          headers: {
+            cookie,
+          },
+        }),
+      );
+      expect(disconnectResponse.status).toBe(200);
+      expect(await runtime.store.getTelegramLink('444')).toBeNull();
+
+      const disconnectedMe = await handleTalliApiRequest(
+        runtime.service,
+        new Request('http://localhost/api/me', {
+          headers: {
+            cookie,
+          },
+        }),
+      );
+      expect(await disconnectedMe.json()).toMatchObject({
+        connected: false,
+        userId: 'demo',
+      });
+
+      expect(await runtime.service.getLedger('demo')).toEqual(before);
+
+      const relinkToken = await runtime.service.createTelegramLinkToken('demo');
+      const relinked = await runtime.service.consumeTelegramLinkToken({
+        token: relinkToken.token,
+        telegramUserId: '444',
+        telegramUsername: 'merchant',
+      });
+      expect(relinked).not.toBeNull();
+      expect(await runtime.store.getTelegramLink('444')).not.toBeNull();
     } finally {
       await runtime.cleanup();
     }

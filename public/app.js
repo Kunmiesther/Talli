@@ -55,6 +55,7 @@ const state = {
   clarification: null,
   transcriptPreview: '',
   pendingSubmission: null,
+  telegramDisconnectOpen: false,
   voiceSupport: {
     supported: false,
     note: 'Tap the mic and tell Talli what happened.',
@@ -156,6 +157,10 @@ function isConnectedAccount() {
   return Boolean(state.account?.connected);
 }
 
+function activeSessionId() {
+  return state.account.userId ?? DEMO_SESSION_ID;
+}
+
 function telegramConnectionButtons() {
   const buttons = [];
   if (dom.connectTelegramButton) {
@@ -170,7 +175,7 @@ function telegramConnectionButtons() {
 }
 
 function sessionQuerySuffix() {
-  return isConnectedAccount() ? '' : `?sessionId=${encodeURIComponent(DEMO_SESSION_ID)}`;
+  return `?sessionId=${encodeURIComponent(activeSessionId())}`;
 }
 
 function ledgerPathSuffix() {
@@ -832,8 +837,9 @@ function renderAccountCard() {
   for (const button of telegramConnectionButtons()) {
     if (state.account.connected) {
       button.dataset.connectionState = 'connected';
-      button.disabled = true;
-      button.setAttribute('aria-disabled', 'true');
+      button.disabled = false;
+      button.removeAttribute('aria-disabled');
+      button.title = 'Disconnect Telegram';
       button.innerHTML =
         '<i class="fa-solid fa-circle-check"></i><span>Connected to Telegram</span>';
       continue;
@@ -843,6 +849,7 @@ function renderAccountCard() {
       button.dataset.connectionState = 'pending';
       button.disabled = true;
       button.setAttribute('aria-disabled', 'true');
+      button.removeAttribute('title');
       button.innerHTML =
         '<i class="fa-solid fa-spinner fa-spin"></i><span>Opening Telegram...</span>';
       continue;
@@ -851,7 +858,32 @@ function renderAccountCard() {
     button.dataset.connectionState = 'idle';
     button.disabled = false;
     button.removeAttribute('aria-disabled');
+    button.removeAttribute('title');
     button.innerHTML = '<span>Connect Telegram</span>';
+  }
+}
+
+function renderTelegramDisconnectModal() {
+  if (!dom.telegramDisconnectModal) {
+    return;
+  }
+
+  const connected = state.account.connected;
+  const open = connected && state.telegramDisconnectOpen;
+  dom.telegramDisconnectModal.hidden = !open;
+  dom.telegramDisconnectModal.setAttribute('aria-hidden', String(!open));
+
+  if (!open) {
+    return;
+  }
+
+  const username = state.account.telegramUsername?.replace(/^@+/, '').trim();
+  const displayName = username ? `@${username}` : 'this Telegram account';
+  if (dom.telegramDisconnectCopy) {
+    dom.telegramDisconnectCopy.textContent = `Talli will stop sending updates to ${displayName}. Your ledger will stay intact.`;
+  }
+  if (dom.telegramDisconnectConfirm) {
+    dom.telegramDisconnectConfirm.focus();
   }
 }
 
@@ -864,6 +896,7 @@ function renderAll() {
   renderComposerState();
   renderNotice();
   renderAccountCard();
+  renderTelegramDisconnectModal();
   if (dom.currencySelect) {
     dom.currencySelect.value = state.account.connected
       ? state.account.preferredCurrency || state.ledger?.currency || 'NGN'
@@ -934,6 +967,12 @@ const api = {
       body: JSON.stringify({}),
     });
   },
+  async disconnectTelegram() {
+    return apiRequest('/api/auth/telegram/disconnect', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  },
   async linkStatus(token) {
     return apiRequest(`/api/auth/telegram/link-status?token=${encodeURIComponent(token)}`);
   },
@@ -950,10 +989,8 @@ const api = {
       timezone: TIMEZONE,
       language: detectLanguage(text),
       origin: 'web',
+      sessionId: activeSessionId(),
     };
-    if (!isConnectedAccount()) {
-      body.sessionId = DEMO_SESSION_ID;
-    }
     return apiRequest('/api/message', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -1220,6 +1257,43 @@ async function connectTelegram() {
   }
 }
 
+function openTelegramDisconnectModal() {
+  if (!state.account.connected) {
+    return;
+  }
+
+  state.telegramDisconnectOpen = true;
+  renderAll();
+}
+
+function closeTelegramDisconnectModal() {
+  if (!state.telegramDisconnectOpen) {
+    return;
+  }
+
+  state.telegramDisconnectOpen = false;
+  renderAll();
+}
+
+async function disconnectTelegram() {
+  if (!state.account.connected) {
+    closeTelegramDisconnectModal();
+    return;
+  }
+
+  try {
+    await api.disconnectTelegram();
+    state.telegramDisconnectOpen = false;
+    setNotice('Telegram disconnected.');
+    await loadDashboard();
+  } catch (error) {
+    console.error(error);
+    setNotice('Talli could not disconnect Telegram right now.');
+  } finally {
+    renderAll();
+  }
+}
+
 async function updateCurrencyPreference() {
   const select = dom.currencySelect;
   if (!select) {
@@ -1385,10 +1459,18 @@ function bindEvents() {
   dom.micToggle.addEventListener('click', toggleRecognition);
   dom.clearComposer.addEventListener('click', clearComposer);
   dom.connectTelegramButton?.addEventListener('click', () => {
+    if (state.account.connected) {
+      openTelegramDisconnectModal();
+      return;
+    }
     void connectTelegram();
   });
   for (const button of dom.connectTelegramCtas ?? []) {
     button.addEventListener('click', () => {
+      if (state.account.connected) {
+        openTelegramDisconnectModal();
+        return;
+      }
       void connectTelegram();
     });
   }
@@ -1425,7 +1507,23 @@ function bindEvents() {
     }
   });
 
+  dom.telegramDisconnectCancel?.addEventListener('click', () => {
+    closeTelegramDisconnectModal();
+  });
+  dom.telegramDisconnectConfirm?.addEventListener('click', () => {
+    void disconnectTelegram();
+  });
+  dom.telegramDisconnectModal?.addEventListener('click', (event) => {
+    if (event.target === dom.telegramDisconnectModal) {
+      closeTelegramDisconnectModal();
+    }
+  });
+
   document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && state.telegramDisconnectOpen) {
+      closeTelegramDisconnectModal();
+      return;
+    }
     if (event.key === 'Escape' && dom.primaryNav.dataset.open === 'true') {
       dom.primaryNav.dataset.open = 'false';
       dom.navToggle.setAttribute('aria-expanded', 'false');
@@ -1470,6 +1568,12 @@ function cacheDom() {
   dom.navToggle = document.querySelector('[data-role="nav-toggle"]');
   dom.primaryNav = document.querySelector('[data-role="primary-nav"]');
   dom.tryButtons = document.querySelectorAll('a[href="#workspace"]');
+  dom.telegramDisconnectModal = document.querySelector('[data-role="telegram-disconnect-modal"]');
+  dom.telegramDisconnectCancel = document.querySelector('[data-role="telegram-disconnect-cancel"]');
+  dom.telegramDisconnectConfirm = document.querySelector(
+    '[data-role="telegram-disconnect-confirm"]',
+  );
+  dom.telegramDisconnectCopy = document.querySelector('[data-role="telegram-disconnect-copy"]');
 }
 
 async function init() {

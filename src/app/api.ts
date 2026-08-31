@@ -255,7 +255,8 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
   }
 
   if (request.method === 'POST' && url.pathname === '/api/auth/telegram/link-token') {
-    const token = await service.createTelegramLinkToken();
+    const sessionId = await resolveSessionId(service, request);
+    const token = await service.createTelegramLinkToken(sessionId);
     const botUsername = normalizeTelegramUsername(process.env.TELEGRAM_BOT_USERNAME);
     const deepLink = botUsername
       ? `https://t.me/${botUsername}?start=link_${token.token}`
@@ -305,6 +306,16 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
       );
     }
     return response;
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/auth/telegram/disconnect') {
+    const sessionId = await resolveSessionId(service, request);
+    await service.disconnectTelegram(sessionId);
+    return jsonResponse(200, {
+      ok: true,
+      connected: false,
+      sessionId,
+    });
   }
 
   if (request.method === 'POST' && url.pathname === '/api/demo/reset') {
@@ -417,7 +428,14 @@ export function createTalliHttpServer(service: TalliService, port: number): Serv
     response.headers.forEach((value, key) => {
       res.setHeader(key, value);
     });
-    const text = await response.text();
-    res.end(text);
+    const body =
+      method === 'HEAD' || response.body === null
+        ? null
+        : Buffer.from(await response.arrayBuffer());
+    if (body) {
+      res.end(body);
+      return;
+    }
+    res.end();
   });
 }

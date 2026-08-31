@@ -28,6 +28,12 @@ describe('static frontend serving', () => {
       expect(rootHtml).not.toContain('hackathon project');
       expect(rootHtml).not.toContain('API online');
       expect(rootHtml).not.toContain('provider');
+      expect(rootHtml).not.toContain('Implemented capabilities, not generic AI claims');
+      expect(rootHtml).not.toContain('Financial state should not change');
+      expect(rootHtml).not.toContain('Waiting for Telegram');
+      expect(rootHtml).toContain('Open Talli in Telegram');
+      expect(rootHtml).toContain('Speak here');
+      expect(rootHtml).toContain('What Talli can help you with');
 
       const cssResponse = await handleTalliApiRequest(
         service,
@@ -44,18 +50,18 @@ describe('static frontend serving', () => {
       expect(jsResponse.headers.get('content-type')).toContain('text/javascript');
 
       for (const assetPath of [
-        '/assets/hero-merchant.jpg',
-        '/assets/ledger-closeup.jpg',
-        '/assets/market-conversation.jpg',
-        '/assets/merchant-balance-review.jpg',
-        '/assets/notebook-ledger.jpg',
+        '/assets/hero-merchant.png',
+        '/assets/ledger-closeup.png',
+        '/assets/market-conversation.png',
+        '/assets/merchant-balance-review.png',
+        '/assets/notebook-ledger.png',
       ]) {
         const assetResponse = await handleTalliApiRequest(
           service,
           new Request(`http://localhost${assetPath}`),
         );
         expect(assetResponse.status).toBe(200);
-        expect(assetResponse.headers.get('content-type')).toContain('image/jpeg');
+        expect(assetResponse.headers.get('content-type')).toContain('image/png');
         expect((await assetResponse.arrayBuffer()).byteLength).toBeGreaterThan(0);
       }
 

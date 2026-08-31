@@ -77,6 +77,14 @@ function isSecureRequest(request: Request): boolean {
   return new URL(request.url).protocol === 'https:';
 }
 
+function normalizeTelegramUsername(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) {
+    return null;
+  }
+  return trimmed.replace(/^@+/, '');
+}
+
 async function resolveSessionId(service: TalliService, request: Request): Promise<string> {
   const url = new URL(request.url);
   const querySessionId = url.searchParams.get('sessionId') ?? null;
@@ -248,7 +256,7 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
 
   if (request.method === 'POST' && url.pathname === '/api/auth/telegram/link-token') {
     const token = await service.createTelegramLinkToken();
-    const botUsername = process.env.TELEGRAM_BOT_USERNAME?.trim();
+    const botUsername = normalizeTelegramUsername(process.env.TELEGRAM_BOT_USERNAME);
     const deepLink = botUsername
       ? `https://t.me/${botUsername}?start=link_${token.token}`
       : `https://t.me/?start=link_${token.token}`;

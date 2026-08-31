@@ -76,6 +76,8 @@ function messageUpdate(input: {
 describe('shared Telegram and web state', () => {
   it('creates, expires, and consumes link tokens once', async () => {
     const runtime = await tempRuntime();
+    const originalUsername = process.env.TELEGRAM_BOT_USERNAME;
+    process.env.TELEGRAM_BOT_USERNAME = '@talli_bot';
 
     try {
       const expired = await runtime.service.createTelegramLinkToken('user-expired', -1000);
@@ -123,9 +125,12 @@ describe('shared Telegram and web state', () => {
         deepLink?: string;
       };
       expect(linkTokenBody.linkToken?.startsWith('link_')).toBe(false);
-      expect(linkTokenBody.deepLink).toContain(`start=link_${linkTokenBody.linkToken}`);
+      expect(linkTokenBody.deepLink).toBe(
+        `https://t.me/talli_bot?start=link_${linkTokenBody.linkToken}`,
+      );
       expect(linkTokenBody.deepLink).not.toContain('link_link_');
     } finally {
+      process.env.TELEGRAM_BOT_USERNAME = originalUsername;
       await runtime.cleanup();
     }
   });

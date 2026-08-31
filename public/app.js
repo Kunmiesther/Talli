@@ -6,7 +6,7 @@ const STORAGE_KEYS = {
 };
 
 const DEFAULT_WORKSPACE_NOTE =
-  'Speak a credit update or type one below. Talli asks before it changes anything unsafe.';
+  'Send a voice note or type an update. Talli asks before it changes anything unclear.';
 
 const SAFE_FAILURE_NOTICE =
   "Talli couldn't process that update right now. Nothing was changed. Please try again.";
@@ -57,7 +57,7 @@ const state = {
   pendingSubmission: null,
   voiceSupport: {
     supported: false,
-    note: "Voice input isn't available here. Type your update instead.",
+    note: 'Tap the mic and tell Talli what happened.',
     status: 'ready',
   },
   notice: '',
@@ -336,7 +336,7 @@ function renderCustomerList() {
     dom.customerList.innerHTML = `
       <div class="empty-state">
         <i class="fa-solid fa-users"></i>
-        <p>No credit records yet. Speak or type an update to get started.</p>
+        <p>No credit records yet. Tell Talli about your first credit sale to get started.</p>
       </div>
     `;
     return;
@@ -403,7 +403,7 @@ function renderPendingTurn() {
       </div>
       <p class="turn__input">${escapeHtml(state.pendingSubmission.text)}</p>
       <div class="turn__response">
-        <p>Talli is updating your ledger&hellip;</p>
+        <p>Updating your ledger&hellip;</p>
       </div>
     </article>
   `;
@@ -535,7 +535,7 @@ function renderCustomerDetail() {
     dom.customerDetail.innerHTML = `
       <div class="empty-state empty-state--detail">
         <i class="fa-solid fa-user-tag"></i>
-        <p>Choose a customer to inspect obligations, payments, corrections, and history.</p>
+        <p>Choose a customer to see what they owe, what they paid, and the notes behind it.</p>
       </div>
     `;
     return;
@@ -611,7 +611,7 @@ function renderCustomerDetail() {
           ${
             openObligations.length
               ? openObligations.map(renderObligationItem).join('')
-              : `<div class="empty-state"><i class="fa-solid fa-circle-check"></i><p>No open obligations.</p></div>`
+              : `<div class="empty-state"><i class="fa-solid fa-circle-check"></i><p>No open balances.</p></div>`
           }
         </div>
       </section>
@@ -622,7 +622,7 @@ function renderCustomerDetail() {
           ${
             settledObligations.length
               ? settledObligations.map(renderObligationItem).join('')
-              : `<div class="empty-state"><i class="fa-solid fa-circle-check"></i><p>No settled obligations yet.</p></div>`
+              : `<div class="empty-state"><i class="fa-solid fa-circle-check"></i><p>No settled balances yet.</p></div>`
           }
         </div>
       </section>
@@ -633,7 +633,7 @@ function renderCustomerDetail() {
           ${
             events.length
               ? events.map(renderEventItem).join('')
-              : `<div class="empty-state"><i class="fa-solid fa-clock"></i><p>No historical events yet.</p></div>`
+              : `<div class="empty-state"><i class="fa-solid fa-clock"></i><p>No notes yet.</p></div>`
           }
         </div>
       </section>
@@ -644,7 +644,7 @@ function renderCustomerDetail() {
           ${
             recentTurns.length
               ? recentTurns.map(renderTurnChip).join('')
-              : `<div class="empty-state"><i class="fa-solid fa-comment-dots"></i><p>No recent turns for this customer.</p></div>`
+              : `<div class="empty-state"><i class="fa-solid fa-comment-dots"></i><p>No recent updates for this customer.</p></div>`
           }
         </div>
       </section>
@@ -739,43 +739,49 @@ function renderComposerState() {
   const transcript = dom.transcriptPreview;
   const mic = dom.micToggle;
   const micLabel = dom.micLabel;
+  const voicePrompt = dom.voicePrompt;
   const sendLabel = dom.sendLabel;
   const sendDisabled = state.sending || state.listening || !dom.composerInput.value.trim();
 
-  if (!state.voiceSupport.supported) {
+  if (state.pendingSubmission) {
+    voicePrompt.textContent = 'Updating your ledger...';
+    voiceNote.textContent = 'Please wait while Talli records this update.';
+    mic.dataset.state = 'pending';
+    stateChip.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating your ledger...';
+  } else if (!state.voiceSupport.supported) {
+    voicePrompt.textContent = 'Speak here';
     voiceNote.textContent = state.voiceSupport.note;
     mic.dataset.state = 'unsupported';
+    stateChip.innerHTML = '<i class="fa-solid fa-circle-info"></i> Ready to record';
   } else if (state.listening) {
-    voiceNote.textContent =
-      'Listening. Speak naturally, then stop to review the text before sending.';
+    voicePrompt.textContent = 'Listening...';
+    voiceNote.textContent = 'Speak naturally. Talli will fill the box below.';
     mic.dataset.state = 'listening';
+    stateChip.innerHTML = '<i class="fa-solid fa-wave-square"></i> Listening...';
   } else if (state.voiceSupport.status === 'error') {
+    voicePrompt.textContent = 'Speak here';
     voiceNote.textContent = state.voiceSupport.note;
     mic.dataset.state = 'error';
+    stateChip.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Speak here';
   } else {
+    voicePrompt.textContent = 'Speak here';
     voiceNote.textContent = state.voiceSupport.note;
-    mic.dataset.state = '';
-  }
-
-  if (state.pendingSubmission) {
-    stateChip.innerHTML =
-      '<i class="fa-solid fa-spinner fa-spin"></i> Talli is updating your ledger';
-  } else if (state.listening) {
-    stateChip.innerHTML = '<i class="fa-solid fa-wave-square"></i> Listening';
-  } else if (state.transcriptPreview) {
-    stateChip.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Transcript ready';
-  } else if (state.clarification) {
-    stateChip.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Clarification waiting';
-  } else {
-    stateChip.innerHTML = '<i class="fa-solid fa-circle-info"></i> Ready to record';
+    mic.dataset.state = 'ready';
+    if (state.transcriptPreview) {
+      stateChip.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Transcript ready';
+    } else if (state.clarification) {
+      stateChip.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Clarification waiting';
+    } else {
+      stateChip.innerHTML = '<i class="fa-solid fa-circle-info"></i> Speak here';
+    }
   }
 
   transcript.textContent =
     state.transcriptPreview ||
-    (state.listening ? 'Listening for speech...' : 'Speech will appear here before you send it.');
+    (state.listening ? 'Listening...' : 'Your speech will appear here before you send it.');
   mic.setAttribute('aria-pressed', String(state.listening));
-  mic.setAttribute('aria-label', state.listening ? 'Stop voice input' : 'Start voice input');
-  mic.setAttribute('title', state.listening ? 'Stop voice input' : 'Start voice input');
+  mic.setAttribute('aria-label', state.listening ? 'Stop listening' : 'Start voice input');
+  mic.setAttribute('title', state.listening ? 'Stop listening' : 'Start voice input');
   micLabel.textContent = state.listening ? 'Stop voice input' : 'Voice input';
   sendLabel.textContent = state.sending ? 'Sending...' : 'Send';
   dom.sendMessage.setAttribute('aria-busy', String(state.sending));
@@ -793,22 +799,23 @@ function renderAccountCard() {
   }
 
   if (state.account.connected) {
-    const username = state.account.telegramUsername
-      ? `@${state.account.telegramUsername}`
-      : 'Telegram';
-    dom.accountStatus.textContent = `Connected to Telegram as ${username}.`;
+    const username = state.account.telegramUsername?.replace(/^@+/, '').trim();
+    const displayName = username ? `@${username}` : 'Telegram';
+    dom.accountStatus.textContent = `Connected to Telegram as ${displayName}.`;
     dom.connectTelegramButton.hidden = true;
     dom.telegramLink.hidden = true;
   } else {
-    dom.accountStatus.textContent =
-      'Connect Telegram to keep the same ledger in chat and on the web.';
+    dom.accountStatus.textContent = state.account.deepLink
+      ? "If Telegram doesn't open, click Open Talli in Telegram."
+      : 'Connect Telegram to use the same ledger in chat and on the web.';
     dom.connectTelegramButton.hidden = false;
     dom.connectTelegramButton.textContent =
-      state.account.linkTokenStatus === 'pending' ? 'Waiting for Telegram...' : 'Connect Telegram';
+      state.account.linkTokenStatus === 'pending' ? 'Opening Telegram...' : 'Connect Telegram';
+    dom.connectTelegramButton.disabled = state.account.linkTokenStatus === 'pending';
     if (state.account.deepLink) {
       dom.telegramLink.hidden = false;
       dom.telegramLink.href = state.account.deepLink;
-      dom.telegramLink.textContent = 'Open Telegram';
+      dom.telegramLink.textContent = 'Open Talli in Telegram';
     } else {
       dom.telegramLink.hidden = true;
     }
@@ -1043,7 +1050,7 @@ async function submitComposer() {
   };
   state.transcriptPreview = text;
   clearRecognitionBuffer();
-  setNotice('Talli is updating your ledger...');
+  setNotice('Updating your ledger...');
   renderAll();
 
   try {
@@ -1136,6 +1143,7 @@ async function connectTelegram() {
     return;
   }
 
+  const telegramWindow = window.open('', '_blank');
   state.account.linkTokenStatus = 'pending';
   state.account.deepLink = null;
   renderAll();
@@ -1144,6 +1152,9 @@ async function connectTelegram() {
     const response = await api.createTelegramLink();
     state.account.linkToken = response.linkToken;
     state.account.deepLink = response.deepLink;
+    if (telegramWindow && response.deepLink) {
+      telegramWindow.location.href = response.deepLink;
+    }
     renderAll();
 
     const deadline = Date.now() + 2 * 60 * 1000;
@@ -1194,7 +1205,7 @@ async function updateCurrencyPreference() {
   } else {
     await api.setCurrency(currency);
     await refreshLedgerData();
-    setNotice(`Demo ledger currency set to ${currency}.`);
+    setNotice(`Ledger currency set to ${currency}.`);
   }
   renderAll();
 }
@@ -1216,7 +1227,7 @@ function initSpeechRecognition() {
   }
 
   state.voiceSupport.supported = true;
-  state.voiceSupport.note = 'Voice input is ready. Speak, then review the text before sending.';
+  state.voiceSupport.note = 'Tap the mic and tell Talli what happened.';
   recognition = new SpeechRecognitionCtor();
   recognition.lang = 'en-GB';
   recognition.continuous = false;
@@ -1259,9 +1270,9 @@ function initSpeechRecognition() {
       message: event.message ?? null,
     });
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      state.voiceSupport.note = 'Microphone permission was denied. Type your update instead.';
+      state.voiceSupport.note = 'Microphone access was blocked. Type your update instead.';
     } else if (event.error === 'network') {
-      state.voiceSupport.note = "Voice input couldn't connect. Please type your update instead.";
+      state.voiceSupport.note = 'Voice input could not connect. Please type your update instead.';
     } else if (event.error === 'audio-capture') {
       state.voiceSupport.note = "We couldn't access your microphone. Type your update instead.";
     } else if (event.error === 'no-speech') {
@@ -1281,9 +1292,10 @@ function initSpeechRecognition() {
       const combined = [finalTranscript, interimTranscript].filter(Boolean).join(' ').trim();
       dom.composerInput.value = combined;
       state.transcriptPreview = combined;
-      state.voiceSupport.note = 'Transcript ready. Review the text before sending.';
+      state.voiceSupport.note = 'Transcript ready. Review it before you send it.';
     } else if (!hadError) {
-      state.voiceSupport.note = 'No speech was captured. Try again or type your update.';
+      state.voiceSupport.note =
+        'No speech was captured. Tap the mic and try again, or type your update.';
       state.transcriptPreview = '';
     }
     state.voiceSupport.status = hadError ? 'error' : 'ready';
@@ -1406,6 +1418,7 @@ function cacheDom() {
   dom.composerInput = document.querySelector('[data-role="composer-input"]');
   dom.micToggle = document.querySelector('[data-role="mic-toggle"]');
   dom.micLabel = document.querySelector('[data-role="mic-label"]');
+  dom.voicePrompt = document.querySelector('[data-role="voice-prompt"]');
   dom.clearComposer = document.querySelector('[data-role="clear-composer"]');
   dom.sendMessage = document.querySelector('[data-role="send-message"]');
   dom.sendLabel = document.querySelector('[data-role="send-label"]');

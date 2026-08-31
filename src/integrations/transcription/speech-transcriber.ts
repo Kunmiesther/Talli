@@ -40,10 +40,6 @@ function stripWrappingQuotes(value: string | undefined): string | undefined {
 }
 
 function loadLocalEnvFallback(): void {
-  if (process.env.OPENAI_API_KEY) {
-    return;
-  }
-
   const envPath = resolve(process.cwd(), '.env');
   if (!existsSync(envPath)) {
     return;
@@ -114,6 +110,52 @@ export function resolveConfiguredTranscriptionModel(options: {
   }
 
   throw new Error('TRANSCRIPTION_MODEL is required for this transcription base URL.');
+}
+
+export interface ResolvedSpeechTranscriberConfig {
+  apiKey: string;
+  model: string;
+  baseUrl: string;
+}
+
+export interface SpeechTranscriberConfigEnv {
+  TRANSCRIPTION_API_KEY?: string;
+  TRANSCRIPTION_BASE_URL?: string;
+  TRANSCRIPTION_MODEL?: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_BASE_URL?: string;
+  OPENAI_TRANSCRIPTION_MODEL?: string;
+}
+
+export function resolveConfiguredSpeechTranscriberConfig(
+  env: SpeechTranscriberConfigEnv = process.env,
+): ResolvedSpeechTranscriberConfig | null {
+  const baseUrl =
+    normalizeBaseUrl(stripWrappingQuotes(env.TRANSCRIPTION_BASE_URL?.trim())) ||
+    normalizeBaseUrl(stripWrappingQuotes(env.OPENAI_BASE_URL?.trim())) ||
+    DEFAULT_BASE_URL;
+  const explicitApiKey = stripWrappingQuotes(env.TRANSCRIPTION_API_KEY?.trim());
+  const fallbackApiKey = stripWrappingQuotes(env.OPENAI_API_KEY?.trim());
+  const apiKey =
+    explicitApiKey ??
+    (isOpenAIBaseUrl(baseUrl) || baseUrl === DEFAULT_BASE_URL ? fallbackApiKey : undefined);
+  if (!apiKey) {
+    return null;
+  }
+
+  const explicitModel =
+    stripWrappingQuotes(env.TRANSCRIPTION_MODEL?.trim()) ||
+    stripWrappingQuotes(env.OPENAI_TRANSCRIPTION_MODEL?.trim()) ||
+    undefined;
+
+  return {
+    apiKey,
+    baseUrl,
+    model: resolveConfiguredTranscriptionModel({
+      baseUrl,
+      explicitModel,
+    }),
+  };
 }
 
 async function withTimeout<T>(
@@ -211,27 +253,10 @@ export class OpenAICompatibleSpeechTranscriber implements SpeechTranscriber {
 
 export function createConfiguredSpeechTranscriber(): SpeechTranscriber | null {
   loadLocalEnvFallback();
-  const apiKey = stripWrappingQuotes(process.env.OPENAI_API_KEY?.trim());
-  if (!apiKey) {
+  const config = resolveConfiguredSpeechTranscriberConfig(process.env);
+  if (!config) {
     return null;
   }
 
-  const baseUrl =
-    normalizeBaseUrl(stripWrappingQuotes(process.env.TRANSCRIPTION_BASE_URL?.trim())) ||
-    normalizeBaseUrl(stripWrappingQuotes(process.env.OPENAI_BASE_URL?.trim())) ||
-    DEFAULT_BASE_URL;
-  const explicitModel =
-    stripWrappingQuotes(process.env.TRANSCRIPTION_MODEL?.trim()) ||
-    stripWrappingQuotes(process.env.OPENAI_TRANSCRIPTION_MODEL?.trim()) ||
-    undefined;
-  const model = resolveConfiguredTranscriptionModel({
-    baseUrl,
-    explicitModel,
-  });
-
-  return new OpenAICompatibleSpeechTranscriber({
-    apiKey,
-    model,
-    baseUrl,
-  });
+  return new OpenAICompatibleSpeechTranscriber(config);
 }

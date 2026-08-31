@@ -96,6 +96,7 @@ The real-model modes require credentials:
 - `OPENAI_API_KEY`
 - `OPENAI_MODEL` with `gpt-5` as the default
 - `OPENAI_BASE_URL` for an OpenAI-compatible endpoint override
+- `TRANSCRIPTION_API_KEY` for voice-note transcription credentials
 - `TRANSCRIPTION_BASE_URL` for voice-note transcription; it can fall back to `OPENAI_BASE_URL`
 - `TRANSCRIPTION_MODEL` for voice-note transcription when you are not using OpenAI or Groq defaults
 
@@ -104,6 +105,8 @@ Voice transcription defaults are provider-aware:
 - OpenAI-compatible OpenAI endpoints use `whisper-1`
 - Groq uses `whisper-large-v3-turbo`
 - other OpenAI-compatible endpoints must set `TRANSCRIPTION_MODEL` explicitly
+- Groq transcription uses `TRANSCRIPTION_API_KEY`; it does not reuse `OPENAI_API_KEY`
+- OpenAI transcription can fall back to `OPENAI_API_KEY` only when the transcription base URL is OpenAI
 
 If those values come from `.env`, the loader strips surrounding quotes before creating the provider.
 
@@ -146,7 +149,7 @@ Useful environment variables:
 
 - `TALLI_DATA_DIR` or `TALLI_LEDGER_FILE` to control where the local event store lives.
 - `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_BASE_URL` for live provider-backed interpretation.
-- `TRANSCRIPTION_BASE_URL` and `TRANSCRIPTION_MODEL` for Telegram voice-note transcription.
+- `TRANSCRIPTION_API_KEY`, `TRANSCRIPTION_BASE_URL`, and `TRANSCRIPTION_MODEL` for Telegram voice-note transcription.
 - `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_USERNAME` for the Telegram polling worker and deep links.
 - `SESSION_SECRET` for the web API startup guard.
 - `TALLI_STORAGE_DRIVER=supabase` with `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for Supabase-backed persistence.

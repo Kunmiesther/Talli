@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   OpenAICompatibleSpeechTranscriber,
+  resolveConfiguredSpeechTranscriberConfig,
   resolveConfiguredTranscriptionModel,
 } from '../src/integrations/transcription/index.js';
 
@@ -23,6 +24,53 @@ describe('transcription provider configuration', () => {
         baseUrl: 'https://openrouter.ai/api/v1',
       }),
     ).toThrow(/TRANSCRIPTION_MODEL/i);
+  });
+
+  it('uses TRANSCRIPTION_API_KEY for Groq transcription even when OPENAI_API_KEY is set', () => {
+    const config = resolveConfiguredSpeechTranscriberConfig({
+      OPENAI_API_KEY: 'openrouter-key',
+      TRANSCRIPTION_API_KEY: 'groq-key',
+      TRANSCRIPTION_BASE_URL: 'https://api.groq.com/openai/v1',
+      TRANSCRIPTION_MODEL: 'whisper-large-v3-turbo',
+      OPENAI_BASE_URL: 'https://openrouter.ai/api/v1',
+      OPENAI_TRANSCRIPTION_MODEL: undefined,
+    });
+
+    expect(config).toEqual({
+      apiKey: 'groq-key',
+      baseUrl: 'https://api.groq.com/openai/v1',
+      model: 'whisper-large-v3-turbo',
+    });
+  });
+
+  it('falls back to OPENAI_API_KEY only for OpenAI-backed transcription', () => {
+    const config = resolveConfiguredSpeechTranscriberConfig({
+      OPENAI_API_KEY: 'openai-key',
+      OPENAI_BASE_URL: 'https://api.openai.com/v1',
+      TRANSCRIPTION_API_KEY: undefined,
+      TRANSCRIPTION_BASE_URL: undefined,
+      TRANSCRIPTION_MODEL: undefined,
+      OPENAI_TRANSCRIPTION_MODEL: undefined,
+    });
+
+    expect(config).toEqual({
+      apiKey: 'openai-key',
+      baseUrl: 'https://api.openai.com/v1',
+      model: 'whisper-1',
+    });
+  });
+
+  it('does not fall back to OPENAI_API_KEY for Groq transcription when TRANSCRIPTION_API_KEY is missing', () => {
+    expect(
+      resolveConfiguredSpeechTranscriberConfig({
+        OPENAI_API_KEY: 'openrouter-key',
+        OPENAI_BASE_URL: 'https://openrouter.ai/api/v1',
+        TRANSCRIPTION_API_KEY: undefined,
+        TRANSCRIPTION_BASE_URL: 'https://api.groq.com/openai/v1',
+        TRANSCRIPTION_MODEL: 'whisper-large-v3-turbo',
+        OPENAI_TRANSCRIPTION_MODEL: undefined,
+      }),
+    ).toBeNull();
   });
 
   it('posts multipart transcription requests to the configured base URL with the configured model', async () => {

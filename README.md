@@ -147,7 +147,17 @@ Useful environment variables:
 - `TALLI_DATA_DIR` or `TALLI_LEDGER_FILE` to control where the local event store lives.
 - `OPENAI_API_KEY`, `OPENAI_MODEL`, and `OPENAI_BASE_URL` for live provider-backed interpretation.
 - `TRANSCRIPTION_BASE_URL` and `TRANSCRIPTION_MODEL` for Telegram voice-note transcription.
+- `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_USERNAME` for the Telegram polling worker and deep links.
+- `SESSION_SECRET` for the web API startup guard.
+- `TALLI_STORAGE_DRIVER=supabase` with `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` for Supabase-backed persistence.
 - `TALLI_PORT` or `PORT` for the local HTTP API.
+
+Local startup commands:
+
+```bash
+npm run dev:api
+npm run dev:telegram
+```
 
 The demo and API both use the same text-first runtime path, so typed input and the future voice transcript flow will hit the same message endpoint.
 

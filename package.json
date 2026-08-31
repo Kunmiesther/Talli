@@ -16,7 +16,8 @@
     "demo:seed": "tsx src/app/demo.ts seed",
     "demo:reset": "tsx src/app/demo.ts reset",
     "dev:api": "tsx src/app/server.ts",
-    "telegram:poll": "tsx src/integrations/telegram/run-polling-bot.ts"
+    "telegram:poll": "tsx src/integrations/telegram/run-polling-bot.ts",
+    "dev:telegram": "tsx src/integrations/telegram/run-polling-bot.ts"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.3.1",

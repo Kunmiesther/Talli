@@ -25,15 +25,19 @@ export function createConfiguredTalliStore(options: TalliStorageOptions = {}): T
   if (driver === 'supabase') {
     const supabaseUrl = envValue(process.env.SUPABASE_URL);
     const serviceRoleKey = envValue(process.env.SUPABASE_SERVICE_ROLE_KEY);
-    if (supabaseUrl && serviceRoleKey) {
-      return new SupabaseTalliSessionStore({
-        supabaseUrl,
-        supabaseServiceRoleKey: serviceRoleKey,
-        defaultSessionId: options.defaultSessionId,
-        timezone: options.timezone,
-        turnHistoryLimit: options.turnHistoryLimit,
-      });
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error(
+        'TALLI_STORAGE_DRIVER=supabase requires SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.',
+      );
     }
+
+    return new SupabaseTalliSessionStore({
+      supabaseUrl,
+      supabaseServiceRoleKey: serviceRoleKey,
+      defaultSessionId: options.defaultSessionId,
+      timezone: options.timezone,
+      turnHistoryLimit: options.turnHistoryLimit,
+    });
   }
 
   return new TalliSessionStore(options);

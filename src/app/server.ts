@@ -1,4 +1,5 @@
 import { createTalliHttpServer } from './api.js';
+import { loadLocalEnvFile, readRequiredEnv } from './runtime-env.js';
 import { createTalliService } from './talli-service.js';
 
 function readHost(): string {
@@ -15,6 +16,8 @@ function readPort(): number {
 }
 
 async function main() {
+  loadLocalEnvFile();
+  readRequiredEnv('SESSION_SECRET', 'SESSION_SECRET is required to start the Talli API.');
   const service = createTalliService();
   const host = readHost();
   const port = readPort();

@@ -29,6 +29,7 @@ export interface TalliMessageInput {
   referenceTime?: string;
   timezone?: string;
   language?: 'en' | 'pcm' | 'mixed';
+  origin?: 'web' | 'telegram';
 }
 
 export interface TalliLedgerChange {
@@ -76,6 +77,11 @@ export interface TalliServiceOptions {
   interpreter?: ActionInterpreter | null;
   store?: TalliStorageBackend;
   defaultSessionId?: string;
+  telegramNotifier?: TelegramConfirmationTransport | null;
+}
+
+export interface TelegramConfirmationTransport {
+  sendMessage(chatId: number, text: string): Promise<void>;
 }
 
 const SAFE_PROVIDER_FAILURE_MESSAGE =
@@ -377,12 +383,14 @@ function findResultObligation(
 export class TalliService {
   readonly store: TalliStorageBackend;
   readonly interpreter: ActionInterpreter | null;
+  private readonly telegramNotifier: TelegramConfirmationTransport | null;
 
   constructor(options: TalliServiceOptions = {}) {
     this.store =
       options.store ?? createConfiguredTalliStore({ defaultSessionId: options.defaultSessionId });
     this.interpreter =
       options.interpreter !== undefined ? options.interpreter : this.createDefaultInterpreter();
+    this.telegramNotifier = options.telegramNotifier ?? null;
   }
 
   private createDefaultInterpreter(): ActionInterpreter | null {
@@ -483,6 +491,7 @@ export class TalliService {
     const referenceTime = input.referenceTime ?? new Date().toISOString();
     const timezone = input.timezone ?? this.store.timezone;
     const language = input.language ?? detectLanguage(input.text);
+    const origin = input.origin ?? 'web';
     const loaded = await this.store.load(sessionId);
     let workingDocument = loaded.document;
     let snapshotBefore = projectLedger(workingDocument);
@@ -557,6 +566,7 @@ export class TalliService {
           },
           pendingClarification: loaded.state.pendingClarification,
         });
+        await this.maybeSendTelegramConfirmation(sessionId, origin, response);
         return response;
       }
     }
@@ -604,7 +614,7 @@ export class TalliService {
       await this.store.appendEvents(loaded.ledgerPath, appendedEvents);
       await this.store.saveState(loaded.statePath, nextState);
 
-      return this.buildResponse({
+      const response = this.buildResponse({
         sessionId,
         turnId,
         input,
@@ -614,6 +624,8 @@ export class TalliService {
         snapshotBefore,
         snapshotAfter: result.snapshot,
       });
+      await this.maybeSendTelegramConfirmation(sessionId, origin, response);
+      return response;
     }
 
     if (!this.interpreter) {
@@ -752,7 +764,38 @@ export class TalliService {
       snapshotAfter: result.snapshot,
     });
 
+    await this.maybeSendTelegramConfirmation(sessionId, origin, response);
     return response;
+  }
+
+  private async maybeSendTelegramConfirmation(
+    sessionId: string,
+    origin: 'web' | 'telegram',
+    response: TalliMessageResponse,
+  ): Promise<void> {
+    if (origin === 'telegram' || !this.telegramNotifier) {
+      return;
+    }
+
+    if (response.status !== 'applied' && response.status !== 'clarification_required') {
+      return;
+    }
+
+    const identity = await this.store.getUserIdentity(sessionId);
+    if (!identity.telegramUserId) {
+      return;
+    }
+
+    const chatId = Number(identity.telegramUserId);
+    if (!Number.isFinite(chatId)) {
+      return;
+    }
+
+    try {
+      await this.telegramNotifier.sendMessage(chatId, response.message);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   private updateSessionState(

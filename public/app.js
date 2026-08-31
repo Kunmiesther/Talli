@@ -156,6 +156,19 @@ function isConnectedAccount() {
   return Boolean(state.account?.connected);
 }
 
+function telegramConnectionButtons() {
+  const buttons = [];
+  if (dom.connectTelegramButton) {
+    buttons.push(dom.connectTelegramButton);
+  }
+  for (const button of dom.connectTelegramCtas ?? []) {
+    if (button) {
+      buttons.push(button);
+    }
+  }
+  return buttons;
+}
+
 function sessionQuerySuffix() {
   return isConnectedAccount() ? '' : `?sessionId=${encodeURIComponent(DEMO_SESSION_ID)}`;
 }
@@ -802,16 +815,11 @@ function renderAccountCard() {
     const username = state.account.telegramUsername?.replace(/^@+/, '').trim();
     const displayName = username ? `@${username}` : 'Telegram';
     dom.accountStatus.textContent = `Connected to Telegram as ${displayName}.`;
-    dom.connectTelegramButton.hidden = true;
     dom.telegramLink.hidden = true;
   } else {
     dom.accountStatus.textContent = state.account.deepLink
       ? "If Telegram doesn't open, click Open Talli in Telegram."
       : 'Connect Telegram to use the same ledger in chat and on the web.';
-    dom.connectTelegramButton.hidden = false;
-    dom.connectTelegramButton.textContent =
-      state.account.linkTokenStatus === 'pending' ? 'Opening Telegram...' : 'Connect Telegram';
-    dom.connectTelegramButton.disabled = state.account.linkTokenStatus === 'pending';
     if (state.account.deepLink) {
       dom.telegramLink.hidden = false;
       dom.telegramLink.href = state.account.deepLink;
@@ -819,6 +827,31 @@ function renderAccountCard() {
     } else {
       dom.telegramLink.hidden = true;
     }
+  }
+
+  for (const button of telegramConnectionButtons()) {
+    if (state.account.connected) {
+      button.dataset.connectionState = 'connected';
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+      button.innerHTML =
+        '<i class="fa-solid fa-circle-check"></i><span>Connected to Telegram</span>';
+      continue;
+    }
+
+    if (state.account.linkTokenStatus === 'pending') {
+      button.dataset.connectionState = 'pending';
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+      button.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i><span>Opening Telegram...</span>';
+      continue;
+    }
+
+    button.dataset.connectionState = 'idle';
+    button.disabled = false;
+    button.removeAttribute('aria-disabled');
+    button.innerHTML = '<span>Connect Telegram</span>';
   }
 }
 
@@ -916,6 +949,7 @@ const api = {
       referenceTime: new Date().toISOString(),
       timezone: TIMEZONE,
       language: detectLanguage(text),
+      origin: 'web',
     };
     if (!isConnectedAccount()) {
       body.sessionId = DEMO_SESSION_ID;
@@ -1353,6 +1387,11 @@ function bindEvents() {
   dom.connectTelegramButton?.addEventListener('click', () => {
     void connectTelegram();
   });
+  for (const button of dom.connectTelegramCtas ?? []) {
+    button.addEventListener('click', () => {
+      void connectTelegram();
+    });
+  }
   dom.currencySelect?.addEventListener('change', () => {
     void updateCurrencyPreference();
   });
@@ -1408,6 +1447,9 @@ function cacheDom() {
   dom.detailStatus = document.querySelector('[data-role="detail-status"]');
   dom.accountStatus = document.querySelector('[data-role="account-status"]');
   dom.connectTelegramButton = document.querySelector('[data-role="connect-telegram-button"]');
+  dom.connectTelegramCtas = Array.from(
+    document.querySelectorAll('[data-role="connect-telegram-cta"]'),
+  );
   dom.telegramLink = document.querySelector('[data-role="telegram-link"]');
   dom.currencySelect = document.querySelector('[data-role="currency-select"]');
   dom.clarificationPanel = document.querySelector('[data-role="clarification-panel"]');

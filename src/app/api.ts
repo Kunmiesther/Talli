@@ -351,6 +351,7 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
     const response = await service.processMessage({
       ...body,
       sessionId,
+      origin: 'web',
     });
     return jsonResponse(200, response);
   }

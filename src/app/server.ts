@@ -1,3 +1,4 @@
+import { TelegramBotApiTransport } from '../integrations/telegram/http-transport.js';
 import { createTalliHttpServer } from './api.js';
 import { loadLocalEnvFile, readRequiredEnv } from './runtime-env.js';
 import { createTalliService } from './talli-service.js';
@@ -18,7 +19,9 @@ function readPort(): number {
 async function main() {
   loadLocalEnvFile();
   readRequiredEnv('SESSION_SECRET', 'SESSION_SECRET is required to start the Talli API.');
-  const service = createTalliService();
+  const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const telegramNotifier = telegramBotToken ? new TelegramBotApiTransport(telegramBotToken) : null;
+  const service = createTalliService({ telegramNotifier });
   const host = readHost();
   const port = readPort();
   const server = createTalliHttpServer(service, port);

@@ -150,6 +150,7 @@ export class TelegramConversationService {
         text: transcript,
         sessionId: linked.userId,
         language: 'en',
+        origin: 'telegram',
       });
       await this.transport.sendMessage(message.chat.id, response.message);
     } catch {
@@ -251,6 +252,7 @@ export class TelegramConversationService {
       text,
       sessionId: userId,
       language: 'en',
+      origin: 'telegram',
     });
     await this.transport.sendMessage(message.chat.id, response.message);
   }

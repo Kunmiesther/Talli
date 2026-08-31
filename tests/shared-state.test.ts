@@ -111,8 +111,23 @@ describe('shared Telegram and web state', () => {
         runtime.service,
         new Request(`http://localhost/api/auth/telegram/link-status?token=${token.token}`),
       );
-      expect(linkStatusResponse.headers.get('set-cookie')).toContain('HttpOnly');
-      expect(linkStatusResponse.headers.get('set-cookie')).toContain('SameSite=Lax');
+      const setCookie = linkStatusResponse.headers.get('set-cookie') ?? '';
+      expect(setCookie).toContain('HttpOnly');
+      expect(setCookie).toContain('SameSite=Lax');
+
+      const meResponse = await handleTalliApiRequest(
+        runtime.service,
+        new Request('http://localhost/api/me', {
+          headers: {
+            cookie: setCookie.split(';')[0] ?? '',
+          },
+        }),
+      );
+      expect(await meResponse.json()).toMatchObject({
+        ok: true,
+        connected: true,
+        userId: 'user-link',
+      });
 
       const linkTokenResponse = await handleTalliApiRequest(
         runtime.service,

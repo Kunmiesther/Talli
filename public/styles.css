@@ -257,6 +257,31 @@ textarea:focus-visible {
   font-size: 0.92rem;
 }
 
+.button[data-connection-state="connected"] {
+  background: rgba(112, 128, 95, 0.16);
+  border-color: rgba(112, 128, 95, 0.26);
+  color: var(--sage-deep);
+  box-shadow: none;
+}
+
+.button[data-connection-state="pending"] {
+  background: rgba(180, 93, 61, 0.12);
+  border-color: rgba(180, 93, 61, 0.18);
+  color: var(--ink-soft);
+  box-shadow: none;
+}
+
+.button[data-connection-state="connected"]:hover,
+.button[data-connection-state="connected"]:focus-visible {
+  transform: none;
+}
+
+.button[data-connection-state="connected"][disabled],
+.button[data-connection-state="pending"][disabled] {
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
 .eyebrow,
 .section-kicker {
   margin: 0 0 0.8rem;

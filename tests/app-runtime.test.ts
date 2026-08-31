@@ -1,10 +1,10 @@
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { handleTalliApiRequest } from '../src/app/api.js';
 import { TalliSessionStore } from '../src/app/storage.js';
-import { createTalliService } from '../src/app/talli-service.js';
+import { type TalliServiceOptions, createTalliService } from '../src/app/talli-service.js';
 import { ledgerActionSchema } from '../src/domain/actions.js';
 import { formatMinorUnits, formatNgn, nairaToMinorUnits } from '../src/domain/money.js';
 import type { ActionInterpreter, AdvancedInterpreterInput } from '../src/interpreters.js';
@@ -66,10 +66,26 @@ class ScriptedInterpreter implements ActionInterpreter {
   }
 }
 
-async function tempService(interpreter: ActionInterpreter | null = null) {
+class RecordingTelegramNotifier {
+  public readonly messages: Array<{ chatId: number; text: string }> = [];
+  public failNextSend = false;
+
+  async sendMessage(chatId: number, text: string): Promise<void> {
+    if (this.failNextSend) {
+      this.failNextSend = false;
+      throw new Error('telegram send failed');
+    }
+    this.messages.push({ chatId, text });
+  }
+}
+
+async function tempService(
+  interpreter: ActionInterpreter | null = null,
+  options: Pick<TalliServiceOptions, 'telegramNotifier'> = {},
+) {
   const dataDir = await mkdtemp(join(tmpdir(), 'talli-runtime-'));
   const store = new TalliSessionStore({ dataDir, defaultSessionId: 'demo' });
-  const service = createTalliService({ store, interpreter });
+  const service = createTalliService({ store, interpreter, ...options });
   return {
     dataDir,
     store,
@@ -368,6 +384,137 @@ describe('Talli application runtime', () => {
 
       const afterConflict = await runtime.service.getLedger('demo');
       expect(afterConflict).toEqual(beforeConflict);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('mirrors successful web updates to the linked Telegram chat once', async () => {
+    const notifier = new RecordingTelegramNotifier();
+    const runtime = await tempService(null, { telegramNotifier: notifier });
+
+    try {
+      const token = await runtime.service.createTelegramLinkToken('web-user');
+      const linked = await runtime.service.consumeTelegramLinkToken({
+        token: token.token,
+        telegramUserId: '444',
+        telegramUsername: 'merchant',
+      });
+      expect(linked).not.toBeNull();
+
+      const response = await runtime.service.processMessage({
+        text: 'Bisi owes 5k',
+        sessionId: 'web-user',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+        origin: 'web',
+      });
+
+      expect(response.status).toBe('applied');
+      expect(notifier.messages).toHaveLength(1);
+      expect(notifier.messages[0]).toMatchObject({
+        chatId: 444,
+        text: response.message,
+      });
+
+      const ledger = await runtime.service.getLedger('web-user');
+      expect(ledger.obligations).toHaveLength(1);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('does not send a Telegram confirmation for unlinked web users', async () => {
+    const notifier = new RecordingTelegramNotifier();
+    const runtime = await tempService(null, { telegramNotifier: notifier });
+
+    try {
+      const response = await runtime.service.processMessage({
+        text: 'Bisi owes 5k',
+        sessionId: 'unlinked-user',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+        origin: 'web',
+      });
+
+      expect(response.status).toBe('applied');
+      expect(notifier.messages).toHaveLength(0);
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('keeps the ledger mutation successful if Telegram sending fails', async () => {
+    const notifier = new RecordingTelegramNotifier();
+    notifier.failNextSend = true;
+    const runtime = await tempService(null, { telegramNotifier: notifier });
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => void 0);
+
+    try {
+      const token = await runtime.service.createTelegramLinkToken('web-user');
+      await runtime.service.consumeTelegramLinkToken({
+        token: token.token,
+        telegramUserId: '444',
+        telegramUsername: 'merchant',
+      });
+
+      const response = await runtime.service.processMessage({
+        text: 'Bisi owes 5k',
+        sessionId: 'web-user',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+        origin: 'web',
+      });
+
+      expect(response.status).toBe('applied');
+      expect(notifier.messages).toHaveLength(0);
+      const ledger = await runtime.service.getLedger('web-user');
+      expect(ledger.obligations).toHaveLength(1);
+    } finally {
+      consoleErrorSpy.mockRestore();
+      await runtime.cleanup();
+    }
+  });
+
+  it('can mirror a clarification turn to Telegram without mutating the ledger', async () => {
+    const notifier = new RecordingTelegramNotifier();
+    const runtime = await tempService(null, { telegramNotifier: notifier });
+
+    try {
+      const token = await runtime.service.createTelegramLinkToken('web-user');
+      await runtime.service.consumeTelegramLinkToken({
+        token: token.token,
+        telegramUserId: '444',
+        telegramUsername: 'merchant',
+      });
+
+      await runtime.service.processMessage({
+        text: 'Sarah owes 200 dollars',
+        sessionId: 'web-user',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+        origin: 'web',
+      });
+
+      const before = await runtime.service.getLedger('web-user');
+      const response = await runtime.service.processMessage({
+        text: 'James owes 10 pounds',
+        sessionId: 'web-user',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+        origin: 'web',
+      });
+
+      expect(response.status).toBe('clarification_required');
+      expect(notifier.messages).toHaveLength(2);
+      expect(notifier.messages.at(-1)?.text).toBe(response.message);
+      const after = await runtime.service.getLedger('web-user');
+      expect(after).toEqual(before);
     } finally {
       await runtime.cleanup();
     }

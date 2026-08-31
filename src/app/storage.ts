@@ -436,7 +436,7 @@ export class TalliSessionStore {
     const auth = await this.loadAuthState();
     const now = Date.now();
     const sessionId = options.sessionId ?? randomUUID();
-    const token = `link_${randomUUID().replace(/-/g, '')}`;
+    const token = randomUUID();
     const record: LinkTokenRecord = {
       token,
       userId: sessionId,

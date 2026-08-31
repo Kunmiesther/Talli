@@ -7,3 +7,4 @@ export * from './benchmark/evaluator.js';
 export * from './llm/index.js';
 export * from './app/index.js';
 export * from './integrations/telegram/index.js';
+export * from './integrations/transcription/index.js';

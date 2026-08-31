@@ -15,14 +15,28 @@ export class TelegramBotApiTransport implements TelegramTransport {
     private readonly botToken: string,
     private readonly baseUrl = 'https://api.telegram.org',
     private readonly fetchImpl: typeof fetch = fetch,
+    private readonly requestTimeoutMs = 30_000,
   ) {}
 
   private get apiBase(): string {
     return trimTrailingSlash(this.baseUrl);
   }
 
+  private async fetchWithTimeout(input: string, init: RequestInit): Promise<Response> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.requestTimeoutMs);
+    try {
+      return await this.fetchImpl(input, {
+        ...init,
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   private async callApi<T>(method: string, body?: Record<string, unknown>): Promise<T> {
-    const response = await this.fetchImpl(`${this.apiBase}/bot${this.botToken}/${method}`, {
+    const response = await this.fetchWithTimeout(`${this.apiBase}/bot${this.botToken}/${method}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,7 +70,10 @@ export class TelegramBotApiTransport implements TelegramTransport {
   }
 
   async downloadFile(filePath: string): Promise<Uint8Array> {
-    const response = await this.fetchImpl(`${this.apiBase}/file/bot${this.botToken}/${filePath}`);
+    const response = await this.fetchWithTimeout(
+      `${this.apiBase}/file/bot${this.botToken}/${filePath}`,
+      {},
+    );
     if (!response.ok) {
       throw new Error(`Failed to download Telegram file ${filePath}.`);
     }

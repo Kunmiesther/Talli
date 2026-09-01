@@ -141,6 +141,32 @@ describe('compact ledger intent contract', () => {
     expect(result.action.dueAt).toBe('2026-09-03T23:00:00.000Z');
   });
 
+  it.each([
+    'John owes me 3000 naira and will pay back on Saturday',
+    'John owes me 3000 naira and will pay on Saturday',
+    'John owes me 3000 naira and will repay on Saturday',
+    'John owes me 3000 naira and will settle on Saturday',
+    'John owes me 3000 naira due Saturday',
+    'John owes me 3000 naira due on Saturday',
+  ])('creates a new obligation with Saturday repayment phrasing: %s', (utterance) => {
+    const result = compile({
+      intent: {
+        intent: 'create_obligation',
+        customer: { name: 'John' },
+        amountMinor: nairaToMinorUnits(3_000),
+      },
+      utterance,
+    });
+
+    expect(result.action.type).toBe('CREATE_OBLIGATION');
+    if (result.action.type !== 'CREATE_OBLIGATION') {
+      throw new Error('Expected a create obligation action.');
+    }
+
+    expect(result.action.amountMinor).toBe(nairaToMinorUnits(3_000));
+    expect(result.action.dueAt).toBe('2026-09-04T23:00:00.000Z');
+  });
+
   it('resolves an existing customer by name', () => {
     const state = seedObligation({
       name: 'Amina',

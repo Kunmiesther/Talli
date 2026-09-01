@@ -97,12 +97,22 @@ function localMidnightIso(date: string): string {
 function deriveDueAtFromUtterance(utterance: string, clock: ReferenceClock): string | null {
   const hints = buildTemporalHints(clock);
   const normalized = utterance.toLowerCase();
-  if (/\bfriday\b/.test(normalized)) {
-    return localMidnightIso(hints.nextFriday);
+  const weekdayHints = [
+    ['friday', hints.nextFriday],
+    ['monday', hints.nextMonday],
+    ['sunday', hints.nextSunday],
+    ['tuesday', hints.nextTuesday],
+    ['wednesday', hints.nextWednesday],
+    ['thursday', hints.nextThursday],
+    ['saturday', hints.nextSaturday],
+  ] as const;
+
+  for (const [weekday, dueDate] of weekdayHints) {
+    if (new RegExp(`\\b${weekday}\\b`).test(normalized)) {
+      return localMidnightIso(dueDate);
+    }
   }
-  if (/\bmonday\b/.test(normalized)) {
-    return localMidnightIso(hints.nextMonday);
-  }
+
   if (/\btomorrow\b/.test(normalized)) {
     return localMidnightIso(hints.tomorrow);
   }

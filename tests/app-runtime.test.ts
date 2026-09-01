@@ -540,6 +540,90 @@ describe('Talli application runtime', () => {
     }
   });
 
+  it('stores the next Saturday due date for natural repayment phrasing', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      const response = await runtime.service.processMessage({
+        text: 'John owes me 3000 naira and will pay back on Saturday',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(response.status).toBe('applied');
+      expect(response.message).toContain('John now owes');
+      expect(response.message).toContain(formatNgn(nairaToMinorUnits(3_000)));
+      expect(response.message).toContain('Due Saturday');
+
+      const ledger = await runtime.service.getLedger('demo');
+      expect(ledger.customers).toHaveLength(1);
+      expect(ledger.customers[0]?.displayName).toBe('John');
+      expect(ledger.obligations[0]?.originalAmountMinor).toBe(nairaToMinorUnits(3_000));
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(3_000));
+      expect(ledger.obligations[0]?.dueAt).toBe(
+        new Date('2026-09-05T00:00:00+01:00').toISOString(),
+      );
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
+  it('keeps naira payments in the correct minor-unit amount across multiple updates', async () => {
+    const runtime = await tempService(null);
+
+    try {
+      const created = await runtime.service.processMessage({
+        text: 'John owes me 3000 naira',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(created.status).toBe('applied');
+
+      let ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.originalAmountMinor).toBe(nairaToMinorUnits(3_000));
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(3_000));
+
+      const firstPayment = await runtime.service.processMessage({
+        text: 'John has paid back 1000 naira',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(firstPayment.status).toBe('applied');
+      expect(firstPayment.message).toContain(formatNgn(nairaToMinorUnits(1_000)));
+      expect(firstPayment.message).toContain(formatNgn(nairaToMinorUnits(2_000)));
+
+      ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.totalPaidMinor).toBe(nairaToMinorUnits(1_000));
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(2_000));
+
+      const secondPayment = await runtime.service.processMessage({
+        text: 'John has paid 500 naira',
+        sessionId: 'demo',
+        referenceTime: '2026-08-29T09:00:00+01:00',
+        timezone: 'Africa/Lagos',
+        language: 'en',
+      });
+
+      expect(secondPayment.status).toBe('applied');
+      expect(secondPayment.message).toContain(formatNgn(nairaToMinorUnits(500)));
+      expect(secondPayment.message).toContain(formatNgn(nairaToMinorUnits(1_500)));
+
+      ledger = await runtime.service.getLedger('demo');
+      expect(ledger.obligations[0]?.totalPaidMinor).toBe(nairaToMinorUnits(1_500));
+      expect(ledger.obligations[0]?.outstandingMinor).toBe(nairaToMinorUnits(1_500));
+    } finally {
+      await runtime.cleanup();
+    }
+  });
+
   it('asks for clarification when the customer name is ambiguous', async () => {
     const runtime = await tempService(null);
 

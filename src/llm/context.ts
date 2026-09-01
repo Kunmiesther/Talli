@@ -70,8 +70,13 @@ export interface AdvancedContextPackage extends ResolutionCandidatePackage {
     today: string;
     yesterday: string;
     tomorrow: string;
-    nextFriday: string;
+    nextSunday: string;
     nextMonday: string;
+    nextTuesday: string;
+    nextWednesday: string;
+    nextThursday: string;
+    nextFriday: string;
+    nextSaturday: string;
   };
   recentTurns: Array<{
     turnId: string;
@@ -366,8 +371,13 @@ export function buildTemporalHints(clock: ReferenceClock): AdvancedContextPackag
     today: formatDay(reference, clock.timezone),
     yesterday: formatDay(shiftDays(reference, -1), clock.timezone),
     tomorrow: formatDay(shiftDays(reference, 1), clock.timezone),
-    nextFriday: nextWeekday(reference, clock.timezone, 'Friday'),
+    nextSunday: nextWeekday(reference, clock.timezone, 'Sunday'),
     nextMonday: nextWeekday(reference, clock.timezone, 'Monday'),
+    nextTuesday: nextWeekday(reference, clock.timezone, 'Tuesday'),
+    nextFriday: nextWeekday(reference, clock.timezone, 'Friday'),
+    nextWednesday: nextWeekday(reference, clock.timezone, 'Wednesday'),
+    nextThursday: nextWeekday(reference, clock.timezone, 'Thursday'),
+    nextSaturday: nextWeekday(reference, clock.timezone, 'Saturday'),
   };
 }
 

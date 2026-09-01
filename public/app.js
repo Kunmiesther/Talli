@@ -11,6 +11,10 @@ const DEFAULT_WORKSPACE_NOTE =
 const SAFE_FAILURE_NOTICE =
   "Talli couldn't process that update right now. Nothing was changed. Please try again.";
 
+const API_REQUEST_TIMEOUT_MS = 30_000;
+const API_TIMEOUT_NOTICE =
+  'Talli timed out while updating your ledger. Nothing was changed. Please try again.';
+
 const dateFormatter = new Intl.DateTimeFormat('en-NG', {
   day: 'numeric',
   month: 'short',
@@ -396,7 +400,7 @@ function renderCustomerList() {
         >
           <span class="customer-row__name">${escapeHtml(customer.displayName)}</span>
           <span class="customer-row__balance">${escapeHtml(balance)}</span>
-          <span class="customer-row__status">${escapeHtml(statusText)} &middot; ${escapeHtml(aliasText)}</span>
+          <span class="customer-row__status">${escapeHtml(statusText)} · ${escapeHtml(aliasText)}</span>
           <span class="customer-row__due">${escapeHtml(dueText)}</span>
         </button>
       `;
@@ -415,7 +419,7 @@ function renderPendingTurn() {
         <span class="turn__badge">
           <i class="fa-solid fa-spinner fa-spin"></i>
           Processing
-          &middot; Update
+          · Update
         </span>
         <time class="turn__time">${escapeHtml(formatDateTime(state.pendingSubmission.timestamp))}</time>
       </div>
@@ -450,7 +454,7 @@ function renderActivityFeed() {
             <span class="turn__badge">
               <i class="fa-solid ${statusIcon(response.status)}"></i>
               ${escapeHtml(statusLabel(response.status))}
-              &middot; ${escapeHtml(actionLabel(response.action?.type))}
+              · ${escapeHtml(actionLabel(response.action?.type))}
             </span>
             <time class="turn__time">${escapeHtml(formatDateTime(item.timestamp))}</time>
           </div>
@@ -485,7 +489,7 @@ function renderResponseBlock(response) {
     extra.push(
       `<div class="turn-chip">
         <span class="turn-chip__label">Ledger update</span>
-        <span class="turn-chip__copy">${escapeHtml(response.ledgerChange.customerName)} &middot; ${escapeHtml(outstanding)}</span>
+        <span class="turn-chip__copy">${escapeHtml(response.ledgerChange.customerName)} · ${escapeHtml(outstanding)}</span>
       </div>`,
     );
   }
@@ -523,7 +527,7 @@ function renderClarification() {
       return `
         <button class="candidate" type="button" data-candidate-suggestion="${escapeHtml(suggestion)}">
           <strong class="candidate__title">${escapeHtml(candidate.displayName)}</strong>
-          <span class="candidate__detail">${escapeHtml(kindLabel)} &middot; tap to fill a safe follow-up</span>
+          <span class="candidate__detail">${escapeHtml(kindLabel)} · tap to fill a safe follow-up</span>
         </button>
       `;
     })
@@ -679,7 +683,7 @@ function renderObligationItem(obligation) {
   const meta = [
     obligation.dueAt ? `Due ${formatDate(obligation.dueAt)}` : 'No due date',
     `${formatMoney(obligation.totalPaidMinor)} paid`,
-  ].join(' &middot; ');
+  ].join(' · ');
 
   return `
     <article class="obligation-item">
@@ -727,7 +731,7 @@ function eventCopy(event) {
     case 'customer.created':
       return `${event.displayName} added on ${formatDateTime(event.timestamp)}.`;
     case 'obligation.created':
-      return `${formatMoney(event.originalAmountMinor)} opened${event.dueAt ? ` &middot; due ${formatDate(event.dueAt)}` : ''}.`;
+      return `${formatMoney(event.originalAmountMinor)} opened${event.dueAt ? ` · due ${formatDate(event.dueAt)}` : ''}.`;
     case 'payment.recorded':
       return `${formatMoney(event.amountMinor)} moved from ${formatMoney(event.outstandingBeforeMinor)} to ${formatMoney(event.outstandingAfterMinor)} outstanding.`;
     case 'obligation.corrected':
@@ -917,32 +921,45 @@ function clearNotice() {
 }
 
 async function apiRequest(path, options = {}) {
-  const response = await fetch(path, {
-    credentials: 'same-origin',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers ?? {}),
-    },
-    ...options,
-  });
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), API_REQUEST_TIMEOUT_MS);
 
-  const text = await response.text();
-  let body = null;
-  if (text) {
-    try {
-      body = JSON.parse(text);
-    } catch {
-      body = text;
+  try {
+    const response = await fetch(path, {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers ?? {}),
+      },
+      ...options,
+      signal: controller.signal,
+    });
+
+    const text = await response.text();
+    let body = null;
+    if (text) {
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = text;
+      }
     }
-  }
 
-  if (!response.ok && path !== '/api/message') {
-    const error = new Error(`Request failed with status ${response.status}`);
-    error.body = body;
+    if (!response.ok) {
+      const error = new Error(`Request failed with status ${response.status}`);
+      error.body = body;
+      throw error;
+    }
+
+    return body;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(API_TIMEOUT_NOTICE);
+    }
     throw error;
+  } finally {
+    window.clearTimeout(timeoutId);
   }
-
-  return body;
 }
 
 const api = {
@@ -1167,6 +1184,10 @@ async function submitComposer() {
       renderAll();
     }
   } catch (error) {
+    const failureNotice =
+      error instanceof Error && error.message === API_TIMEOUT_NOTICE
+        ? API_TIMEOUT_NOTICE
+        : SAFE_FAILURE_NOTICE;
     state.conversation = [
       ...state.conversation,
       {
@@ -1175,7 +1196,7 @@ async function submitComposer() {
         text,
         response: {
           status: 'error',
-          message: SAFE_FAILURE_NOTICE,
+          message: failureNotice,
           action: { type: 'NO_ACTION' },
           ledgerChange: null,
           clarification: null,
@@ -1187,7 +1208,7 @@ async function submitComposer() {
       },
     ].slice(-24);
     state.pendingSubmission = null;
-    state.notice = SAFE_FAILURE_NOTICE;
+    setNotice(failureNotice);
     console.error(error);
   } finally {
     state.sending = false;

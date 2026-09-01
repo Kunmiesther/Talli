@@ -93,6 +93,18 @@ export class TelegramBotApiTransport implements TelegramTransport {
     });
   }
 
+  async setMyCommands(
+    commands: Array<{ command: string; description: string }>,
+    scope?: Record<string, unknown> | null,
+    languageCode?: string | null,
+  ): Promise<boolean> {
+    return this.callApi<boolean>('setMyCommands', {
+      commands,
+      ...(scope ? { scope } : {}),
+      ...(languageCode ? { language_code: languageCode } : {}),
+    });
+  }
+
   async getWebhookInfo(): Promise<TelegramWebhookInfo> {
     return this.callApi<TelegramWebhookInfo>('getWebhookInfo');
   }

@@ -1,3 +1,5 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { readRequiredEnv } from '../../app/runtime-env.js';
 import {
   buildTelegramWebhookUrl,
@@ -5,6 +7,13 @@ import {
   readTelegramWebhookSecret,
 } from './config.js';
 import { TelegramBotApiTransport } from './http-transport.js';
+
+export const TELEGRAM_COMMAND_MENU = [
+  { command: 'start', description: 'Start Talli or connect your account' },
+  { command: 'help', description: 'See how to use Talli' },
+  { command: 'balance', description: 'View your outstanding credit summary' },
+  { command: 'customers', description: 'View customers and their balances' },
+] as const;
 
 function readCommandArgument(name: string): string | null {
   const index = process.argv.findIndex((entry) => entry === name);
@@ -36,14 +45,19 @@ async function setWebhook(): Promise<void> {
   const secret = readTelegramWebhookSecret();
   const transport = new TelegramBotApiTransport(botToken);
   const result = await transport.setWebhook(webhookUrl, secret);
+  const commandsResult = await transport.setMyCommands(
+    TELEGRAM_COMMAND_MENU.map((entry) => ({ ...entry })),
+  );
   const info = await transport.getWebhookInfo();
 
   console.log(
     JSON.stringify(
       {
         ok: result,
+        commandsOk: commandsResult,
         webhookUrl,
         secretConfigured: Boolean(secret),
+        commands: TELEGRAM_COMMAND_MENU,
         webhookInfo: info,
       },
       null,
@@ -76,7 +90,9 @@ async function main() {
   throw new Error('Usage: tsx src/integrations/telegram/run-webhook-admin.ts <set|info>');
 }
 
-main().catch((error: unknown) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exitCode = 1;
-});
+if (resolve(process.argv[1] ?? '') === resolve(fileURLToPath(import.meta.url))) {
+  main().catch((error: unknown) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  });
+}

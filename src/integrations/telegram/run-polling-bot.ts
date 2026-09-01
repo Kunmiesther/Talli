@@ -1,22 +1,16 @@
-import { loadLocalEnvFile, readRequiredEnv } from '../../app/runtime-env.js';
 import { createTalliService } from '../../app/talli-service.js';
 import { createConfiguredSpeechTranscriber } from '../transcription/speech-transcriber.js';
+import { readTelegramBotRuntimeConfig } from './config.js';
 import { TelegramBotApiTransport } from './http-transport.js';
 import { TelegramPollingBot } from './polling-bot.js';
 import { TelegramConversationService } from './telegram-service.js';
 
 function readTelegramConfig(): { token: string; username: string } {
-  loadLocalEnvFile();
-  return {
-    token: readRequiredEnv(
-      'TELEGRAM_BOT_TOKEN',
-      'TELEGRAM_BOT_TOKEN is required to run the Telegram polling bot.',
-    ),
-    username: readRequiredEnv(
-      'TELEGRAM_BOT_USERNAME',
-      'TELEGRAM_BOT_USERNAME is required to build Telegram deep links.',
-    ),
-  };
+  const config = readTelegramBotRuntimeConfig();
+  if (!config) {
+    throw new Error('TELEGRAM_BOT_TOKEN is required to run the Telegram polling bot.');
+  }
+  return config;
 }
 
 async function main() {

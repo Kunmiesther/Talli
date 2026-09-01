@@ -17,7 +17,9 @@
     "demo:reset": "tsx src/app/demo.ts reset",
     "dev:api": "tsx src/app/server.ts",
     "telegram:poll": "tsx src/integrations/telegram/run-polling-bot.ts",
-    "dev:telegram": "tsx src/integrations/telegram/run-polling-bot.ts"
+    "dev:telegram": "tsx src/integrations/telegram/run-polling-bot.ts",
+    "telegram:webhook:set": "tsx src/integrations/telegram/run-webhook-admin.ts set",
+    "telegram:webhook:info": "tsx src/integrations/telegram/run-webhook-admin.ts info"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.3.1",

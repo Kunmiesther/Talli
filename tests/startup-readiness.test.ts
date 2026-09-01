@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { loadLocalEnvFile, readRequiredEnv } from '../src/app/runtime-env.js';
 import { createConfiguredTalliStore } from '../src/app/storage-factory.js';
 import { SupabaseTalliSessionStore } from '../src/app/supabase-storage.js';
+import { readTelegramBotRuntimeConfig } from '../src/integrations/telegram/config.js';
 
 function snapshotEnv(keys: string[]): Record<string, string | undefined> {
   return Object.fromEntries(keys.map((key) => [key, process.env[key]]));
@@ -73,6 +74,27 @@ describe('startup readiness', () => {
 
       const store = createConfiguredTalliStore();
       expect(store).toBeInstanceOf(SupabaseTalliSessionStore);
+    } finally {
+      restoreEnv(snapshot);
+    }
+  });
+
+  it('requires a Telegram username when a Telegram bot token is configured', () => {
+    const snapshot = snapshotEnv(['TELEGRAM_BOT_TOKEN', 'TELEGRAM_BOT_USERNAME']);
+
+    try {
+      process.env.TELEGRAM_BOT_TOKEN = 'telegram-bot-token';
+      Reflect.deleteProperty(process.env, 'TELEGRAM_BOT_USERNAME');
+
+      expect(() => readTelegramBotRuntimeConfig()).toThrow(
+        'TELEGRAM_BOT_USERNAME is required when TELEGRAM_BOT_TOKEN is configured.',
+      );
+
+      process.env.TELEGRAM_BOT_USERNAME = '@UseTalliBot';
+      expect(readTelegramBotRuntimeConfig()).toMatchObject({
+        token: 'telegram-bot-token',
+        username: 'UseTalliBot',
+      });
     } finally {
       restoreEnv(snapshot);
     }

@@ -1,4 +1,9 @@
-import type { TelegramFile, TelegramTransport, TelegramUpdate } from './types.js';
+import type {
+  TelegramFile,
+  TelegramTransport,
+  TelegramUpdate,
+  TelegramWebhookInfo,
+} from './types.js';
 
 interface TelegramApiResponse<T> {
   ok: boolean;
@@ -78,5 +83,23 @@ export class TelegramBotApiTransport implements TelegramTransport {
       throw new Error(`Failed to download Telegram file ${filePath}.`);
     }
     return new Uint8Array(await response.arrayBuffer());
+  }
+
+  async setWebhook(url: string, secretToken?: string | null): Promise<boolean> {
+    return this.callApi<boolean>('setWebhook', {
+      url,
+      ...(secretToken ? { secret_token: secretToken } : {}),
+      allowed_updates: ['message'],
+    });
+  }
+
+  async getWebhookInfo(): Promise<TelegramWebhookInfo> {
+    return this.callApi<TelegramWebhookInfo>('getWebhookInfo');
+  }
+
+  async deleteWebhook(dropPendingUpdates = false): Promise<boolean> {
+    return this.callApi<boolean>('deleteWebhook', {
+      drop_pending_updates: dropPendingUpdates,
+    });
   }
 }

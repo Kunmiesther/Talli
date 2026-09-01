@@ -3,11 +3,22 @@ import { readFile } from 'node:fs/promises';
 import { type IncomingMessage, type Server, createServer } from 'node:http';
 import { dirname, extname, relative, resolve } from 'node:path';
 import { URL, fileURLToPath } from 'node:url';
+import {
+  buildTelegramDeepLink,
+  readTelegramWebhookSecret,
+} from '../integrations/telegram/config.js';
+import type { TelegramConversationService } from '../integrations/telegram/telegram-service.js';
+import type { TelegramUpdate } from '../integrations/telegram/types.js';
 import type { TalliMessageInput, TalliService } from './talli-service.js';
 
 export interface TalliApiResponse<T = unknown> {
   status: number;
   body: T;
+}
+
+export interface TalliHttpServerOptions {
+  telegramConversation?: TelegramConversationService | null;
+  telegramWebhookSecret?: string | null;
 }
 
 async function readJsonBody(request: Request): Promise<unknown> {
@@ -183,7 +194,11 @@ async function serveFrontendAsset(pathname: string): Promise<Response | null> {
   return null;
 }
 
-async function routeRequest(service: TalliService, request: Request): Promise<Response> {
+async function routeRequest(
+  service: TalliService,
+  request: Request,
+  options: TalliHttpServerOptions = {},
+): Promise<Response> {
   const url = new URL(request.url);
 
   if (request.method === 'GET' || request.method === 'HEAD') {
@@ -258,9 +273,7 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
     const sessionId = await resolveSessionId(service, request);
     const token = await service.createTelegramLinkToken(sessionId);
     const botUsername = normalizeTelegramUsername(process.env.TELEGRAM_BOT_USERNAME);
-    const deepLink = botUsername
-      ? `https://t.me/${botUsername}?start=link_${token.token}`
-      : `https://t.me/?start=link_${token.token}`;
+    const deepLink = buildTelegramDeepLink(botUsername, token.token);
     return jsonResponse(200, {
       ok: true,
       linkToken: token.token,
@@ -306,6 +319,45 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
       );
     }
     return response;
+  }
+
+  if (request.method === 'POST' && url.pathname === '/api/telegram/webhook') {
+    const configuredSecret = options.telegramWebhookSecret ?? readTelegramWebhookSecret() ?? null;
+    if (configuredSecret) {
+      const providedSecret = request.headers.get('x-telegram-bot-api-secret-token');
+      if (providedSecret !== configuredSecret) {
+        return jsonResponse(401, {
+          ok: false,
+          status: 'unauthorized',
+          message: 'Invalid Telegram webhook secret.',
+        });
+      }
+    }
+
+    const telegramConversation = options.telegramConversation ?? null;
+    if (!telegramConversation) {
+      return jsonResponse(503, {
+        ok: false,
+        status: 'unavailable',
+        message: 'Telegram webhook handling is not configured.',
+      });
+    }
+
+    let update: TelegramUpdate;
+    try {
+      update = (await readJsonBody(request)) as TelegramUpdate;
+    } catch {
+      return jsonResponse(400, {
+        ok: false,
+        status: 'bad_request',
+        message: 'Invalid Telegram update payload.',
+      });
+    }
+
+    await telegramConversation.handleUpdate(update);
+    return jsonResponse(200, {
+      ok: true,
+    });
   }
 
   if (request.method === 'POST' && url.pathname === '/api/auth/telegram/disconnect') {
@@ -381,9 +433,10 @@ async function routeRequest(service: TalliService, request: Request): Promise<Re
 export async function handleTalliApiRequest(
   service: TalliService,
   request: Request,
+  options: TalliHttpServerOptions = {},
 ): Promise<Response> {
   try {
-    return await routeRequest(service, request);
+    return await routeRequest(service, request, options);
   } catch (error) {
     void error;
     return jsonResponse(500, {
@@ -398,7 +451,11 @@ export async function handleTalliApiRequest(
   }
 }
 
-export function createTalliHttpServer(service: TalliService, port: number): Server {
+export function createTalliHttpServer(
+  service: TalliService,
+  port: number,
+  options: TalliHttpServerOptions = {},
+): Server {
   return createServer(async (req: IncomingMessage, res) => {
     const method = req.method ?? 'GET';
     const host = req.headers.host ?? `127.0.0.1:${port}`;
@@ -423,7 +480,7 @@ export function createTalliHttpServer(service: TalliService, port: number): Serv
       body: chunks.length > 0 ? Buffer.concat(chunks) : undefined,
     });
 
-    const response = await handleTalliApiRequest(service, request);
+    const response = await handleTalliApiRequest(service, request, options);
     res.statusCode = response.status;
     response.headers.forEach((value, key) => {
       res.setHeader(key, value);

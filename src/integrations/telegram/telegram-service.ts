@@ -40,6 +40,8 @@ const SAFE_VOICE_TOO_LARGE_MESSAGE =
   'That voice note is too long. Please send a shorter voice note or type the update.';
 const SAFE_VOICE_PROCESS_FAILURE_MESSAGE =
   "Talli couldn't process that voice note. Please try again or send the update as text.";
+const WELCOME_MESSAGE =
+  'Welcome to Talli. Send updates naturally, or use /help, /balance, and /customers.';
 
 export interface TelegramVoiceHandlingOptions {
   tempDirRoot?: string;
@@ -192,6 +194,17 @@ export class TelegramConversationService {
       await this.transport.sendMessage(
         message.chat.id,
         'Telegram connected. Open Talli on the web to see the same ledger.',
+      );
+      return;
+    }
+
+    if (normalizeCommand(text) === '/start') {
+      const linked = await this.service.store.getTelegramLink(String(from.id));
+      await this.transport.sendMessage(
+        message.chat.id,
+        linked
+          ? 'Telegram is connected. Send updates naturally, or use /help, /balance, and /customers.'
+          : WELCOME_MESSAGE,
       );
       return;
     }

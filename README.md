@@ -202,6 +202,8 @@ TRANSCRIPTION_MODEL=
 # Telegram
 TELEGRAM_BOT_TOKEN=
 TELEGRAM_BOT_USERNAME=UseTalliBot
+TELEGRAM_WEBHOOK_SECRET=
+TALLI_PUBLIC_URL=https://talli.onrender.com
 
 # Persistent storage
 TALLI_STORAGE_DRIVER=supabase
@@ -230,6 +232,19 @@ npm run dev:telegram
 ```
 
 The web service and Telegram worker use the same configured storage, which is what allows both interfaces to operate on one merchant ledger.
+Do not run polling and webhook delivery against the same bot at the same time.
+
+For production webhook delivery on Render, register the webhook once after deployment:
+
+```bash
+npm run telegram:webhook:set
+```
+
+To inspect the current Telegram webhook status:
+
+```bash
+npm run telegram:webhook:info
+```
 
 ### Tests and quality checks
 
